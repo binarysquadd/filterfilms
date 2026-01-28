@@ -1,6 +1,6 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Plus, Edit, Trash2, X, Upload, Loader2, Package as PackageIcon } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '@/app/src/components/ui/button';
@@ -53,12 +53,6 @@ export default function PackageManagement({ initialPackages }: Props) {
   });
 
   useEffect(() => {
-    if (!initialPackages || initialPackages.length === 0) {
-      fetchPackages();
-    }
-  }, []);
-
-  useEffect(() => {
     return () => {
       if (localPreview) {
         URL.revokeObjectURL(localPreview);
@@ -66,7 +60,7 @@ export default function PackageManagement({ initialPackages }: Props) {
     };
   }, [localPreview]);
 
-  const fetchPackages = async () => {
+  const fetchPackages = useCallback(async () => {
     setIsFetchingPackages(true);
     try {
       const response = await fetch('/api/admin/package', {
@@ -85,7 +79,13 @@ export default function PackageManagement({ initialPackages }: Props) {
     } finally {
       setIsFetchingPackages(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (!initialPackages || initialPackages.length === 0) {
+      fetchPackages();
+    }
+  }, [initialPackages, fetchPackages]);
 
   const resetForm = () => {
     setFormData({

@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 /**
  * GET — single package group
  */
-export async function GET(req: NextRequest, context: { params: Promise<{ packageId: string }> }) {
+export async function GET(_req: NextRequest, context: { params: Promise<{ packageId: string }> }) {
   const session = await getServerSession();
 
   if (!session || !['admin', 'customer'].includes(session.role)) {

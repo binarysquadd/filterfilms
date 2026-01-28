@@ -1,15 +1,7 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import {
-  Plus,
-  Trash2,
-  X,
-  Video,
-  Loader2,
-  Image as ImageIcon,
-  UploadCloud,
-} from 'lucide-react';
+import React, { useEffect, useState, useCallback } from 'react';
+import { Plus, Trash2, X, Video, Loader2, Image as ImageIcon, UploadCloud } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/app/src/components/ui/button';
@@ -18,9 +10,6 @@ import { eventTypes, Gallery, EventType, CategoryValue } from '@/app/types/galle
 import { Label } from '@/app/src/components/ui/label';
 import toast from 'react-hot-toast';
 import DeleteModal from '@/app/src/components/common/modal/delete-modal';
-
-
-
 
 interface Props {
   initialGallery?: Gallery[];
@@ -60,14 +49,7 @@ export default function ManageGallery({ initialGallery }: Props) {
     category: eventTypes.Wedding.categories[0].value,
   });
 
-  /* ----------------------------------------
-     FETCH
-  ----------------------------------------- */
-  useEffect(() => {
-    if (!initialGallery) fetchGallery();
-  }, []);
-
-  const fetchGallery = async () => {
+  const fetchGallery = useCallback(async () => {
     setIsFetching(true);
     try {
       const res = await fetch('/api/admin/gallery');
@@ -78,7 +60,13 @@ export default function ManageGallery({ initialGallery }: Props) {
     } finally {
       setIsFetching(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (!initialGallery || initialGallery.length === 0) {
+      fetchGallery();
+    }
+  }, [initialGallery, fetchGallery]);
 
   /* CLEAN PREVIEWS */
   useEffect(() => {
@@ -120,11 +108,7 @@ export default function ManageGallery({ initialGallery }: Props) {
         finalUrl = await uploadFile(imageFile);
       }
 
-      if (
-        formData.type === 'video' &&
-        formData.videoSource === 'upload' &&
-        videoFile
-      ) {
+      if (formData.type === 'video' && formData.videoSource === 'upload' && videoFile) {
         finalUrl = await uploadFile(videoFile);
       }
 
@@ -258,9 +242,9 @@ export default function ManageGallery({ initialGallery }: Props) {
       {isModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
           <div className="relative flex justify-between border-b pb-2 mb-4">
-              <h2 className="text-xl font-bold">Add Gallery Item</h2>
-              <X onClick={closeModal} className="cursor-pointer" />
-            </div>
+            <h2 className="text-xl font-bold">Add Gallery Item</h2>
+            <X onClick={closeModal} className="cursor-pointer" />
+          </div>
           <form
             onSubmit={handleSubmit}
             className="bg-card w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-xl p-6 space-y-4"
@@ -293,9 +277,7 @@ export default function ManageGallery({ initialGallery }: Props) {
                   <Input
                     type="radio"
                     checked={formData.videoSource === 'external'}
-                    onChange={() =>
-                      setFormData({ ...formData, videoSource: 'external', url: '' })
-                    }
+                    onChange={() => setFormData({ ...formData, videoSource: 'external', url: '' })}
                   />
                   Video URL
                 </Label>
@@ -304,9 +286,7 @@ export default function ManageGallery({ initialGallery }: Props) {
                   <Input
                     type="radio"
                     checked={formData.videoSource === 'upload'}
-                    onChange={() =>
-                      setFormData({ ...formData, videoSource: 'upload', url: '' })
-                    }
+                    onChange={() => setFormData({ ...formData, videoSource: 'upload', url: '' })}
                   />
                   Upload Video
                 </Label>
@@ -314,20 +294,17 @@ export default function ManageGallery({ initialGallery }: Props) {
             )}
             {/* TITLE */}
             <div className="">
-              <Label className=''>Event Title</Label>
+              <Label className="">Event Title</Label>
               <Input
                 placeholder="Title"
                 required
                 value={formData.title}
-                onChange={(e) =>
-                  setFormData({ ...formData, title: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               />
             </div>
 
             {/* ================= MEDIA INPUTS ================= */}
             <div className="space-y-4">
-
               {/* PHOTO UPLOAD */}
               {formData.type === 'photo' && (
                 <div className="space-y-2">
@@ -372,9 +349,7 @@ export default function ManageGallery({ initialGallery }: Props) {
                     placeholder="https://youtube.com/..."
                     required
                     value={formData.url}
-                    onChange={(e) =>
-                      setFormData({ ...formData, url: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, url: e.target.value })}
                   />
                 </div>
               )}
@@ -390,9 +365,7 @@ export default function ManageGallery({ initialGallery }: Props) {
                       type="file"
                       accept="video/*"
                       required
-                      onChange={(e) =>
-                        setVideoFile(e.target.files?.[0] || null)
-                      }
+                      onChange={(e) => setVideoFile(e.target.files?.[0] || null)}
                       className="absolute inset-0 opacity-0 cursor-pointer z-10"
                     />
 
@@ -445,9 +418,7 @@ export default function ManageGallery({ initialGallery }: Props) {
                   </div>
                 </div>
               )}
-
             </div>
-
 
             {/* ================= EVENT & CATEGORY ================= */}
             <div className="space-y-4">
@@ -498,7 +469,6 @@ export default function ManageGallery({ initialGallery }: Props) {
                 </select>
               </div>
             </div>
-
 
             <div className="flex flex-row mt-6">
               <Button variant="cancel" size={'sm'} onClick={closeModal} className="mr-2 w-full">

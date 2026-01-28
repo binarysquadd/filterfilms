@@ -1,7 +1,7 @@
 'use client';
 
 import { Loader2, Check, Clock, ShoppingCart } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Button } from '@/app/src/components/ui/button';
 import { Badge } from '@/app/src/components/ui/badge';
@@ -37,17 +37,33 @@ export default function CustomerPackagesPage() {
   const [expandedPackage, setExpandedPackage] = useState<PackageWithCategory | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
 
+  const loadCartFromStorage = useCallback(() => {
+    const saved = localStorage.getItem('bookingCart');
+    if (!saved) return;
+
+    try {
+      setCart(JSON.parse(saved) as CartItem[]);
+    } catch {
+      localStorage.removeItem('bookingCart');
+      setCart([]);
+    }
+  }, []);
+
+  const fetchPackages = useCallback(async () => {
+    setFetchingPackages(true);
+    try {
+      const res = await fetch('/api/admin/package');
+      const data = await res.json();
+      setPackageGroups(data.packages || []);
+    } finally {
+      setFetchingPackages(false);
+    }
+  }, []);
+
   useEffect(() => {
     fetchPackages();
     loadCartFromStorage();
-  }, []);
-
-  /* ---------------- CART ---------------- */
-
-  const loadCartFromStorage = () => {
-    const saved = localStorage.getItem('bookingCart');
-    if (saved) setCart(JSON.parse(saved));
-  };
+  }, [fetchPackages, loadCartFromStorage]);
 
   const saveCartToStorage = (data: CartItem[]) => {
     localStorage.setItem('bookingCart', JSON.stringify(data));
@@ -83,16 +99,6 @@ export default function CustomerPackagesPage() {
     setCart(updated);
     saveCartToStorage(updated);
     toast.success(`${pkg.name} added to cart`);
-  };
-
-  /* ---------------- DATA ---------------- */
-
-  const fetchPackages = async () => {
-    setFetchingPackages(true);
-    const res = await fetch('/api/admin/package');
-    const data = await res.json();
-    setPackageGroups(data.packages || []);
-    setFetchingPackages(false);
   };
 
   const formatPrice = (price: number) =>

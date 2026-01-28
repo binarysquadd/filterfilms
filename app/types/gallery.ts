@@ -11,7 +11,6 @@ export interface Gallery {
   updatedAt: string;
 }
 
-
 export type CategoryValue =
   | 'ceremony'
   | 'bridal'
@@ -33,13 +32,11 @@ export type CategoryValue =
   | 'candid'
   | 'bridal-portraits'
   | 'wedding-films'
-  | 'decor-details'
-
+  | 'decor-details';
 
 export type EventConfig = {
   categories: { label: string; value: CategoryValue }[];
 };
-
 
 export const eventTypes: Record<string, EventConfig> = {
   Wedding: {

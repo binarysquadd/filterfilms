@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Save, Building, Mail, Phone, Globe, Loader2 } from 'lucide-react';
 import { useToast } from '@/app/hooks/use-toast';
 import { Input } from '@/app/src/components/ui/input';
@@ -25,36 +25,16 @@ const AdminSettings: React.FC = () => {
     socialYoutube: '',
   });
 
-  // Fetch settings on mount
-  useEffect(() => {
-    fetchSettings();
-  }, []);
-
-  const fetchSettings = async () => {
+  const fetchSettings = useCallback(async () => {
     setIsFetching(true);
     try {
       const response = await fetch('/api/admin/setting');
       const data = await response.json();
 
       if (response.ok && data.settings) {
-        // If settings exist, use the first one (assuming single settings record)
-        if (Array.isArray(data.settings) && data.settings.length > 0) {
-          const setting = data.settings[0];
-          setSettingId(setting.id);
-          setSettings({
-            businessName: setting.businessName || '',
-            email: setting.email || '',
-            phone: setting.phone || '',
-            address: setting.address || '',
-            website: setting.website || '',
-            description: setting.description || '',
-            socialFacebook: setting.socialFacebook || '',
-            socialInstagram: setting.socialInstagram || '',
-            socialYoutube: setting.socialYoutube || '',
-          });
-        } else if (!Array.isArray(data.settings)) {
-          // Single setting object
-          const setting = data.settings;
+        const setting = Array.isArray(data.settings) ? data.settings[0] : data.settings;
+
+        if (setting) {
           setSettingId(setting.id);
           setSettings({
             businessName: setting.businessName || '',
@@ -68,14 +48,7 @@ const AdminSettings: React.FC = () => {
             socialYoutube: setting.socialYoutube || '',
           });
         }
-      } else if (
-        response.status === 404 ||
-        (Array.isArray(data.settings) && data.settings.length === 0)
-      ) {
-        // No settings found - this is okay, we'll create them on first save
-        console.log('No settings found, will create on first save');
-      } else {
-        console.error('Failed to fetch settings:', data);
+      } else if (response.status !== 404) {
         toast({
           title: 'Error',
           description: 'Failed to load settings',
@@ -92,7 +65,12 @@ const AdminSettings: React.FC = () => {
     } finally {
       setIsFetching(false);
     }
-  };
+  }, [toast]);
+
+  // Fetch settings on mount
+  useEffect(() => {
+    fetchSettings();
+  }, [fetchSettings]);
 
   const handleSave = async () => {
     setLoading(true);

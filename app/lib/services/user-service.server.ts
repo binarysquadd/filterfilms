@@ -126,7 +126,7 @@ export const userService = {
 
     // Initialize role-specific profile when role changes
     if (role === 'team' && !user.teamProfile) {
-      updates.teamProfile;
+      updates.teamProfile = {};
     } else if (role === 'customer' && !user.customerProfile) {
       updates.customerProfile = {
         preferences: [],

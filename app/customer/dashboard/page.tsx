@@ -13,7 +13,7 @@ import {
   Star,
 } from 'lucide-react';
 import { useAuth } from '@/app/lib/firebase/auth-context';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Booking } from '@/app/types/booking';
 import { Package as PackageType } from '@/app/types/package';
 import toast from 'react-hot-toast';
@@ -52,35 +52,39 @@ export default function CustomerDashboard() {
   const [packages, setPackages] = useState<PackageType[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const fetchBookings = useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/booking');
+      const data = await res.json();
+      if (res.ok) setBookings(data.bookings || []);
+    } catch (err: unknown) {
+      toast.error('Failed to load bookings.');
+      console.error('Error fetching bookings:', err);
+    }
+  }, []);
+
+  const fetchPackages = useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/package');
+      const data = await res.json();
+      if (res.ok) setPackages(data.packages || []);
+    } catch (err: unknown) {
+      console.error('Error fetching packages:', err);
+    }
+  }, []);
+
   useEffect(() => {
+    // if you want, you can early-return when user is not available
+    // if (!user) return;
+
     const loadData = async () => {
       setLoading(true);
       await Promise.all([fetchBookings(), fetchPackages()]);
       setLoading(false);
     };
+
     loadData();
-  }, [user]);
-
-  const fetchBookings = async () => {
-    try {
-      const res = await fetch('/api/admin/booking');
-      const data = await res.json();
-      if (res.ok) setBookings(data.bookings || []);
-    } catch (err) {
-      toast.error('Failed to load bookings.');
-      console.error('Error fetching bookings:', err);
-    }
-  };
-
-  const fetchPackages = async () => {
-    try {
-      const res = await fetch('/api/admin/package');
-      const data = await res.json();
-      if (res.ok) setPackages(data.packages || []);
-    } catch (err) {
-      console.error('Error fetching packages:', err);
-    }
-  };
+  }, [fetchBookings, fetchPackages, user]);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -234,7 +238,7 @@ export default function CustomerDashboard() {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-gray-900">Welcome back, {user?.name}! 👋</h1>
-        <p className="text-gray-600 mt-1">Here's an overview of your bookings and events</p>
+        <p className="text-gray-600 mt-1">Here&apos;s an overview of your bookings and events</p>
       </div>
 
       {/* Stats Grid */}

@@ -22,7 +22,8 @@ const cormorant = Cormorant_Garamond({
 
 export const metadata: Metadata = {
   title: 'Filter Films - Professional Video Production Services',
-  description: "Filter Films - Elevate Your Visual Storytelling with Our Expert Video Production Services",
+  description:
+    'Filter Films - Elevate Your Visual Storytelling with Our Expert Video Production Services',
 };
 
 export default async function RootLayout({

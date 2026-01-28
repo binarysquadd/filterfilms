@@ -1,8 +1,6 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
-  Calendar,
-  MapPin,
   Package,
   Loader2,
   CheckCircle,
@@ -14,6 +12,7 @@ import {
   ArrowRight,
   Plus,
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { useToast } from '@/app/hooks/use-toast';
 import { Button } from '@/app/src/components/ui/button';
 import { Input } from '@/app/src/components/ui/input';
@@ -41,7 +40,7 @@ interface BookingDetailsModal {
   booking: Booking | null;
 }
 
-const statusConfig: Record<BookingStatus, { label: string; color: string; icon: any }> = {
+const statusConfig: Record<BookingStatus, { label: string; color: string; icon: LucideIcon }> = {
   pending: {
     label: 'Pending',
     color: 'bg-yellow-100 text-yellow-700 border-yellow-200',
@@ -91,42 +90,14 @@ export default function CustomerBookingsPage() {
     notes: '',
   });
 
-  useEffect(() => {
-    fetchBookings();
-    loadCartFromStorage();
-  }, []);
-
-  // Load cart from localStorage
-  const loadCartFromStorage = () => {
-    try {
-      const savedCart = localStorage.getItem('bookingCart');
-      if (savedCart) {
-        setCart(JSON.parse(savedCart));
-      }
-    } catch (error) {
-      console.error('Error loading cart:', error);
-    }
-  };
-
-  // Save cart to localStorage
-  const saveCartToStorage = (cartData: CartItem[]) => {
-    try {
-      localStorage.setItem('bookingCart', JSON.stringify(cartData));
-    } catch (error) {
-      console.error('Error saving cart:', error);
-    }
-  };
-
-  const fetchBookings = async () => {
+  const fetchBookings = useCallback(async () => {
     setLoading(true);
     try {
       const response = await fetch('/api/admin/booking');
       const data = await response.json();
 
-      if (response.ok) {
-        setBookings(data.bookings || []);
-      }
-    } catch (error) {
+      if (response.ok) setBookings(data.bookings || []);
+    } catch {
       toast({
         title: 'Error',
         description: 'Failed to load bookings',
@@ -134,6 +105,29 @@ export default function CustomerBookingsPage() {
       });
     } finally {
       setLoading(false);
+    }
+  }, [toast]);
+
+  const loadCartFromStorage = useCallback(() => {
+    try {
+      const savedCart = localStorage.getItem('bookingCart');
+      if (savedCart) setCart(JSON.parse(savedCart));
+    } catch (e: unknown) {
+      console.error('Error loading cart:', e);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchBookings();
+    loadCartFromStorage();
+  }, [fetchBookings, loadCartFromStorage]);
+
+  // Save cart to localStorage
+  const saveCartToStorage = (cartData: CartItem[]) => {
+    try {
+      localStorage.setItem('bookingCart', JSON.stringify(cartData));
+    } catch (e: unknown) {
+      console.error('Error saving cart:', e);
     }
   };
 
@@ -288,7 +282,7 @@ export default function CustomerBookingsPage() {
           variant: 'destructive',
         });
       }
-    } catch (error) {
+    } catch {
       toast({
         title: 'Error',
         description: 'An unexpected error occurred',

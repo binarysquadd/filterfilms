@@ -27,7 +27,6 @@ import {
 } from '@/app/src/components/ui/select';
 import DeleteModal from '@/app/src/components/common/modal/delete-modal';
 
-
 interface TeamMember {
   id: string;
   name: string;

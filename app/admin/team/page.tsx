@@ -19,7 +19,6 @@ import {
   SelectValue,
 } from '@/app/src/components/ui/select';
 
-
 const roles = [
   { value: 'admin', label: 'Admin' },
   { value: 'team', label: 'Team' },
@@ -81,9 +80,8 @@ export default function TeamPage() {
 
         const data = await res.json();
         setTeam(data.users);
-      } catch (err) {
+      } catch {
         toast.error('Error fetching team members');
-        console.log('Fetch users error:', err);
       } finally {
         setLoading(false);
       }
@@ -201,9 +199,8 @@ export default function TeamPage() {
       setIsModalOpen(false);
       resetForm();
       router.refresh();
-    } catch (error) {
+    } catch {
       toast.error('An error occurred while saving the team member');
-      console.error('Submit error:', error);
     } finally {
       setLoading(false);
       setIsUploading(false);
