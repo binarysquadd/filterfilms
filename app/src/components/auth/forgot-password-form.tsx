@@ -9,13 +9,24 @@ import { Label } from '../ui/label';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
+type FirebaseAuthError = {
+  code?: string;
+  message?: string;
+};
+
+function isFirebaseAuthError(err: unknown): err is FirebaseAuthError {
+  return typeof err === 'object' && err !== null && ('code' in err || 'message' in err);
+}
+
 export default function ForgotPasswordForm() {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const { resetPassword } = useAuth();
 
   // Firebase auth error mapper
-  const getAuthErrorMessage = (error: any) => {
+  const getAuthErrorMessage = (error: unknown) => {
+    if (!isFirebaseAuthError(error)) return 'Failed to send reset email';
+
     switch (error.code) {
       case 'auth/user-not-found':
         return 'No account found with this email';
@@ -47,7 +58,7 @@ export default function ForgotPasswordForm() {
       await resetPassword(email);
       toast.success('Reset link sent! Check your inbox.');
       setEmail('');
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast.error(getAuthErrorMessage(err));
     } finally {
       setLoading(false);

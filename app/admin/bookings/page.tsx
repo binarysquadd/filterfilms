@@ -27,12 +27,6 @@ import {
 } from '@/app/src/components/ui/select';
 import DeleteModal from '@/app/src/components/common/modal/delete-modal';
 
-interface PackageGroup {
-  id: string;
-  category: string;
-  packages: Package[];
-}
-
 interface Package {
   id: string;
   name: string;
@@ -54,7 +48,6 @@ const bookingStatuses = [
 
 export default function ManageBookings() {
   const [bookings, setBookings] = useState<Booking[]>([]);
-  // const [packageGroups, setPackageGroups] = useState<PackageGroup[]>([]);
   const [team, setTeam] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -86,9 +79,6 @@ export default function ManageBookings() {
       if (bookingsRes.ok) {
         setBookings(bookingsData.bookings || []);
       }
-      // if (packagesRes.ok) {
-      //   setPackageGroups(packagesData.packages || []);
-      // }
       if (teamRes.ok) {
         setTeam(teamData.team || []);
       }

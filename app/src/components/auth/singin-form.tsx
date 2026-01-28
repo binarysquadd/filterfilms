@@ -9,6 +9,15 @@ import { Label } from '../ui/label';
 import { Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+type FirebaseAuthError = {
+  code?: string;
+  message?: string;
+};
+
+function isFirebaseAuthError(err: unknown): err is FirebaseAuthError {
+  return typeof err === 'object' && err !== null && ('code' in err || 'message' in err);
+}
+
 function getDashboardByRole(role: string): string {
   switch (role) {
     case 'admin':
@@ -52,23 +61,37 @@ export default function SignInForm({ callbackUrl }: { callbackUrl?: string }) {
         // Fallback to customer dashboard if session check fails
         window.location.href = callbackUrl || '/customer/dashboard';
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Sign in error:', err);
       toast.error('Sign in failed. Please try again.');
 
-      if (err.code === 'auth/user-not-found') {
-        setError('No account found with this email');
-      } else if (err.code === 'auth/wrong-password') {
-        setError('Incorrect password');
-      } else if (err.code === 'auth/invalid-email') {
-        setError('Invalid email address');
-      } else if (err.code === 'auth/invalid-credential') {
-        setError('Invalid email or password');
-      } else if (err.code === 'auth/too-many-requests') {
-        setError('Too many failed attempts. Please try again later');
-      } else {
+      if (isFirebaseAuthError(err)) {
+        if (err.code === 'auth/user-not-found') {
+          setError('No account found with this email');
+          return;
+        }
+        if (err.code === 'auth/wrong-password') {
+          setError('Incorrect password');
+          return;
+        }
+        if (err.code === 'auth/invalid-email') {
+          setError('Invalid email address');
+          return;
+        }
+        if (err.code === 'auth/invalid-credential') {
+          setError('Invalid email or password');
+          return;
+        }
+        if (err.code === 'auth/too-many-requests') {
+          setError('Too many failed attempts. Please try again later');
+          return;
+        }
+
         setError(err.message || 'Failed to sign in');
+        return;
       }
+
+      setError('Failed to sign in');
     } finally {
       setEmailLoading(false);
     }
@@ -94,17 +117,24 @@ export default function SignInForm({ callbackUrl }: { callbackUrl?: string }) {
         // Fallback to customer dashboard if session check fails
         window.location.href = callbackUrl || '/customer/dashboard';
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Google sign in error:', err);
       toast.error('Sign in with Google failed. Please try again.');
 
-      if (err.code === 'auth/popup-closed-by-user') {
-        setError('Sign in cancelled');
-      } else if (err.code === 'auth/popup-blocked') {
-        setError('Popup blocked. Please allow popups for this site');
-      } else {
+      if (isFirebaseAuthError(err)) {
+        if (err.code === 'auth/popup-closed-by-user') {
+          setError('Sign in cancelled');
+          return;
+        }
+        if (err.code === 'auth/popup-blocked') {
+          setError('Popup blocked. Please allow popups for this site');
+          return;
+        }
         setError(err.message || 'Failed to sign in with Google');
+        return;
       }
+
+      setError('Failed to sign in with Google');
     } finally {
       setGoogleLoading(false);
     }

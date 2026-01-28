@@ -1,6 +1,6 @@
 'use client';
 
-import { Loader2, Check, Clock, Star, ShoppingCart } from 'lucide-react';
+import { Loader2, Check, Clock, ShoppingCart } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Button } from '@/app/src/components/ui/button';

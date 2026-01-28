@@ -9,6 +9,15 @@ import { Label } from '../ui/label';
 import { Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+type FirebaseAuthError = {
+  code?: string;
+  message?: string;
+};
+
+function isFirebaseAuthError(err: unknown): err is FirebaseAuthError {
+  return typeof err === 'object' && err !== null && ('code' in err || 'message' in err);
+}
+
 function getDashboardByRole(role: string): string {
   switch (role) {
     case 'admin':
@@ -93,21 +102,23 @@ export default function SignUpForm({ callbackUrl }: { callbackUrl?: string }) {
         toast.success('Account created successfully!');
         window.location.href = callbackUrl || '/customer/dashboard';
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Sign up error:', err);
 
       let errorMessage = 'Failed to create account';
 
-      if (err.code === 'auth/email-already-in-use') {
-        errorMessage = 'Email already in use. Please sign in instead.';
-      } else if (err.code === 'auth/invalid-email') {
-        errorMessage = 'Invalid email address';
-      } else if (err.code === 'auth/weak-password') {
-        errorMessage = 'Password is too weak. Use at least 6 characters';
-      } else if (err.code === 'auth/operation-not-allowed') {
-        errorMessage = 'Email/password sign up is not enabled';
-      } else if (err.message) {
-        errorMessage = err.message;
+      if (isFirebaseAuthError(err)) {
+        if (err.code === 'auth/email-already-in-use') {
+          errorMessage = 'Email already in use. Please sign in instead.';
+        } else if (err.code === 'auth/invalid-email') {
+          errorMessage = 'Invalid email address';
+        } else if (err.code === 'auth/weak-password') {
+          errorMessage = 'Password is too weak. Use at least 6 characters';
+        } else if (err.code === 'auth/operation-not-allowed') {
+          errorMessage = 'Email/password sign up is not enabled';
+        } else if (err.message) {
+          errorMessage = err.message;
+        }
       }
 
       setError(errorMessage);
@@ -138,19 +149,22 @@ export default function SignUpForm({ callbackUrl }: { callbackUrl?: string }) {
         toast.success('Signed up successfully!');
         window.location.href = callbackUrl || '/customer/dashboard';
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Google sign up error:', err);
 
       let errorMessage = 'Failed to sign up with Google';
 
-      if (err.code === 'auth/popup-closed-by-user') {
-        errorMessage = 'Sign up cancelled';
-      } else if (err.code === 'auth/popup-blocked') {
-        errorMessage = 'Popup blocked. Please allow popups for this site';
-      } else if (err.code === 'auth/account-exists-with-different-credential') {
-        errorMessage = 'An account already exists with this email using a different sign-in method';
-      } else if (err.message) {
-        errorMessage = err.message;
+      if (isFirebaseAuthError(err)) {
+        if (err.code === 'auth/popup-closed-by-user') {
+          errorMessage = 'Sign up cancelled';
+        } else if (err.code === 'auth/popup-blocked') {
+          errorMessage = 'Popup blocked. Please allow popups for this site';
+        } else if (err.code === 'auth/account-exists-with-different-credential') {
+          errorMessage =
+            'An account already exists with this email using a different sign-in method';
+        } else if (err.message) {
+          errorMessage = err.message;
+        }
       }
 
       setError(errorMessage);
