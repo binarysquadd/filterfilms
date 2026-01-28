@@ -28,8 +28,9 @@ export default function GalleryPage() {
         const categoriesRes = await fetch('/api/admin/gallery/categories');
         const categoriesData = await categoriesRes.json();
         setCategories(['All', ...(categoriesData.categories || [])]);
-      } catch (err: any) {
-        setError(err.message || 'Failed to load gallery');
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : 'Failed to load gallery';
+        setError(message);
       } finally {
         setLoading(false);
       }
@@ -106,7 +107,7 @@ export default function GalleryPage() {
                   md:grid-cols-4
                 "
               >
-                {filteredGallery.map((item, index) => (
+                {filteredGallery.map((item) => (
                   <div
                     key={item.id}
                     className="relative group overflow-hidden cursor-pointer shadow-md hover:shadow-xl transition-all"

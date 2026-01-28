@@ -1,13 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Calendar, Clock, Users, TrendingUp, Loader2 } from 'lucide-react';
 import { Attendance } from '@/app/types/attendance';
 import { Button } from '@/app/src/components/ui/button';
 import { useAuth } from '@/app/lib/firebase/auth-context';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
-import { set } from 'react-hook-form';
 
 export default function TeamAttendancePage() {
   const { user } = useAuth();
@@ -21,7 +20,7 @@ export default function TeamAttendancePage() {
   const today = new Date().toISOString().split('T')[0];
 
   // Fetch attendance data
-  const fetchAttendance = async () => {
+  const fetchAttendance = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch('/api/admin/attendance');
@@ -42,11 +41,11 @@ export default function TeamAttendancePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [today, user?.id]);
 
   useEffect(() => {
     fetchAttendance();
-  }, []);
+  }, [fetchAttendance]);
 
   // Create today's attendance record
   const handleMarkAttendance = async () => {
@@ -254,7 +253,7 @@ export default function TeamAttendancePage() {
         <div className="bg-popover rounded-xl shadow-xl p-8 text-foreground">
           <div className="flex items-center gap-3 mb-6">
             <Clock className="w-8 h-8" />
-            <h2 className="text-2xl font-bold">Today's Attendance</h2>
+            <h2 className="text-2xl font-bold">Today&apos;s Attendance</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

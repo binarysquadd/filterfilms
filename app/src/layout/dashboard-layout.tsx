@@ -241,7 +241,7 @@ const UnifiedDashboard: React.FC<UnifiedDashboardProps> = ({ children }) => {
                   <h1 className="text-2xl font-bold text-gray-900 mb-2">
                     Welcome Back, {user.name || user.email?.split('@')[0]}!
                   </h1>
-                  <p className="text-gray-600">Here's your dashboard overview.</p>
+                  <p className="text-gray-600">Here&apos;s your dashboard overview.</p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

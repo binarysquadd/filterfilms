@@ -54,7 +54,7 @@ const bookingStatuses = [
 
 export default function ManageBookings() {
   const [bookings, setBookings] = useState<Booking[]>([]);
-  const [packageGroups, setPackageGroups] = useState<PackageGroup[]>([]);
+  // const [packageGroups, setPackageGroups] = useState<PackageGroup[]>([]);
   const [team, setTeam] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -77,8 +77,8 @@ export default function ManageBookings() {
       const bookingsRes = await fetch('/api/admin/booking');
       const bookingsData = await bookingsRes.json();
 
-      const packagesRes = await fetch('/api/admin/package');
-      const packagesData = await packagesRes.json();
+      // const packagesRes = await fetch('/api/admin/package');
+      // const packagesData = await packagesRes.json();
 
       const teamRes = await fetch('/api/admin/team');
       const teamData = await teamRes.json();
@@ -86,13 +86,13 @@ export default function ManageBookings() {
       if (bookingsRes.ok) {
         setBookings(bookingsData.bookings || []);
       }
-      if (packagesRes.ok) {
-        setPackageGroups(packagesData.packages || []);
-      }
+      // if (packagesRes.ok) {
+      //   setPackageGroups(packagesData.packages || []);
+      // }
       if (teamRes.ok) {
         setTeam(teamData.team || []);
       }
-    } catch (error) {
+    } catch {
       toast.error('Error fetching data');
     } finally {
       setLoading(false);
@@ -144,7 +144,7 @@ export default function ManageBookings() {
         const error = await response.json();
         toast.error(error.error || 'Failed to update status');
       }
-    } catch (error) {
+    } catch {
       toast.error('Failed to update status');
     }
   };
@@ -220,7 +220,7 @@ export default function ManageBookings() {
         const error = await response.json();
         toast.error(error.error || 'Failed to update booking');
       }
-    } catch (error) {
+    } catch {
       toast.error('Failed to update booking');
     } finally {
       setLoading(false);
@@ -246,7 +246,7 @@ export default function ManageBookings() {
         const error = await response.json();
         toast.error(error.error || 'Failed to delete booking');
       }
-    } catch (error) {
+    } catch {
       toast.error('Failed to delete booking');
     } finally {
       setDeleting(false);

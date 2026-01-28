@@ -1,5 +1,6 @@
 'use client';
-import { useEffect, useState } from 'react';
+
+import { useEffect, useState, useCallback } from 'react';
 import {
   Calendar,
   CheckCircle,
@@ -14,11 +15,20 @@ import {
   Filter,
   Loader,
 } from 'lucide-react';
-import { Attendance } from '@/app/types/attendance';
-import { User } from '@/app/types/user';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
+
+import { Attendance } from '@/app/types/attendance';
+import { User } from '@/app/types/user';
 import DeleteModal from '@/app/src/components/common/modal/delete-modal';
+
+type RawTeamMember = {
+  id: string;
+  name: string;
+  role?: string;
+  image?: string;
+  email?: string;
+};
 
 const AdminAttendancePage = () => {
   const [attendance, setAttendance] = useState<Attendance[]>([]);
@@ -34,56 +44,53 @@ const AdminAttendancePage = () => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
 
-  // Fetch attendance records
-  useEffect(() => {
-    fetchAttendance();
-  }, []);
-
-  // Fetch team members
-  useEffect(() => {
-    fetchTeamMembers();
-  }, []);
-
-  const fetchAttendance = async () => {
+  const fetchAttendance = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch('/api/admin/attendance');
       if (!response.ok) throw new Error('Failed to fetch attendance');
+
       const data = await response.json();
       setAttendance(data.attendance || []);
       setError(null);
-    } catch (err) {
+    } catch {
       setError('Failed to load attendance records');
       toast.error('Failed to load attendance records');
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const fetchTeamMembers = async () => {
+  const fetchTeamMembers = useCallback(async () => {
     try {
       const response = await fetch('/api/admin/team');
       if (!response.ok) throw new Error('Failed to fetch team members');
+
       const data = await response.json();
-      // Handle both 'members' and 'team' property names
       const members = data.members || data.team || [];
-      // Map the data to match our interface
-      const mappedMembers = members.map((member: any) => ({
+
+      const mappedMembers = (members as RawTeamMember[]).map((member) => ({
         id: member.id,
         name: member.name,
         role: member.role,
-        photo:
-          member.image ||
-          member.image ||
-          `https://api.dicebear.com/7.x/avataaars/svg?seed=${member.name}`,
+        photo: member.image || `https://api.dicebear.com/7.x/avataaars/svg?seed=${member.name}`,
         email: member.email,
       }));
+
       setTeamMembers(mappedMembers);
-    } catch (err) {
+    } catch (_err) {
       toast.error('Error loading team members');
-      console.error('❌ Error loading team members:', err);
+      console.error('❌ Error loading team members:', _err);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchAttendance();
+  }, [fetchAttendance]);
+
+  useEffect(() => {
+    fetchTeamMembers();
+  }, [fetchTeamMembers]);
 
   const handleMarkAttendance = async (
     memberId: string,
@@ -214,8 +221,8 @@ const AdminAttendancePage = () => {
 
   const filteredMembers = teamMembers.filter(
     (m) =>
-      m?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      m?.role.toLowerCase().includes(searchTerm.toLowerCase())
+      (m?.name ?? '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (m?.role ?? '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const stats = getStats();
