@@ -1,0 +1,268 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+@layer base {
+  :root {
+    --background: 60 33% 96%;
+    --foreground: 0 0% 6%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 6%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 6%;
+
+    --primary: 168 70% 18%;
+    --primary-foreground: 60 33% 96%;
+
+    --secondary: 43 65% 52%;
+    --secondary-foreground: 0 0% 6%;
+
+    --muted: 60 20% 90%;
+    --muted-foreground: 0 0% 35%;
+
+    --accent: 43 65% 52%;
+    --accent-foreground: 0 0% 6%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 60 15% 85%;
+    --input: 60 15% 85%;
+    --ring: 168 70% 18%;
+
+    --radius: 0.5rem;
+
+    /* Custom wedding theme colors */
+    --emerald: 168 70% 18%;
+    --emerald-light: 168 55% 28%;
+    --emerald-dark: 168 75% 12%;
+    --gold: 43 65% 52%;
+    --gold-light: 43 70% 65%;
+    --gold-dark: 43 60% 42%;
+    --ivory: 60 33% 96%;
+    --ivory-dark: 60 20% 90%;
+    --cream: 60 25% 93%;
+
+    /* Gradients */
+    --gradient-royal: linear-gradient(135deg, hsl(var(--emerald)) 0%, hsl(var(--emerald-dark)) 100%);
+    --gradient-gold: linear-gradient(135deg, hsl(var(--gold)) 0%, hsl(var(--gold-dark)) 100%);
+    --gradient-elegant: linear-gradient(180deg, hsl(var(--ivory)) 0%, hsl(var(--cream)) 100%);
+
+    /* Shadows */
+    --shadow-elegant: 0 10px 40px -10px hsl(var(--emerald) / 0.15);
+    --shadow-card: 0 4px 20px -4px hsl(var(--emerald) / 0.1);
+    --shadow-gold: 0 8px 30px -8px hsl(var(--gold) / 0.3);
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 0 0% 6%;
+    --sidebar-primary: 168 70% 18%;
+    --sidebar-primary-foreground: 60 33% 96%;
+    --sidebar-accent: 43 65% 52%;
+    --sidebar-accent-foreground: 0 0% 6%;
+    --sidebar-border: 60 15% 85%;
+    --sidebar-ring: 168 70% 18%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    @apply bg-background text-foreground;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+  }
+}
+
+@layer components {
+  .text-gradient-gold {
+    @apply bg-gradient-to-r from-gold via-gold-light to-gold bg-clip-text text-transparent;
+  }
+
+  .bg-gradient-royal {
+    background: var(--gradient-royal);
+  }
+
+  .bg-gradient-gold {
+    background: var(--gradient-gold);
+  }
+
+  .bg-gradient-elegant {
+    background: var(--gradient-elegant);
+  }
+
+  .shadow-elegant {
+    box-shadow: var(--shadow-elegant);
+  }
+
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+
+  .shadow-gold {
+    box-shadow: var(--shadow-gold);
+  }
+
+  /* Mandala pattern overlay */
+  .mandala-pattern {
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23D4AF37' fill-opacity='0.08'%3E%3Cpath d='M30 30c0-11.046 8.954-20 20-20s20 8.954 20 20-8.954 20-20 20-20-8.954-20-20zM10 30c0 11.046-8.954 20-20 20S-30 41.046-30 30s8.954-20 20-20 20 8.954 20 20z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  /* Floral border pattern */
+  .floral-border {
+    border-image: linear-gradient(90deg, hsl(var(--gold)) 0%, hsl(var(--gold-light)) 50%, hsl(var(--gold)) 100%) 1;
+  }
+
+  /* Elegant card hover */
+  .card-hover {
+    @apply transition-all duration-500 hover:shadow-elegant hover:-translate-y-1;
+  }
+
+  /* Gold shimmer animation */
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--gold) / 0) 0%,
+      hsl(var(--gold) / 0.3) 50%,
+      hsl(var(--gold) / 0) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  /* Fade in animation */
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Scale in animation */
+  .animate-scale-in {
+    animation: scaleIn 0.5s ease-out forwards;
+  }
+
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  /* Slide up animation */
+  .animate-slide-up {
+    animation: slideUp 0.5s ease-out forwards;
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Pulse glow */
+  .pulse-glow {
+    animation: pulseGlow 2s ease-in-out infinite;
+  }
+
+  @keyframes pulseGlow {
+    0%, 100% {
+      box-shadow: 0 0 20px hsl(var(--gold) / 0.3);
+    }
+    50% {
+      box-shadow: 0 0 40px hsl(var(--gold) / 0.5);
+    }
+  }
+
+  /* Decorative corner ornament */
+  .ornament-corner {
+    position: relative;
+  }
+
+  .ornament-corner::before,
+  .ornament-corner::after {
+    content: '❧';
+    position: absolute;
+    color: hsl(var(--gold));
+    font-size: 1.5rem;
+    opacity: 0.6;
+  }
+
+  .ornament-corner::before {
+    top: -0.5rem;
+    left: -0.5rem;
+    transform: rotate(-45deg);
+  }
+
+  .ornament-corner::after {
+    bottom: -0.5rem;
+    right: -0.5rem;
+    transform: rotate(135deg);
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .delay-100 { animation-delay: 100ms; }
+  .delay-200 { animation-delay: 200ms; }
+  .delay-300 { animation-delay: 300ms; }
+  .delay-400 { animation-delay: 400ms; }
+  .delay-500 { animation-delay: 500ms; }
+}
+
+
+@media print {
+  body {
+    background: white !important;
+  }
+
+  #invoice {
+    width: 100%;
+    box-shadow: none !important;
+    margin: 0;
+  }
+
+  button {
+    display: none !important;
+  }
+}
