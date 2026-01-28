@@ -85,8 +85,9 @@ export default function CustomersPage() {
       const data = await res.json();
       setCustomers(data.customers || []);
       setFilteredCustomers(data.customers || []);
-    } catch (err) {
+    } catch (error) {
       toast.error('Error fetching customers');
+      console.log('Fetch customers error:', error);
     } finally {
       setLoading(false);
     }
@@ -185,9 +186,11 @@ export default function CustomersPage() {
         router.refresh();
       } else {
         toast.error(result.error || 'Failed to update customer');
+        console.log('Update customer error:', result.error);
       }
     } catch (error) {
       toast.error('An error occurred while updating the customer');
+      console.error('Submit error:', error);
     } finally {
       setLoading(false);
       setIsUploading(false);

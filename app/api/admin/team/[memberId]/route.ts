@@ -1,6 +1,5 @@
 import { getServerSession } from '@/app/lib/firebase/server-auth';
 import { userService } from '@/app/lib/services/user-service.server';
-import { get } from 'http';
 import { NextRequest, NextResponse } from 'next/server';
 
 // GET single team member

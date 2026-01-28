@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { attendenceService } from '@/app/lib/services/attendance-service';
-import { get } from 'http';
 import { getServerSession } from '@/app/lib/firebase/server-auth';
 
 export async function GET(

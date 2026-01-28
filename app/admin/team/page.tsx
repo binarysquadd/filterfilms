@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/app/src/components/ui/button';
 import { User } from '@/app/types/user';
 import { useEffect, useState } from 'react';
-import { Loader2, Plus, X, Upload, Edit, Trash2 } from 'lucide-react';
+import { Loader2, Plus, Upload, Edit, Trash2 } from 'lucide-react';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
 import { Label } from '@/app/src/components/ui/label';
@@ -19,9 +19,6 @@ import {
   SelectValue,
 } from '@/app/src/components/ui/select';
 
-interface Props {
-  initialTeam?: User[];
-}
 
 const roles = [
   { value: 'admin', label: 'Admin' },
@@ -29,7 +26,7 @@ const roles = [
   { value: 'customer', label: 'Customer' },
 ];
 
-export default function TeamPage({ initialTeam }: Props) {
+export default function TeamPage() {
   const router = useRouter();
   const [team, setTeam] = useState<User[]>([]);
   const [accessDenied, setAccessDenied] = useState(false);
@@ -86,6 +83,7 @@ export default function TeamPage({ initialTeam }: Props) {
         setTeam(data.users);
       } catch (err) {
         toast.error('Error fetching team members');
+        console.log('Fetch users error:', err);
       } finally {
         setLoading(false);
       }
@@ -205,6 +203,7 @@ export default function TeamPage({ initialTeam }: Props) {
       router.refresh();
     } catch (error) {
       toast.error('An error occurred while saving the team member');
+      console.error('Submit error:', error);
     } finally {
       setLoading(false);
       setIsUploading(false);
