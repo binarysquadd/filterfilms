@@ -27,12 +27,6 @@ import {
 } from '@/app/src/components/ui/select';
 import DeleteModal from '@/app/src/components/common/modal/delete-modal';
 
-interface Package {
-  id: string;
-  name: string;
-  price: number;
-}
-
 interface TeamMember {
   id: string;
   name: string;

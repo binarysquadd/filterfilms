@@ -1,7 +1,4 @@
 import 'dotenv/config';
-// import dotenv from 'dotenv';
-// dotenv.config({ path: '.env' });
-
 import { google } from 'googleapis';
 
 if (
@@ -37,38 +34,42 @@ async function getFileId(name: string): Promise<string | null> {
 }
 
 export const driveService = {
-  async getCollection<T = any>(name: string): Promise<T[]> {
+  async getCollection<T>(name: string): Promise<T[]> {
     const fileId = await getFileId(name);
     if (!fileId) return [];
 
     const res = await drive.files.get({ fileId, alt: 'media' }, { responseType: 'json' });
 
+    // Drive API returns unknown JSON; we trust the caller-provided T here.
     return res.data as T[];
   },
 
-  async saveCollection(name: string, data: any[]) {
+  async saveCollection<T>(name: string, data: T[]): Promise<void> {
     const fileId = await getFileId(name);
+
+    const body = JSON.stringify(data, null, 2);
 
     if (fileId) {
       await drive.files.update({
         fileId,
         media: {
           mimeType: 'application/json',
-          body: JSON.stringify(data, null, 2),
+          body,
         },
       });
-    } else {
-      await drive.files.create({
-        requestBody: {
-          name: `${name}.json`,
-          parents: [process.env.GOOGLE_DRIVE_FOLDER_ID!],
-          mimeType: 'application/json',
-        },
-        media: {
-          mimeType: 'application/json',
-          body: JSON.stringify(data, null, 2),
-        },
-      });
+      return;
     }
+
+    await drive.files.create({
+      requestBody: {
+        name: `${name}.json`,
+        parents: [process.env.GOOGLE_DRIVE_FOLDER_ID!],
+        mimeType: 'application/json',
+      },
+      media: {
+        mimeType: 'application/json',
+        body,
+      },
+    });
   },
 };
