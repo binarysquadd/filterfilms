@@ -7,14 +7,38 @@ import { Button } from '@/app/src/components/ui/button';
 import { Gallery } from '@/app/types/gallery';
 import Image from 'next/image';
 
+/* ----------------------------------------
+   HELPERS
+----------------------------------------- */
+const toEmbedUrl = (url: string) => {
+  // YouTube
+  if (url.includes('youtube.com') || url.includes('youtu.be')) {
+    const id = url.includes('youtu.be') ? url.split('/').pop() : new URL(url).searchParams.get('v');
+    return `https://www.youtube.com/embed/${id}?autoplay=1`;
+  }
+
+  // Vimeo
+  if (url.includes('vimeo.com')) {
+    const id = url.split('/').pop();
+    return `https://player.vimeo.com/video/${id}?autoplay=1`;
+  }
+
+  return url;
+};
+
 export default function GalleryPage() {
   const [activeCategory, setActiveCategory] = useState('All');
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedMedia, setSelectedMedia] = useState<Gallery | null>(null);
+
   const [galleries, setGalleries] = useState<Gallery[]>([]);
   const [categories, setCategories] = useState<string[]>(['All']);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  /* ----------------------------------------
+     FETCH DATA
+  ----------------------------------------- */
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -39,15 +63,21 @@ export default function GalleryPage() {
     fetchData();
   }, []);
 
+  /* ----------------------------------------
+     FILTER
+  ----------------------------------------- */
   const filteredGallery =
     activeCategory === 'All'
       ? galleries
       : galleries.filter((item) => item.category === activeCategory);
 
+  /* ----------------------------------------
+     UI
+  ----------------------------------------- */
   return (
     <>
-      {/* Hero */}
-      <section className="relative py-2" id="gallery">
+      {/* HERO */}
+      <section className="py-4" id="gallery">
         <div className="container mx-auto px-4">
           <SectionHeader
             title="OUR PORTFOLIO"
@@ -57,8 +87,8 @@ export default function GalleryPage() {
         </div>
       </section>
 
-      {/* Sticky Filter */}
-      <section className="relative top-2 z-40 bg-background">
+      {/* CATEGORY FILTER */}
+      <section className="sticky top-0 z-40 bg-background">
         <div className="container mx-auto px-4">
           <div className="flex justify-center gap-2 py-3 overflow-x-auto scrollbar-hide">
             {categories.map((category) => (
@@ -76,7 +106,7 @@ export default function GalleryPage() {
         </div>
       </section>
 
-      {/* Loading */}
+      {/* LOADING */}
       {loading && (
         <section className="py-24">
           <div className="flex flex-col items-center">
@@ -86,7 +116,7 @@ export default function GalleryPage() {
         </section>
       )}
 
-      {/* Error */}
+      {/* ERROR */}
       {error && !loading && (
         <section className="py-24 text-center">
           <p className="text-destructive font-medium mb-3">{error}</p>
@@ -94,24 +124,17 @@ export default function GalleryPage() {
         </section>
       )}
 
-      {/* Gallery Grid */}
+      {/* GALLERY GRID */}
       {!loading && !error && (
         <section className="py-16">
           <div className="container mx-auto px-4">
             {filteredGallery.length > 0 ? (
-              <div
-                className="
-                  grid gap-4
-                  grid-cols-1
-                  sm:grid-cols-2
-                  md:grid-cols-4
-                "
-              >
+              <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
                 {filteredGallery.map((item) => (
                   <div
                     key={item.id}
-                    className="relative group overflow-hidden cursor-pointer shadow-md hover:shadow-xl transition-all"
-                    onClick={() => item.type === 'photo' && setSelectedImage(item.url)}
+                    className="relative group overflow-hidden cursor-pointer hover:shadow-xl transition-all"
+                    onClick={() => setSelectedMedia(item)}
                   >
                     <div className="relative aspect-[4/5]">
                       <Image
@@ -125,16 +148,16 @@ export default function GalleryPage() {
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
                       />
 
-                      {/* Video Play */}
+                      {/* VIDEO PLAY ICON */}
                       {item.type === 'video' && (
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="w-14 h-14 rounded-full bg-gold/90 flex items-center justify-center shadow-lg">
+                          <div className="w-14 h-14 rounded-full bg-gold/90 flex items-center justify-center">
                             <Play className="w-6 h-6 text-maroon-dark ml-1" />
                           </div>
                         </div>
                       )}
 
-                      {/* Overlay */}
+                      {/* OVERLAY */}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
                         <div className="absolute bottom-0 p-4">
                           <p className="text-white font-semibold text-sm">{item.title}</p>
@@ -157,21 +180,50 @@ export default function GalleryPage() {
         </section>
       )}
 
-      {/* Lightbox */}
-      {selectedImage && (
+      {/* LIGHTBOX (PHOTO + VIDEO) */}
+      {selectedMedia && (
         <div
-          className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4"
-          onClick={() => setSelectedImage(null)}
+          className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4 overflow-y-hidden"
+          onClick={() => setSelectedMedia(null)}
         >
           <button
-            className="absolute top-4 right-4 text-white hover:text-gold"
-            onClick={() => setSelectedImage(null)}
+            className="absolute top-4 right-4 text-white hover:text-gold z-10"
+            onClick={() => setSelectedMedia(null)}
           >
             <X className="w-8 h-8" />
           </button>
 
-          <div className="relative w-full max-w-6xl h-[90vh]">
-            <Image src={selectedImage} alt="Preview" fill className="object-contain" />
+          <div className="relative w-full max-w-6xl h-[90vh]" onClick={(e) => e.stopPropagation()}>
+            {/* PHOTO */}
+            {selectedMedia.type === 'photo' && (
+              <Image
+                src={selectedMedia.url}
+                alt={selectedMedia.title}
+                fill
+                className="object-contain"
+              />
+            )}
+
+            {/* VIDEO (UPLOAD) */}
+            {selectedMedia.type === 'video' && selectedMedia.videoSource === 'upload' && (
+              <video
+                src={selectedMedia.url}
+                controls
+                autoPlay
+                className="w-full h-full object-contain"
+              />
+            )}
+
+            {/* VIDEO (EXTERNAL OR FALLBACK) */}
+            {selectedMedia.type === 'video' &&
+              (selectedMedia.videoSource === 'external' || !selectedMedia.videoSource) && (
+                <iframe
+                  src={toEmbedUrl(selectedMedia.url)}
+                  className="w-full h-full"
+                  allow="autoplay; fullscreen"
+                  allowFullScreen
+                />
+              )}
           </div>
         </div>
       )}

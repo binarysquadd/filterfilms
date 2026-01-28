@@ -240,246 +240,252 @@ export default function ManageGallery({ initialGallery }: Props) {
 
       {/* MODAL */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <div className="relative flex justify-between border-b pb-2 mb-4">
-            <h2 className="text-xl font-bold">Add Gallery Item</h2>
-            <X onClick={closeModal} className="cursor-pointer" />
-          </div>
-          <form
-            onSubmit={handleSubmit}
-            className="bg-card w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-xl p-6 space-y-4"
-          >
-            {/* TYPE */}
-            <div className="flex gap-6">
-              <Label className="flex items-center gap-2">
-                <Input
-                  type="radio"
-                  checked={formData.type === 'photo'}
-                  onChange={() => setFormData({ ...formData, type: 'photo' })}
-                />
-                <ImageIcon className="w-4 h-4" /> Photo
-              </Label>
-
-              <Label className="flex items-center gap-2">
-                <Input
-                  type="radio"
-                  checked={formData.type === 'video'}
-                  onChange={() => setFormData({ ...formData, type: 'video' })}
-                />
-                <Video className="w-4 h-4" /> Video
-              </Label>
-            </div>
-
-            {/* VIDEO SOURCE */}
-            {formData.type === 'video' && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-card w-full max-w-xl max-h-[70vh] overflow-y-auto rounded-xl shadow-2xl">
+            <form onSubmit={handleSubmit} className="px-6 py-5 space-y-5">
+              <div className="flex justify-between border-b pb-2 mb-4">
+                <h2 className="text-xl font-bold">Add Gallery Item</h2>
+                <X onClick={closeModal} className="cursor-pointer" />
+              </div>
+              {/* TYPE */}
               <div className="flex gap-6">
                 <Label className="flex items-center gap-2">
                   <Input
                     type="radio"
-                    checked={formData.videoSource === 'external'}
-                    onChange={() => setFormData({ ...formData, videoSource: 'external', url: '' })}
+                    checked={formData.type === 'photo'}
+                    onChange={() => setFormData({ ...formData, type: 'photo' })}
                   />
-                  Video URL
+                  <ImageIcon className="w-4 h-4" /> Photo
                 </Label>
 
                 <Label className="flex items-center gap-2">
                   <Input
                     type="radio"
-                    checked={formData.videoSource === 'upload'}
-                    onChange={() => setFormData({ ...formData, videoSource: 'upload', url: '' })}
+                    checked={formData.type === 'video'}
+                    onChange={() => setFormData({ ...formData, type: 'video' })}
                   />
-                  Upload Video
+                  <Video className="w-4 h-4" /> Video
                 </Label>
               </div>
-            )}
-            {/* TITLE */}
-            <div className="">
-              <Label className="">Event Title</Label>
-              <Input
-                placeholder="Title"
-                required
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              />
-            </div>
 
-            {/* ================= MEDIA INPUTS ================= */}
-            <div className="space-y-4">
-              {/* PHOTO UPLOAD */}
-              {formData.type === 'photo' && (
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium">Photo</Label>
-
-                  {imagePreview && (
-                    <div className="relative h-32 rounded-lg overflow-hidden border">
-                      <Image src={imagePreview} alt="Photo preview" fill className="object-cover" />
-                    </div>
-                  )}
-
-                  <div className="relative">
-                    <Input
-                      key="photo"
-                      type="file"
-                      accept="image/*"
-                      required
-                      onChange={(e) => {
-                        const file = e.target.files?.[0] || null;
-                        setImageFile(file);
-                        if (file) setImagePreview(URL.createObjectURL(file));
-                      }}
-                      className="absolute inset-0 opacity-0 cursor-pointer z-10"
-                    />
-
-                    <div className="h-11 px-3 flex items-center border rounded-md justify-center text-sm gap-2">
-                      <UploadCloud className="w-4 h-4" />
-                      <span className="truncate">
-                        {imageFile ? imageFile.name : 'Select Photo'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* VIDEO URL */}
-              {formData.type === 'video' && formData.videoSource === 'external' && (
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium">Video URL</Label>
-
-                  <Input
-                    placeholder="https://youtube.com/..."
-                    required
-                    value={formData.url}
-                    onChange={(e) => setFormData({ ...formData, url: e.target.value })}
-                  />
-                </div>
-              )}
-
-              {/* VIDEO UPLOAD */}
-              {formData.type === 'video' && formData.videoSource === 'upload' && (
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium">Video File</Label>
-
-                  <div className="relative">
-                    <Input
-                      key="video"
-                      type="file"
-                      accept="video/*"
-                      required
-                      onChange={(e) => setVideoFile(e.target.files?.[0] || null)}
-                      className="absolute inset-0 opacity-0 cursor-pointer z-10"
-                    />
-
-                    <div className="h-11 px-3 flex items-center justify-center border rounded-md text-sm gap-2">
-                      <UploadCloud className="w-4 h-4" />
-                      <span className="truncate">
-                        {videoFile ? videoFile.name : 'Select Video File'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* VIDEO THUMBNAIL */}
+              {/* VIDEO SOURCE */}
               {formData.type === 'video' && (
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium">Video Thumbnail</Label>
-
-                  {thumbnailPreview && (
-                    <div className="relative h-32 rounded-lg overflow-hidden border">
-                      <Image
-                        src={thumbnailPreview}
-                        alt="Thumbnail preview"
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                  )}
-
-                  <div className="relative">
+                <div className="flex gap-6">
+                  <Label className="flex items-center gap-2">
                     <Input
-                      key="thumb"
-                      type="file"
-                      accept="image/*"
-                      required
-                      onChange={(e) => {
-                        const file = e.target.files?.[0] || null;
-                        setThumbnailFile(file);
-                        if (file) setThumbnailPreview(URL.createObjectURL(file));
-                      }}
-                      className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                      type="radio"
+                      checked={formData.videoSource === 'external'}
+                      onChange={() =>
+                        setFormData({ ...formData, videoSource: 'external', url: '' })
+                      }
                     />
+                    Video URL
+                  </Label>
 
-                    <div className="h-11 px-3 flex items-center justify-center border rounded-md text-sm gap-2">
-                      <UploadCloud className="w-4 h-4" />
-                      <span className="truncate">
-                        {thumbnailFile ? thumbnailFile.name : 'Select Thumbnail'}
-                      </span>
-                    </div>
-                  </div>
+                  <Label className="flex items-center gap-2">
+                    <Input
+                      type="radio"
+                      checked={formData.videoSource === 'upload'}
+                      onChange={() => setFormData({ ...formData, videoSource: 'upload', url: '' })}
+                    />
+                    Upload Video
+                  </Label>
                 </div>
               )}
-            </div>
-
-            {/* ================= EVENT & CATEGORY ================= */}
-            <div className="space-y-4">
-              {/* EVENT TYPE */}
-              <div className="flex flex-col gap-1">
-                <Label className="text-sm font-medium">Event Type</Label>
-
-                <select
-                  value={formData.eventType}
-                  onChange={(e) => {
-                    const event = e.target.value as EventType;
-
-                    setFormData({
-                      ...formData,
-                      eventType: event,
-                      category: eventTypes[event].categories[0].value,
-                    });
-                  }}
-                  className="h-11 px-3 rounded-md border text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                >
-                  {Object.keys(eventTypes).map((event) => (
-                    <option key={event} value={event}>
-                      {event}
-                    </option>
-                  ))}
-                </select>
+              {/* TITLE */}
+              <div className="">
+                <Label className="">Event Title</Label>
+                <Input
+                  placeholder="Title"
+                  required
+                  value={formData.title}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                />
               </div>
 
-              {/* CATEGORY */}
-              <div className="flex flex-col gap-1">
-                <Label className="text-sm font-medium">Category</Label>
+              {/* ================= MEDIA INPUTS ================= */}
+              <div className="space-y-4">
+                {/* PHOTO UPLOAD */}
+                {formData.type === 'photo' && (
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Photo</Label>
 
-                <select
-                  value={formData.category}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      category: e.target.value as CategoryValue,
-                    })
-                  }
-                  className="h-11 px-3 rounded-md border text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                >
-                  {eventTypes[formData.eventType].categories.map((category) => (
-                    <option key={category.value} value={category.value}>
-                      {category.label}
-                    </option>
-                  ))}
-                </select>
+                    {imagePreview && (
+                      <div className="relative h-32 rounded-lg overflow-hidden border">
+                        <Image
+                          src={imagePreview}
+                          alt="Photo preview"
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                    )}
+
+                    <div className="relative">
+                      <Input
+                        key="photo"
+                        type="file"
+                        accept="image/*"
+                        required
+                        onChange={(e) => {
+                          const file = e.target.files?.[0] || null;
+                          setImageFile(file);
+                          if (file) setImagePreview(URL.createObjectURL(file));
+                        }}
+                        className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                      />
+
+                      <div className="h-11 px-3 flex items-center border rounded-md justify-center text-sm gap-2">
+                        <UploadCloud className="w-4 h-4" />
+                        <span className="truncate">
+                          {imageFile ? imageFile.name : 'Select Photo'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* VIDEO URL */}
+                {formData.type === 'video' && formData.videoSource === 'external' && (
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Video URL</Label>
+
+                    <Input
+                      placeholder="https://youtube.com/..."
+                      required
+                      value={formData.url}
+                      onChange={(e) => setFormData({ ...formData, url: e.target.value })}
+                    />
+                  </div>
+                )}
+
+                {/* VIDEO UPLOAD */}
+                {formData.type === 'video' && formData.videoSource === 'upload' && (
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Video File</Label>
+
+                    <div className="relative">
+                      <Input
+                        key="video"
+                        type="file"
+                        accept="video/*"
+                        required
+                        onChange={(e) => setVideoFile(e.target.files?.[0] || null)}
+                        className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                      />
+
+                      <div className="h-11 px-3 flex items-center justify-center border rounded-md text-sm gap-2">
+                        <UploadCloud className="w-4 h-4" />
+                        <span className="truncate">
+                          {videoFile ? videoFile.name : 'Select Video File'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* VIDEO THUMBNAIL */}
+                {formData.type === 'video' && (
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Video Thumbnail</Label>
+
+                    {thumbnailPreview && (
+                      <div className="relative h-32 rounded-lg overflow-hidden border">
+                        <Image
+                          src={thumbnailPreview}
+                          alt="Thumbnail preview"
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                    )}
+
+                    <div className="relative">
+                      <Input
+                        key="thumb"
+                        type="file"
+                        accept="image/*"
+                        required
+                        onChange={(e) => {
+                          const file = e.target.files?.[0] || null;
+                          setThumbnailFile(file);
+                          if (file) setThumbnailPreview(URL.createObjectURL(file));
+                        }}
+                        className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                      />
+
+                      <div className="h-11 px-3 flex items-center justify-center border rounded-md text-sm gap-2">
+                        <UploadCloud className="w-4 h-4" />
+                        <span className="truncate">
+                          {thumbnailFile ? thumbnailFile.name : 'Select Thumbnail'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
-            </div>
 
-            <div className="flex flex-row mt-6">
-              <Button variant="cancel" size={'sm'} onClick={closeModal} className="mr-2 w-full">
-                Cancel
-              </Button>
-              <Button type="submit" size={'sm'} disabled={loading} className="w-full">
-                {loading && <Loader2 className="mr-2 animate-spin" />}
-                Add Item
-              </Button>
-            </div>
-          </form>
+              {/* ================= EVENT & CATEGORY ================= */}
+              <div className="space-y-4">
+                {/* EVENT TYPE */}
+                <div className="flex flex-col gap-1">
+                  <Label className="text-sm font-medium">Event Type</Label>
+
+                  <select
+                    value={formData.eventType}
+                    onChange={(e) => {
+                      const event = e.target.value as EventType;
+
+                      setFormData({
+                        ...formData,
+                        eventType: event,
+                        category: eventTypes[event].categories[0].value,
+                      });
+                    }}
+                    className="h-11 px-3 rounded-md border text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                  >
+                    {Object.keys(eventTypes).map((event) => (
+                      <option key={event} value={event}>
+                        {event}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* CATEGORY */}
+                <div className="flex flex-col gap-1">
+                  <Label className="text-sm font-medium">Category</Label>
+
+                  <select
+                    value={formData.category}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        category: e.target.value as CategoryValue,
+                      })
+                    }
+                    className="h-11 px-3 rounded-md border text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                  >
+                    {eventTypes[formData.eventType].categories.map((category) => (
+                      <option key={category.value} value={category.value}>
+                        {category.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex flex-row mt-6">
+                <Button variant="cancel" size={'sm'} onClick={closeModal} className="mr-2 w-full">
+                  Cancel
+                </Button>
+                <Button type="submit" size={'sm'} disabled={loading} className="w-full">
+                  {loading && <Loader2 className="mr-2 animate-spin" />}
+                  Add Item
+                </Button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
 
