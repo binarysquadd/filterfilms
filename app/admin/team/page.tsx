@@ -199,7 +199,7 @@ export default function TeamPage() {
       setIsModalOpen(false);
       resetForm();
       router.refresh();
-    } catch (error) {
+    } catch {
       toast.error('An error occurred while saving the team member');
     } finally {
       setLoading(false);

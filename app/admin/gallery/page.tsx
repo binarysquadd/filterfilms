@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Plus, Trash2, X, Video, Loader2, Upload, Image as ImageIcon } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -59,13 +59,8 @@ export default function ManageGallery({ initialGallery }: Props) {
   });
 
   /* ---------------- FETCH GALLERY ---------------- */
-  useEffect(() => {
-    if (!initialGallery || initialGallery.length === 0) {
-      fetchGallery();
-    }
-  }, []);
 
-  const fetchGallery = async () => {
+  const fetchGallery = useCallback(async () => {
     setIsFetching(true);
     try {
       const res = await fetch('/api/admin/gallery');
@@ -76,7 +71,13 @@ export default function ManageGallery({ initialGallery }: Props) {
     } finally {
       setIsFetching(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (!initialGallery || initialGallery.length === 0) {
+      fetchGallery();
+    }
+  }, [initialGallery, fetchGallery]);
 
   /* ---------------- CLEANUP PREVIEWS ---------------- */
   useEffect(() => {

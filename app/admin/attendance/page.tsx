@@ -24,10 +24,12 @@ import DeleteModal from '@/app/src/components/common/modal/delete-modal';
 
 type RawTeamMember = {
   id: string;
-  name: string;
-  role?: string;
+  name?: string;
+  role?: User['role'];
   image?: string;
   email?: string;
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 const AdminAttendancePage = () => {
@@ -67,15 +69,35 @@ const AdminAttendancePage = () => {
       if (!response.ok) throw new Error('Failed to fetch team members');
 
       const data = await response.json();
-      const members = data.members || data.team || [];
+      const members = (data.members || data.team || []) as RawTeamMember[];
 
-      const mappedMembers = (members as RawTeamMember[]).map((member) => ({
-        id: member.id,
-        name: member.name,
-        role: member.role,
-        photo: member.image || `https://api.dicebear.com/7.x/avataaars/svg?seed=${member.name}`,
-        email: member.email,
-      }));
+      const now = new Date().toISOString();
+
+      const mappedMembers: User[] = members.map((member) => {
+        const name = member.name ?? 'Unknown';
+
+        return {
+          // required/core
+          id: member.id,
+          name,
+          email: member.email ?? '',
+          role: (member.role ?? 'team') as User['role'],
+
+          // ✅ keep it consistent with the rest of your app (you use member.image later)
+          image:
+            member.image ??
+            `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name)}`,
+
+          // ✅ satisfy User typecheck
+          createdAt: member.createdAt ?? now,
+          updatedAt: member.updatedAt ?? now,
+
+          // If your User type has these fields as required, keep them.
+          // If they are optional in your User type, leaving them out is fine.
+          teamProfile: undefined,
+          customerProfile: undefined,
+        };
+      });
 
       setTeamMembers(mappedMembers);
     } catch (_err) {
