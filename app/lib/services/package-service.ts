@@ -1,26 +1,26 @@
-import { Packages } from "@/app/types/package";
-import { driveService } from "../google-drive.server";
-import { v4 as uuidv4 } from "uuid";
+import { Packages } from '@/app/types/package';
+import { driveService } from '../google-drive.server';
+import { v4 as uuidv4 } from 'uuid';
 
 export const packageService = {
   /* ---------------- GROUP LEVEL ---------------- */
 
   async getAllPackageGroups(): Promise<Packages[]> {
     try {
-      return await driveService.getCollection<Packages>("packages");
+      return await driveService.getCollection<Packages>('packages');
     } catch (error) {
-      console.error("Error fetching package groups:", error);
+      console.error('Error fetching package groups:', error);
       return [];
     }
   },
 
   async getPackageGroupById(groupId: string): Promise<Packages | null> {
     const groups = await this.getAllPackageGroups();
-    return groups.find(g => g.id === groupId) || null;
+    return groups.find((g) => g.id === groupId) || null;
   },
 
   async createPackageGroup(
-    data: Omit<Packages, "id" | "createdAt" | "updatedAt">
+    data: Omit<Packages, 'id' | 'createdAt' | 'updatedAt'>
   ): Promise<Packages> {
     const groups = await this.getAllPackageGroups();
 
@@ -32,17 +32,14 @@ export const packageService = {
     };
 
     groups.push(newGroup);
-    await driveService.saveCollection("packages", groups);
+    await driveService.saveCollection('packages', groups);
 
     return newGroup;
   },
 
-  async updatePackageGroup(
-    groupId: string,
-    updates: Partial<Packages>
-  ): Promise<Packages | null> {
+  async updatePackageGroup(groupId: string, updates: Partial<Packages>): Promise<Packages | null> {
     const groups = await this.getAllPackageGroups();
-    const index = groups.findIndex(g => g.id === groupId);
+    const index = groups.findIndex((g) => g.id === groupId);
 
     if (index === -1) return null;
 
@@ -52,18 +49,18 @@ export const packageService = {
       updatedAt: new Date().toISOString(),
     };
 
-    await driveService.saveCollection("packages", groups);
+    await driveService.saveCollection('packages', groups);
     return groups[index];
   },
 
   async deletePackageGroup(groupId: string): Promise<boolean> {
     const groups = await this.getAllPackageGroups();
-    const index = groups.findIndex(g => g.id === groupId);
+    const index = groups.findIndex((g) => g.id === groupId);
 
     if (index === -1) return false;
 
     groups.splice(index, 1);
-    await driveService.saveCollection("packages", groups);
+    await driveService.saveCollection('packages', groups);
     return true;
   },
 
@@ -73,7 +70,7 @@ export const packageService = {
     const groups = await this.getAllPackageGroups();
 
     for (const group of groups) {
-      const pkg = group.packages.find(p => p.id === packageId);
+      const pkg = group.packages.find((p) => p.id === packageId);
       if (pkg) {
         return { group, pkg };
       }
@@ -86,23 +83,22 @@ export const packageService = {
 
   async searchPackages(query: string): Promise<Packages[]> {
     const groups = await this.getAllPackageGroups();
-    return groups.filter(g =>
-      g.packages.some(p =>
-        p.name.toLowerCase().includes(query.toLowerCase()) ||
-        p.description.toLowerCase().includes(query.toLowerCase())
+    return groups.filter((g) =>
+      g.packages.some(
+        (p) =>
+          p.name.toLowerCase().includes(query.toLowerCase()) ||
+          p.description.toLowerCase().includes(query.toLowerCase())
       )
     );
   },
 
   async filterPackagesByPrice(min: number, max: number): Promise<Packages[]> {
     const groups = await this.getAllPackageGroups();
-    return groups.filter(g =>
-      g.packages.some(p => p.price >= min && p.price <= max)
-    );
+    return groups.filter((g) => g.packages.some((p) => p.price >= min && p.price <= max));
   },
 
   async getPopularPackages(): Promise<Packages[]> {
     const groups = await this.getAllPackageGroups();
-    return groups.filter(g => g.packages.some(p => p.popular));
+    return groups.filter((g) => g.packages.some((p) => p.popular));
   },
 };

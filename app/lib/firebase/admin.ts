@@ -1,5 +1,9 @@
 // lib/firebase/admin.ts (Server-side Firebase Admin)
-import { initializeApp as initializeAdminApp, getApps as getAdminApps, cert } from 'firebase-admin/app';
+import {
+  initializeApp as initializeAdminApp,
+  getApps as getAdminApps,
+  cert,
+} from 'firebase-admin/app';
 import { getAuth as getAdminAuth } from 'firebase-admin/auth';
 
 const adminConfig = {

@@ -1,15 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import {
-  Menu,
-  X,
-  User,
-  Loader,
-  ChevronDown,
-  LogOut,
-  LayoutDashboard,
-} from 'lucide-react';
+import { Menu, X, User, Loader, ChevronDown, LogOut, LayoutDashboard } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -42,11 +34,7 @@ export default function Navbar() {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target;
-      if (
-        dropdownRef.current &&
-        target instanceof Node &&
-        !dropdownRef.current.contains(target)
-      ) {
+      if (dropdownRef.current && target instanceof Node && !dropdownRef.current.contains(target)) {
         setIsDropdownOpen(false);
       }
     };
@@ -143,12 +131,9 @@ export default function Navbar() {
                     className="rounded-full gap-2"
                     onClick={() => setIsDropdownOpen((prev) => !prev)}
                   >
-                    <span className=''>{user?.name}</span>
+                    <span className="">{user?.name}</span>
                     <ChevronDown
-                      className={cn(
-                        'w-4 h-4 transition-transform',
-                        isDropdownOpen && 'rotate-180'
-                      )}
+                      className={cn('w-4 h-4 transition-transform', isDropdownOpen && 'rotate-180')}
                     />
                   </Button>
 
@@ -177,7 +162,7 @@ export default function Navbar() {
                 </div>
               ) : (
                 <Link href="/signin">
-                  <Button variant="outline" size="sm" className='rounded-full'>
+                  <Button variant="outline" size="sm" className="rounded-full">
                     <User className="w-4 h-4 mr-2" />
                     Login
                   </Button>

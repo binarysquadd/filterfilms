@@ -15,7 +15,7 @@ export async function getServerSession(): Promise<User | null> {
 
     const decodedToken = await adminAuth.verifySessionCookie(sessionCookie, true);
     const user = await userService.getUserByEmail(decodedToken.email!);
-    
+
     return user;
   } catch (error) {
     console.error('Error getting server session:', error);

@@ -1,13 +1,12 @@
-import { driveService } from "./google-drive.server";
+import { driveService } from './google-drive.server';
 
 export async function getUsers() {
-    return driveService.getCollection('users');
+  return driveService.getCollection('users');
 }
 
 export async function saveUser(users: any[]) {
-    return driveService.saveCollection('users', users);
+  return driveService.saveCollection('users', users);
 }
-
 
 export async function getBookings() {
   return driveService.getCollection('bookings');

@@ -1,16 +1,16 @@
 'use client';
 
-import { useRouter } from "next/navigation";
-import { Button } from "@/app/src/components/ui/button";
-import { User } from "@/app/types/user";
-import { useEffect, useState } from "react";
-import { Loader2, Eye, Trash2, Search, Edit, Upload, X } from "lucide-react";
-import Image from "next/image";
-import toast from "react-hot-toast";
-import { Input } from "@/app/src/components/ui/input";
-import { Label } from "@/app/src/components/ui/label";
-import DeleteModal from "@/app/src/components/common/modal/delete-modal";
-import { Textarea } from "@/app/src/components/ui/textarea";
+import { useRouter } from 'next/navigation';
+import { Button } from '@/app/src/components/ui/button';
+import { User } from '@/app/types/user';
+import { useEffect, useState } from 'react';
+import { Loader2, Eye, Trash2, Search, Edit, Upload, X } from 'lucide-react';
+import Image from 'next/image';
+import toast from 'react-hot-toast';
+import { Input } from '@/app/src/components/ui/input';
+import { Label } from '@/app/src/components/ui/label';
+import DeleteModal from '@/app/src/components/common/modal/delete-modal';
+import { Textarea } from '@/app/src/components/ui/textarea';
 
 export default function CustomersPage() {
   const router = useRouter();
@@ -86,7 +86,7 @@ export default function CustomersPage() {
       setCustomers(data.customers || []);
       setFilteredCustomers(data.customers || []);
     } catch (err) {
-      toast.error("Error fetching customers");
+      toast.error('Error fetching customers');
     } finally {
       setLoading(false);
     }
@@ -139,7 +139,7 @@ export default function CustomersPage() {
     });
 
     if (!response.ok) {
-      toast.error("Image upload failed");
+      toast.error('Image upload failed');
       throw new Error('Image upload failed');
     }
 
@@ -166,7 +166,7 @@ export default function CustomersPage() {
         phoneNumber: formData.phoneNumber,
         address: formData.address,
         photo: photoUrl,
-        role: 'customer' // Keep role as customer
+        role: 'customer', // Keep role as customer
       };
 
       const response = await fetch(`/api/admin/users/${editingId}`, {
@@ -178,18 +178,16 @@ export default function CustomersPage() {
       const result = await response.json();
 
       if (response.ok) {
-        setCustomers(prev =>
-          prev.map(c => c.id === editingId ? result.user : c)
-        );
-        toast.success("Customer updated successfully!");
+        setCustomers((prev) => prev.map((c) => (c.id === editingId ? result.user : c)));
+        toast.success('Customer updated successfully!');
         setEditModalOpen(false);
         resetForm();
         router.refresh();
       } else {
-        toast.error(result.error || "Failed to update customer");
+        toast.error(result.error || 'Failed to update customer');
       }
     } catch (error) {
-      toast.error("An error occurred while updating the customer");
+      toast.error('An error occurred while updating the customer');
     } finally {
       setLoading(false);
       setIsUploading(false);
@@ -206,16 +204,16 @@ export default function CustomersPage() {
       });
 
       if (response.ok) {
-        setCustomers(prev => prev.filter(c => c.id !== deletingId));
-        toast.success("Customer removed successfully!");
+        setCustomers((prev) => prev.filter((c) => c.id !== deletingId));
+        toast.success('Customer removed successfully!');
         router.refresh();
       } else {
         const result = await response.json();
-        toast.error(result.error || "Error deleting customer");
+        toast.error(result.error || 'Error deleting customer');
       }
     } catch (error) {
       console.error('Delete error:', error);
-      toast.error("Error deleting customer");
+      toast.error('Error deleting customer');
     } finally {
       setIsDeleting(false);
       setDeleteOpen(false);
@@ -226,9 +224,7 @@ export default function CustomersPage() {
   if (accessDenied) {
     return (
       <div className="flex h-96 items-center justify-center">
-        <p className="text-muted-foreground">
-          You do not have permission to view this page.
-        </p>
+        <p className="text-muted-foreground">You do not have permission to view this page.</p>
       </div>
     );
   }
@@ -260,7 +256,9 @@ export default function CustomersPage() {
             <table className="w-full">
               <thead className="bg-muted/50">
                 <tr>
-                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">Customer</th>
+                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">
+                    Customer
+                  </th>
                   <th className="p-3 text-sm font-medium text-muted-foreground">Email</th>
                   <th className="p-3 text-sm font-medium text-muted-foreground">Joined</th>
                   <th className="p-3 text-sm font-medium text-muted-foreground">Actions</th>
@@ -280,7 +278,9 @@ export default function CustomersPage() {
                   <tr>
                     <td colSpan={4} className="h-72">
                       <div className="flex h-full items-center justify-center text-muted-foreground">
-                        {searchQuery ? 'No customers found matching your search' : 'No customers found'}
+                        {searchQuery
+                          ? 'No customers found matching your search'
+                          : 'No customers found'}
                       </div>
                     </td>
                   </tr>
@@ -323,7 +323,11 @@ export default function CustomersPage() {
                         <Button variant="close" size="sm" onClick={() => openEditModal(customer)}>
                           <Edit className="w-4 h-4" />
                         </Button>
-                        <Button variant="close" size="sm" onClick={() => openDeleteModal(customer.id)}>
+                        <Button
+                          variant="close"
+                          size="sm"
+                          onClick={() => openDeleteModal(customer.id)}
+                        >
                           <Trash2 className="w-4 h-4 text-red-500" />
                         </Button>
                       </td>
@@ -359,12 +363,16 @@ export default function CustomersPage() {
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-muted-foreground text-3xl">
-                        {selectedCustomer.name ? selectedCustomer.name.charAt(0).toUpperCase() : 'U'}
+                        {selectedCustomer.name
+                          ? selectedCustomer.name.charAt(0).toUpperCase()
+                          : 'U'}
                       </div>
                     )}
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-foreground">{selectedCustomer.name || 'N/A'}</h3>
+                    <h3 className="text-xl font-semibold text-foreground">
+                      {selectedCustomer.name || 'N/A'}
+                    </h3>
                     <p className="text-muted-foreground">{selectedCustomer.email}</p>
                   </div>
                 </div>
@@ -372,7 +380,9 @@ export default function CustomersPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm text-muted-foreground">Role</p>
-                    <p className="text-foreground font-medium capitalize">{selectedCustomer.role}</p>
+                    <p className="text-foreground font-medium capitalize">
+                      {selectedCustomer.role}
+                    </p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Joined Date</p>
@@ -387,14 +397,18 @@ export default function CustomersPage() {
                 {selectedCustomer.customerProfile?.phoneNumber && (
                   <div>
                     <p className="text-sm text-muted-foreground">Phone</p>
-                    <p className="text-foreground font-medium">{selectedCustomer.customerProfile.phoneNumber}</p>
+                    <p className="text-foreground font-medium">
+                      {selectedCustomer.customerProfile.phoneNumber}
+                    </p>
                   </div>
                 )}
 
                 {selectedCustomer.customerProfile?.address && (
                   <div>
                     <p className="text-sm text-muted-foreground">Address</p>
-                    <p className="text-foreground font-medium">{selectedCustomer.customerProfile.address}</p>
+                    <p className="text-foreground font-medium">
+                      {selectedCustomer.customerProfile.address}
+                    </p>
                   </div>
                 )}
               </div>
@@ -413,7 +427,10 @@ export default function CustomersPage() {
                     type="button"
                     variant="close"
                     size="icon"
-                    onClick={() => { setEditModalOpen(false); resetForm(); }}
+                    onClick={() => {
+                      setEditModalOpen(false);
+                      resetForm();
+                    }}
                   >
                     <X className="w-5 h-5" />
                   </Button>
@@ -424,7 +441,13 @@ export default function CustomersPage() {
                   <div className="flex items-center space-x-4">
                     <div className="w-20 h-20 rounded-full overflow-hidden bg-muted">
                       {localPreview ? (
-                        <Image src={localPreview} alt="Preview" className="object-cover w-full h-full" width={100} height={100} />
+                        <Image
+                          src={localPreview}
+                          alt="Preview"
+                          className="object-cover w-full h-full"
+                          width={100}
+                          height={100}
+                        />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-muted-foreground text-2xl">
                           {formData.name ? formData.name.charAt(0).toUpperCase() : 'U'}
@@ -436,10 +459,17 @@ export default function CustomersPage() {
                         <Upload className="w-4 h-4" />
                         <span className="text-sm">Upload Photo</span>
                       </div>
-                      <Input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        className="hidden"
+                      />
                     </Label>
                   </div>
-                  <Label className="block text-sm font-medium text-foreground mt-1">Profile Photo</Label>
+                  <Label className="block text-sm font-medium text-foreground mt-1">
+                    Profile Photo
+                  </Label>
                 </div>
 
                 {/* Name */}
@@ -466,7 +496,9 @@ export default function CustomersPage() {
 
                 {/* Phone */}
                 <div>
-                  <Label className="block text-sm font-medium text-foreground mb-2">Phone Number</Label>
+                  <Label className="block text-sm font-medium text-foreground mb-2">
+                    Phone Number
+                  </Label>
                   <Input
                     type="text"
                     value={formData.phoneNumber}
@@ -493,7 +525,10 @@ export default function CustomersPage() {
                   <Button
                     type="button"
                     variant="ghost"
-                    onClick={() => { setEditModalOpen(false); resetForm(); }}
+                    onClick={() => {
+                      setEditModalOpen(false);
+                      resetForm();
+                    }}
                     disabled={loading || isUploading}
                   >
                     Cancel
@@ -504,7 +539,9 @@ export default function CustomersPage() {
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                         {isUploading ? 'Uploading...' : 'Saving...'}
                       </>
-                    ) : 'Update Customer'}
+                    ) : (
+                      'Update Customer'
+                    )}
                   </Button>
                 </div>
               </form>

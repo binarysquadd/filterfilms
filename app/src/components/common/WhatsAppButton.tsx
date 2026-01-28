@@ -17,7 +17,7 @@ export default function WhatsAppButton() {
       <div className="relative">
         {/* Pulse Animation */}
         <div className="absolute inset-0 bg-green-500 rounded-full animate-ping opacity-25" />
-        
+
         {/* Button */}
         <div className="relative w-14 h-14 bg-green-500 rounded-full flex items-center justify-center shadow-lg hover:bg-green-600 transition-all duration-300 hover:scale-110">
           <MessageCircle className="w-7 h-7 text-white" />
@@ -33,4 +33,4 @@ export default function WhatsAppButton() {
       </div>
     </a>
   );
-};
+}

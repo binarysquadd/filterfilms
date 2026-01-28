@@ -6,21 +6,18 @@ import Image from 'next/image';
 
 export default function OurTeam() {
   const founder = {
-    name: "Subham Dalai",
-    role: "Founder & Cinematographer",
-    specialization: "Cinematic Wedding Filmmaker",
-    experience: "7+ Years Experience",
-    bio: "With over 7 years of experience in the film industry, Subham founded Filter Film Studio with a vision to redefine wedding cinematography in India. His storytelling blends traditional Indian emotions with modern cinematic techniques, creating films that feel timeless, emotional, and deeply personal.",
-    photo: "/team-image/founder1.png",
-    instagram: "@subhamdalai__",
-    studioInstagram: "@filterfilm.studio",
+    name: 'Subham Dalai',
+    role: 'Founder & Cinematographer',
+    specialization: 'Cinematic Wedding Filmmaker',
+    experience: '7+ Years Experience',
+    bio: 'With over 7 years of experience in the film industry, Subham founded Filter Film Studio with a vision to redefine wedding cinematography in India. His storytelling blends traditional Indian emotions with modern cinematic techniques, creating films that feel timeless, emotional, and deeply personal.',
+    photo: '/team-image/founder1.png',
+    instagram: '@subhamdalai__',
+    studioInstagram: '@filterfilm.studio',
   };
 
   return (
-    <section
-      id="team"
-      className="relative py-24 lg:py-32 overflow-hidden"
-    >
+    <section id="team" className="relative py-24 lg:py-32 overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-background/95 to-background" />
 
@@ -56,20 +53,14 @@ export default function OurTeam() {
               {founder.name}
             </h2>
 
-            <p className="text-gold text-xl font-semibold mb-2">
-              {founder.role}
-            </p>
+            <p className="text-gold text-xl font-semibold mb-2">{founder.role}</p>
 
-            <p className="text-muted-foreground text-lg mb-8">
-              {founder.specialization}
-            </p>
+            <p className="text-muted-foreground text-lg mb-8">{founder.specialization}</p>
 
             {/* Quote style bio */}
             <div className="relative bg-muted/40 backdrop-blur rounded-2xl p-8 mb-8">
               <Quote className="absolute -top-4 -left-4 w-10 h-10 text-gold/30" />
-              <p className="text-lg leading-relaxed font-medium text-foreground">
-                {founder.bio}
-              </p>
+              <p className="text-lg leading-relaxed font-medium text-foreground">{founder.bio}</p>
             </div>
 
             {/* Social Links */}

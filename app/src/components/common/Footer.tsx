@@ -10,7 +10,6 @@ export default function Footer() {
 
       <div className="container mx-auto px-4 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
-
           {/* Brand */}
           <div>
             {/* Logo Image */}
@@ -24,8 +23,8 @@ export default function Footer() {
               />
             </div>
             <p className="text-sm text-emerald-dark/70 leading-relaxed mb-6">
-              Capturing timeless wedding stories with cinematic elegance, emotion,
-              and authenticity across India.
+              Capturing timeless wedding stories with cinematic elegance, emotion, and authenticity
+              across India.
             </p>
 
             <div className="flex gap-4">
@@ -62,9 +61,7 @@ export default function Footer() {
 
           {/* Services */}
           <div>
-            <h4 className="font-heading text-lg font-semibold text-emerald-dark mb-6">
-              Services
-            </h4>
+            <h4 className="font-heading text-lg font-semibold text-emerald-dark mb-6">Services</h4>
             <ul className="space-y-3 text-sm text-emerald-dark/70">
               <li>Wedding Photography</li>
               <li>Cinematic Wedding Films</li>
@@ -77,14 +74,13 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <h4 className="font-heading text-lg font-semibold text-emerald-dark mb-6">
-              Contact
-            </h4>
+            <h4 className="font-heading text-lg font-semibold text-emerald-dark mb-6">Contact</h4>
             <ul className="space-y-4 text-sm text-emerald-dark/70">
               <li className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 text-gold mt-1" />
                 <span>
-                  Gandhinagar 2nd Lane Extension<br />
+                  Gandhinagar 2nd Lane Extension
+                  <br />
                   Berhampur, Odisha - 760001
                 </span>
               </li>
@@ -102,9 +98,7 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="mt-14 pt-6 border-t border-emerald-dark/10 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-emerald-dark/50">
-          <p>
-            © {new Date().getFullYear()} Filter Film Studio. All rights reserved.
-          </p>
+          <p>© {new Date().getFullYear()} Filter Film Studio. All rights reserved.</p>
           <div className="flex gap-6">
             <Link href="#" className="hover:text-gold transition-colors">
               Privacy Policy

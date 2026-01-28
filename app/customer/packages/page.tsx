@@ -1,19 +1,13 @@
 'use client';
 
-import {
-  Loader2,
-  Check,
-  Clock,
-  Star,
-  ShoppingCart,
-} from "lucide-react";
-import { useEffect, useState } from "react";
-import Image from "next/image";
-import { Button } from "@/app/src/components/ui/button";
-import { Badge } from "@/app/src/components/ui/badge";
-import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
-import { CATEGORY, Category, Package, Packages } from "@/app/types/package";
+import { Loader2, Check, Clock, Star, ShoppingCart } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import Image from 'next/image';
+import { Button } from '@/app/src/components/ui/button';
+import { Badge } from '@/app/src/components/ui/badge';
+import toast from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
+import { CATEGORY, Category, Package, Packages } from '@/app/types/package';
 
 interface PackageWithCategory extends Package {
   categoryLabel: string;
@@ -39,7 +33,7 @@ export default function CustomerPackagesPage() {
 
   const [packageGroups, setPackageGroups] = useState<Packages[]>([]);
   const [fetchingPackages, setFetchingPackages] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [expandedPackage, setExpandedPackage] = useState<PackageWithCategory | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
 
@@ -51,26 +45,23 @@ export default function CustomerPackagesPage() {
   /* ---------------- CART ---------------- */
 
   const loadCartFromStorage = () => {
-    const saved = localStorage.getItem("bookingCart");
+    const saved = localStorage.getItem('bookingCart');
     if (saved) setCart(JSON.parse(saved));
   };
 
   const saveCartToStorage = (data: CartItem[]) => {
-    localStorage.setItem("bookingCart", JSON.stringify(data));
+    localStorage.setItem('bookingCart', JSON.stringify(data));
   };
 
-  const isInCart = (id: string) =>
-    cart.some(item => item.packageId.includes(id));
+  const isInCart = (id: string) => cart.some((item) => item.packageId.includes(id));
 
   const addToCart = (pkg: PackageWithCategory) => {
     if (isInCart(pkg.id)) {
-      toast.error("Package already in cart");
+      toast.error('Package already in cart');
       return;
     }
 
-    const group = packageGroups.find(g =>
-      g.packages.some(p => p.id === pkg.id)
-    );
+    const group = packageGroups.find((g) => g.packages.some((p) => p.id === pkg.id));
 
     if (!group) return;
 
@@ -80,8 +71,8 @@ export default function CustomerPackagesPage() {
       name: pkg.name,
       category: pkg.categoryLabel,
       price: pkg.price,
-      startDate: "",
-      endDate: "",
+      startDate: '',
+      endDate: '',
       description: pkg.description,
       deliverables: pkg.deliverables,
       duration: pkg.duration,
@@ -98,25 +89,23 @@ export default function CustomerPackagesPage() {
 
   const fetchPackages = async () => {
     setFetchingPackages(true);
-    const res = await fetch("/api/admin/package");
+    const res = await fetch('/api/admin/package');
     const data = await res.json();
     setPackageGroups(data.packages || []);
     setFetchingPackages(false);
   };
 
   const formatPrice = (price: number) =>
-    new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
+    new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
       maximumFractionDigits: 0,
     }).format(price);
 
-  const allPackages: PackageWithCategory[] = packageGroups.flatMap(group => {
-    const label =
-      CATEGORY.find(c => c.value === group.category)?.label ||
-      group.category;
+  const allPackages: PackageWithCategory[] = packageGroups.flatMap((group) => {
+    const label = CATEGORY.find((c) => c.value === group.category)?.label || group.category;
 
-    return group.packages.map(pkg => ({
+    return group.packages.map((pkg) => ({
       ...pkg,
       categoryLabel: label,
       categoryValue: group.category,
@@ -124,17 +113,17 @@ export default function CustomerPackagesPage() {
   });
 
   const categories = [
-    { value: "all", label: "All Packages" },
-    ...Array.from(new Set(allPackages.map(p => p.categoryValue))).map(v => ({
+    { value: 'all', label: 'All Packages' },
+    ...Array.from(new Set(allPackages.map((p) => p.categoryValue))).map((v) => ({
       value: v,
-      label: CATEGORY.find(c => c.value === v)?.label || v,
+      label: CATEGORY.find((c) => c.value === v)?.label || v,
     })),
   ];
 
   const filteredPackages =
-    selectedCategory === "all"
+    selectedCategory === 'all'
       ? allPackages
-      : allPackages.filter(p => p.categoryValue === selectedCategory);
+      : allPackages.filter((p) => p.categoryValue === selectedCategory);
 
   /* ---------------- UI ---------------- */
 
@@ -144,14 +133,18 @@ export default function CustomerPackagesPage() {
       <div className="flex justify-between items-start gap-4">
         <div>
           <h1 className="font-heading text-4xl font-bold">Our Packages</h1>
-          <p className="text-muted-foreground mt-1">
-            Compare and explore our curated offerings
-          </p>
+          <p className="text-muted-foreground mt-1">Compare and explore our curated offerings</p>
         </div>
 
-        <Button variant="link" onClick={() => router.push("/customer/bookings")} className="relative">
+        <Button
+          variant="link"
+          onClick={() => router.push('/customer/bookings')}
+          className="relative"
+        >
           {cart.length > 0 && (
-            <Badge className="ml-2 bg-red-500 absolute w-5 h-5 rounded-full flex items-center justify-center text-xs bottom-6 left-5">{cart.length}</Badge>
+            <Badge className="ml-2 bg-red-500 absolute w-5 h-5 rounded-full flex items-center justify-center text-xs bottom-6 left-5">
+              {cart.length}
+            </Badge>
           )}
           <ShoppingCart className="w-16 h-16 mr-2" />
           Cart
@@ -160,11 +153,11 @@ export default function CustomerPackagesPage() {
 
       {/* Filters */}
       <div className="flex flex-wrap gap-2">
-        {categories.map(cat => (
+        {categories.map((cat) => (
           <Button
             key={cat.value}
             size="sm"
-            variant={selectedCategory === cat.value ? "default" : "outline"}
+            variant={selectedCategory === cat.value ? 'default' : 'outline'}
             onClick={() => setSelectedCategory(cat.value)}
             className="rounded-full"
           >
@@ -193,7 +186,7 @@ export default function CustomerPackagesPage() {
 
           {/* TABLE BODY */}
           <div className="divide-y">
-            {filteredPackages.map(pkg => {
+            {filteredPackages.map((pkg) => {
               const open = expandedPackage?.id === pkg.id;
 
               return (
@@ -211,27 +204,21 @@ export default function CustomerPackagesPage() {
                       <p className="font-medium">{pkg.name}</p>
                     </div>
 
-                    <div className="hidden md:block text-sm">
-                      {pkg.categoryLabel}
-                    </div>
+                    <div className="hidden md:block text-sm">{pkg.categoryLabel}</div>
 
                     <div className="text-sm flex items-center gap-1">
                       <Clock className="w-4 h-4" />
                       {pkg.duration} days
                     </div>
 
-                    <div className="font-medium">
-                      {formatPrice(pkg.price)}
-                    </div>
+                    <div className="font-medium">{formatPrice(pkg.price)}</div>
 
                     <div className="text-right">
                       <button
-                        onClick={() =>
-                          setExpandedPackage(open ? null : pkg)
-                        }
+                        onClick={() => setExpandedPackage(open ? null : pkg)}
                         className="text-sm text-primary hover:underline"
                       >
-                        {open ? "Hide" : "View more"}
+                        {open ? 'Hide' : 'View more'}
                       </button>
                     </div>
                   </div>
@@ -240,12 +227,7 @@ export default function CustomerPackagesPage() {
                   {open && (
                     <div className="grid md:grid-cols-2 gap-6 pb-6 animate-in fade-in">
                       <div className="relative aspect-[4/3] rounded-md overflow-hidden">
-                        <Image
-                          src={pkg.preview}
-                          alt={pkg.name}
-                          fill
-                          className="object-cover"
-                        />
+                        <Image src={pkg.preview} alt={pkg.name} fill className="object-cover" />
                       </div>
 
                       <div className="space-y-4">
@@ -265,16 +247,14 @@ export default function CustomerPackagesPage() {
                         </div>
 
                         <div className="flex justify-between items-center pt-4 border-t">
-                          <span className="text-lg font-semibold">
-                            {formatPrice(pkg.price)}
-                          </span>
+                          <span className="text-lg font-semibold">{formatPrice(pkg.price)}</span>
 
                           <Button
                             size="sm"
                             onClick={() => addToCart(pkg)}
                             disabled={isInCart(pkg.id)}
                           >
-                            {isInCart(pkg.id) ? "In cart" : "Add to cart"}
+                            {isInCart(pkg.id) ? 'In cart' : 'Add to cart'}
                           </Button>
                         </div>
                       </div>

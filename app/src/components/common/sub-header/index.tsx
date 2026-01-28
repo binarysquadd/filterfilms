@@ -1,9 +1,7 @@
-
 interface SubHeaderProps {
   title: string;
   description?: string;
   onClick?: () => void;
-
 }
 export default function SubHeader({ title, description, onClick }: SubHeaderProps) {
   return (

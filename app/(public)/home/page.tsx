@@ -17,7 +17,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="overflow-hidden" id='home'>
+    <div className="overflow-hidden" id="home">
       {/* Hero Section */}
       <section className="relative min-h-screen w-full overflow-hidden">
         {/* Video Background */}
@@ -37,10 +37,10 @@ export default function Home() {
           <source src="/videos/wedding2.mp4" type="video/mp4" />
           Your browser does not support the video tag.
         </video>
-        
+
         {/* Fallback Background Image - only shows if video fails */}
         {videoError && (
-          <div 
+          <div
             className="absolute inset-0 bg-cover bg-center"
             style={{ backgroundImage: 'url(/hero-image/hero-image.jpg)' }}
           />

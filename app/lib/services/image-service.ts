@@ -7,7 +7,7 @@ if (
   !process.env.GOOGLE_OAUTH_REFRESH_TOKEN ||
   !process.env.GOOGLE_DRIVE_IMAGES_FOLDER_ID // Add this to .env
 ) {
-  throw new Error("Missing Google Drive environment variables");
+  throw new Error('Missing Google Drive environment variables');
 }
 
 const auth = new google.auth.OAuth2(
@@ -20,7 +20,7 @@ auth.setCredentials({
 });
 
 const drive = google.drive({
-  version: "v3",
+  version: 'v3',
   auth,
 });
 

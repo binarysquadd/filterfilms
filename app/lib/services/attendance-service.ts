@@ -1,27 +1,25 @@
-import { driveService } from "../google-drive.server";
-import { Attendance } from "@/app/types/attendance";
-import { v4 as uuidv4 } from "uuid";
+import { driveService } from '../google-drive.server';
+import { Attendance } from '@/app/types/attendance';
+import { v4 as uuidv4 } from 'uuid';
 
-type AttendanceUpdates = Omit<Partial<Attendance>, "id">;
+type AttendanceUpdates = Omit<Partial<Attendance>, 'id'>;
 
 export const attendenceService = {
   async getAllAttendance(): Promise<Attendance[]> {
     try {
-      return await driveService.getCollection<Attendance>("attendance");
+      return await driveService.getCollection<Attendance>('attendance');
     } catch (error) {
-      console.error("Error fetching attendance records:", error);
+      console.error('Error fetching attendance records:', error);
       return [];
     }
   },
 
   async getAttendanceById(id: string): Promise<Attendance | null> {
     const attendanceRecords = await this.getAllAttendance();
-    return attendanceRecords.find(a => a.id === id) ?? null;
+    return attendanceRecords.find((a) => a.id === id) ?? null;
   },
 
-  async createAttendance(
-    attendanceData: Omit<Attendance, "id">
-  ): Promise<Attendance> {
+  async createAttendance(attendanceData: Omit<Attendance, 'id'>): Promise<Attendance> {
     const attendanceRecords = await this.getAllAttendance();
 
     const newAttendance: Attendance = {
@@ -30,17 +28,14 @@ export const attendenceService = {
     };
 
     attendanceRecords.push(newAttendance);
-    await driveService.saveCollection("attendance", attendanceRecords);
+    await driveService.saveCollection('attendance', attendanceRecords);
 
     return newAttendance;
   },
 
-  async updateAttendance(
-    id: string,
-    updates: AttendanceUpdates
-  ): Promise<Attendance | null> {
+  async updateAttendance(id: string, updates: AttendanceUpdates): Promise<Attendance | null> {
     const attendanceRecords = await this.getAllAttendance();
-    const index = attendanceRecords.findIndex(a => a.id === id);
+    const index = attendanceRecords.findIndex((a) => a.id === id);
 
     if (index === -1) return null;
 
@@ -50,18 +45,18 @@ export const attendenceService = {
       id, // 🔒 enforce immutability
     };
 
-    await driveService.saveCollection("attendance", attendanceRecords);
+    await driveService.saveCollection('attendance', attendanceRecords);
     return attendanceRecords[index];
   },
 
   async deleteAttendance(id: string): Promise<boolean> {
     const attendanceRecords = await this.getAllAttendance();
-    const index = attendanceRecords.findIndex(a => a.id === id);
+    const index = attendanceRecords.findIndex((a) => a.id === id);
 
     if (index === -1) return false;
 
     attendanceRecords.splice(index, 1);
-    await driveService.saveCollection("attendance", attendanceRecords);
+    await driveService.saveCollection('attendance', attendanceRecords);
     return true;
   },
 };

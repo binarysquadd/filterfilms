@@ -1,17 +1,20 @@
-import { Check, ArrowLeft } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
+import { Check } from 'lucide-react';
+// import { Check, ArrowLeft } from "lucide-react";
+import Image from 'next/image';
+import Link from 'next/link';
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="h-screen flex bg-white overflow-hidden">
       {/* Left Side - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-emerald-800 px-12 py-8 flex-col justify-between relative overflow-hidden"> 
-
+      <div className="hidden lg:flex lg:w-1/2 bg-emerald-800 px-12 py-8 flex-col justify-between relative overflow-hidden">
         {/* Logo and Main Content */}
         <div className="relative z-10 flex flex-col justify-center flex-1">
           <div className="mb-8">
-            <Link href="/" className="w-40 h-24 rounded flex flex-row items-center justify-center mb-10">
+            <Link
+              href="/"
+              className="w-40 h-24 rounded flex flex-row items-center justify-center mb-10"
+            >
               <Image
                 src="/logo/logo-white.png"
                 alt="Filter Film Studio Logo"
@@ -22,10 +25,13 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             </Link>
 
             <h2 className="text-4xl font-bold text-ivory leading-tight mb-4">
-              Bring Your Vision<br />to Life
+              Bring Your Vision
+              <br />
+              to Life
             </h2>
             <p className="text-ivory/80 text-base leading-relaxed max-w-md">
-              Join our platform to access premium film production services, manage your projects, and collaborate with industry professionals.
+              Join our platform to access premium film production services, manage your projects,
+              and collaborate with industry professionals.
             </p>
           </div>
 
@@ -35,7 +41,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
               {[
                 'Professional team management',
                 'Real-time project tracking',
-                'Secure booking system'
+                'Secure booking system',
               ].map((feature, i) => (
                 <div key={i} className="flex items-center gap-3 text-white/90">
                   <div className="w-9 h-9 bg-white/10 rounded flex items-center justify-center flex-shrink-0">
@@ -49,11 +55,17 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             <div className="py-4 text-center text-md text-ivory/80">
               <p>&copy; {new Date().getFullYear()} Filter Film Studio. All rights reserved.</p>
               <div className="flex items-center justify-center gap-3 mt-1.5">
-                <a href="#" className="hover:text-ivory transition-colors">Privacy</a>
+                <a href="#" className="hover:text-ivory transition-colors">
+                  Privacy
+                </a>
                 <span>•</span>
-                <a href="#" className="hover:text-ivory transition-colors">Terms</a>
+                <a href="#" className="hover:text-ivory transition-colors">
+                  Terms
+                </a>
                 <span>•</span>
-                <a href="#" className="hover:text-ivory transition-colors">Help</a>
+                <a href="#" className="hover:text-ivory transition-colors">
+                  Help
+                </a>
               </div>
             </div>
           </div>

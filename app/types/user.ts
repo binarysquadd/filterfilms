@@ -1,4 +1,4 @@
-export type UserRole = "admin" | "team" | "customer";
+export type UserRole = 'admin' | 'team' | 'customer';
 
 export interface User {
   id: string;
@@ -9,7 +9,7 @@ export interface User {
   emailVerified?: string; // ISO date string
   createdAt: string; // ISO date string
   updatedAt: string; // ISO date string
-  
+
   // Team-specific fields (only for role: "team")
   teamProfile?: {
     specialization?: string;
@@ -22,7 +22,7 @@ export interface User {
     salary?: string;
     department?: string;
   };
-  
+
   // Customer-specific fields (only for role: "customer")
   customerProfile?: {
     phoneNumber?: string;

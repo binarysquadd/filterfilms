@@ -1,7 +1,16 @@
-"use client";
+'use client';
 
 import Link from 'next/link';
-import { Calendar, Image, Users, TrendingUp, ArrowRight, Package2, IndianRupee, Loader2 } from 'lucide-react';
+import {
+  Calendar,
+  Image,
+  Users,
+  TrendingUp,
+  ArrowRight,
+  Package2,
+  IndianRupee,
+  Loader2,
+} from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Package } from '@/app/types/package';
 import { Booking } from '@/app/types/booking';
@@ -38,7 +47,7 @@ export default function AdminDashboard() {
         galleryRes.json(),
         teamRes.json(),
       ]);
-      
+
       // Extract nested arrays from API response
       setPackages(Array.isArray(packagesData?.packages) ? packagesData.packages : []);
       setBookings(Array.isArray(bookingsData?.bookings) ? bookingsData.bookings : []);
@@ -70,7 +79,7 @@ export default function AdminDashboard() {
     },
     {
       label: 'Active Bookings',
-      value: bookings.filter(b => b.status !== 'completed' && b.status !== 'rejected').length,
+      value: bookings.filter((b) => b.status !== 'completed' && b.status !== 'rejected').length,
       icon: Calendar,
       color: 'bg-green-500',
       link: '/admin/bookings',
@@ -127,7 +136,9 @@ export default function AdminDashboard() {
             href={stat.link}
             className="bg-card rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow border border-border"
           >
-            <div className={`w-12 h-12 rounded-lg ${stat.color} flex items-center justify-center mb-4`}>
+            <div
+              className={`w-12 h-12 rounded-lg ${stat.color} flex items-center justify-center mb-4`}
+            >
               <stat.icon className="w-6 h-6 text-white" />
             </div>
             <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
@@ -163,10 +174,13 @@ export default function AdminDashboard() {
       </div>
 
       {/* Recent Bookings */}
-        <div className="bg-card rounded-xl shadow-sm border border-border">
+      <div className="bg-card rounded-xl shadow-sm border border-border">
         <div className="p-6 border-b border-border flex items-center justify-between">
           <h2 className="text-xl font-semibold text-gray-900">Recent Bookings</h2>
-          <Link href="/admin/bookings" className="text-sm text-muted-foreground cursor-pointer flex items-center gap-1">
+          <Link
+            href="/admin/bookings"
+            className="text-sm text-muted-foreground cursor-pointer flex items-center gap-1"
+          >
             View all <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
@@ -177,16 +191,24 @@ export default function AdminDashboard() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-medium text-gray-900">{booking.eventName}</p>
-                    <p className="text-sm text-gray-600">{booking.startDate} - {booking.endDate} • {booking.venue}</p>
+                    <p className="text-sm text-gray-600">
+                      {booking.startDate} - {booking.endDate} • {booking.venue}
+                    </p>
                   </div>
                   <div className="text-right">
-                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
-                      booking.status === 'approved' ? 'bg-green-100 text-green-700' :
-                      booking.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                      booking.status === 'in-progress' ? 'bg-blue-100 text-blue-700' :
-                      booking.status === 'completed' ? 'bg-purple-100 text-purple-700' :
-                      'bg-red-100 text-red-700'
-                    }`}>
+                    <span
+                      className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
+                        booking.status === 'approved'
+                          ? 'bg-green-100 text-green-700'
+                          : booking.status === 'pending'
+                            ? 'bg-yellow-100 text-yellow-700'
+                            : booking.status === 'in-progress'
+                              ? 'bg-blue-100 text-blue-700'
+                              : booking.status === 'completed'
+                                ? 'bg-purple-100 text-purple-700'
+                                : 'bg-red-100 text-red-700'
+                      }`}
+                    >
                       {booking.status}
                     </span>
                     <p className="text-sm text-gray-600 mt-1">{formatPrice(booking.totalAmount)}</p>

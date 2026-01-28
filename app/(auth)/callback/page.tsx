@@ -1,5 +1,5 @@
-import { getServerSession } from "@/app/lib/firebase/server-auth";
-import { redirect } from "next/navigation";
+import { getServerSession } from '@/app/lib/firebase/server-auth';
+import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,7 +11,7 @@ export default async function AuthCallbackPage({
   const session = await getServerSession();
 
   if (!session) {
-    redirect("/signin");
+    redirect('/signin');
   }
 
   // If there's a callback URL, use it
@@ -23,13 +23,13 @@ export default async function AuthCallbackPage({
   const role = session.role;
 
   switch (role) {
-    case "admin":
-      redirect("/admin/dashboard");
-    case "team":
-      redirect("/team/dashboard");
-    case "customer":
-      redirect("/customer/dashboard");
+    case 'admin':
+      redirect('/admin/dashboard');
+    case 'team':
+      redirect('/team/dashboard');
+    case 'customer':
+      redirect('/customer/dashboard');
     default:
-      redirect("/customer/dashboard");
+      redirect('/customer/dashboard');
   }
 }

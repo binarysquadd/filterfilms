@@ -63,10 +63,7 @@ export default function ForgotPasswordForm() {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <Label
-            htmlFor="email"
-            className="block text-lg font-bold text-muted-foreground mb-1"
-          >
+          <Label htmlFor="email" className="block text-lg font-bold text-muted-foreground mb-1">
             Email
           </Label>
           <Input
@@ -86,11 +83,7 @@ export default function ForgotPasswordForm() {
           className="w-full py-2.5 text-md font-bold"
           disabled={loading}
         >
-          {loading ? (
-            <Loader2 className="animate-spin w-4 h-4 mx-auto" />
-          ) : (
-            'Send Reset Link'
-          )}
+          {loading ? <Loader2 className="animate-spin w-4 h-4 mx-auto" /> : 'Send Reset Link'}
         </Button>
       </form>
 

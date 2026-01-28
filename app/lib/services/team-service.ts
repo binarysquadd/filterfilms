@@ -6,10 +6,10 @@ export const teamService = {
   async getAllTeamMembers(): Promise<TeamMember[]> {
     try {
       const team = await driveService.getCollection<TeamMember>('users');
-      console.log("Team members from Drive:", team);
+      console.log('Team members from Drive:', team);
       return team;
     } catch (error) {
-      console.error("Error fetching team members:", error);
+      console.error('Error fetching team members:', error);
       return [];
     }
   },
@@ -17,17 +17,19 @@ export const teamService = {
   async getTeamMemberById(id: string): Promise<TeamMember | null> {
     try {
       const team = await this.getAllTeamMembers();
-      const member = team.find(m => m.id === id);
+      const member = team.find((m) => m.id === id);
       return member || null;
     } catch (error) {
-      console.error("Error finding team member:", error);
+      console.error('Error finding team member:', error);
       return null;
     }
   },
 
-  async createTeamMember(memberData: Omit<TeamMember, 'id' | 'createdAt' | 'updatedAt'>): Promise<TeamMember> {
+  async createTeamMember(
+    memberData: Omit<TeamMember, 'id' | 'createdAt' | 'updatedAt'>
+  ): Promise<TeamMember> {
     const team = await this.getAllTeamMembers();
-    
+
     const newMember: TeamMember = {
       id: uuidv4(),
       ...memberData,
@@ -40,14 +42,14 @@ export const teamService = {
 
     team.push(newMember);
     await driveService.saveCollection('team', team);
-    
+
     return newMember;
   },
 
   async updateTeamMember(id: string, updates: Partial<TeamMember>): Promise<TeamMember | null> {
     const team = await this.getAllTeamMembers();
-    const memberIndex = team.findIndex(m => m.id === id);
-    
+    const memberIndex = team.findIndex((m) => m.id === id);
+
     if (memberIndex === -1) return null;
 
     team[memberIndex] = {
@@ -62,8 +64,8 @@ export const teamService = {
 
   async deleteTeamMember(id: string): Promise<boolean> {
     const team = await this.getAllTeamMembers();
-    const filteredTeam = team.filter(m => m.id !== id);
-    
+    const filteredTeam = team.filter((m) => m.id !== id);
+
     if (filteredTeam.length === team.length) return false;
 
     await driveService.saveCollection('team', filteredTeam);

@@ -8,7 +8,7 @@ export const userService = {
       const users = await driveService.getCollection<User>('users');
       return users;
     } catch (error) {
-      console.error("Error fetching users:", error);
+      console.error('Error fetching users:', error);
       return [];
     }
   },
@@ -16,10 +16,10 @@ export const userService = {
   async getUserByEmail(email: string): Promise<User | null> {
     try {
       const users = await this.getAllUsers();
-      const user = users.find(user => user.email.toLowerCase() === email.toLowerCase());
+      const user = users.find((user) => user.email.toLowerCase() === email.toLowerCase());
       return user || null;
     } catch (error) {
-      console.error("Error finding user by email:", error);
+      console.error('Error finding user by email:', error);
       return null;
     }
   },
@@ -27,10 +27,10 @@ export const userService = {
   async getUserById(id: string): Promise<User | null> {
     try {
       const users = await this.getAllUsers();
-      const user = users.find(user => user.id === id);
+      const user = users.find((user) => user.id === id);
       return user || null;
     } catch (error) {
-      console.error("Error finding user by ID:", error);
+      console.error('Error finding user by ID:', error);
       return null;
     }
   },
@@ -38,9 +38,9 @@ export const userService = {
   async getUsersByRole(role: UserRole): Promise<User[]> {
     try {
       const users = await this.getAllUsers();
-      return users.filter(user => user.role === role);
+      return users.filter((user) => user.role === role);
     } catch (error) {
-      console.error("Error filtering users by role:", error);
+      console.error('Error filtering users by role:', error);
       return [];
     }
   },
@@ -66,9 +66,9 @@ export const userService = {
     customerProfile?: User['customerProfile'];
   }): Promise<User> {
     const users = await this.getAllUsers();
-    
+
     // Check if user already exists
-    const existingUser = users.find(u => u.email.toLowerCase() === userData.email.toLowerCase());
+    const existingUser = users.find((u) => u.email.toLowerCase() === userData.email.toLowerCase());
     if (existingUser) {
       return existingUser;
     }
@@ -98,14 +98,14 @@ export const userService = {
 
     users.push(newUser);
     await driveService.saveCollection('users', users);
-    
+
     return newUser;
   },
 
   async updateUser(id: string, updates: Partial<User>): Promise<User | null> {
     const users = await this.getAllUsers();
-    const userIndex = users.findIndex(user => user.id === id);
-    
+    const userIndex = users.findIndex((user) => user.id === id);
+
     if (userIndex === -1) return null;
 
     users[userIndex] = {
@@ -126,7 +126,7 @@ export const userService = {
 
     // Initialize role-specific profile when role changes
     if (role === 'team' && !user.teamProfile) {
-      updates.teamProfile
+      updates.teamProfile;
     } else if (role === 'customer' && !user.customerProfile) {
       updates.customerProfile = {
         preferences: [],
@@ -139,8 +139,8 @@ export const userService = {
 
   async deleteUserById(id: string): Promise<boolean> {
     const users = await this.getAllUsers();
-    const filteredUsers = users.filter(user => user.id !== id);
-    
+    const filteredUsers = users.filter((user) => user.id !== id);
+
     if (filteredUsers.length === users.length) return false;
 
     await driveService.saveCollection('users', filteredUsers);
@@ -149,8 +149,8 @@ export const userService = {
 
   async verifyEmail(email: string): Promise<User | null> {
     const users = await this.getAllUsers();
-    const userIndex = users.findIndex(u => u.email.toLowerCase() === email.toLowerCase());
-    
+    const userIndex = users.findIndex((u) => u.email.toLowerCase() === email.toLowerCase());
+
     if (userIndex === -1) return null;
 
     users[userIndex].emailVerified = new Date().toISOString();
@@ -162,7 +162,7 @@ export const userService = {
 
   // Team-specific methods
   async updateTeamProfile(
-    userId: string, 
+    userId: string,
     teamProfile: Partial<User['teamProfile']>
   ): Promise<User | null> {
     const user = await this.getUserById(userId);
@@ -206,41 +206,41 @@ export const userService = {
   async searchUsers(query: string): Promise<User[]> {
     const users = await this.getAllUsers();
     const lowerQuery = query.toLowerCase();
-    
-    return users.filter(user => 
-      user.name?.toLowerCase().includes(lowerQuery) ||
-      user.email.toLowerCase().includes(lowerQuery) ||
-      user.teamProfile?.specialization?.toLowerCase().includes(lowerQuery) ||
-      user.teamProfile?.bio?.toLowerCase().includes(lowerQuery)
+
+    return users.filter(
+      (user) =>
+        user.name?.toLowerCase().includes(lowerQuery) ||
+        user.email.toLowerCase().includes(lowerQuery) ||
+        user.teamProfile?.specialization?.toLowerCase().includes(lowerQuery) ||
+        user.teamProfile?.bio?.toLowerCase().includes(lowerQuery)
     );
   },
 
   async getTeamMembersBySpecialization(specialization: string): Promise<User[]> {
     const teamMembers = await this.getTeamMembers();
-    return teamMembers.filter(member => 
+    return teamMembers.filter((member) =>
       member.teamProfile?.specialization?.toLowerCase().includes(specialization.toLowerCase())
     );
   },
 
   async getTeamMembersByDepartment(department: string): Promise<User[]> {
     const teamMembers = await this.getTeamMembers();
-    return teamMembers.filter(member => 
-      member.teamProfile?.department?.toLowerCase() === department.toLowerCase()
+    return teamMembers.filter(
+      (member) => member.teamProfile?.department?.toLowerCase() === department.toLowerCase()
     );
   },
 
   // Statistics methods
   async getUserStats() {
     const users = await this.getAllUsers();
-    
+
     return {
       total: users.length,
-      admins: users.filter(u => u.role === 'admin').length,
-      team: users.filter(u => u.role === 'team').length,
-      customers: users.filter(u => u.role === 'customer').length,
-      verified: users.filter(u => u.emailVerified).length,
-      unverified: users.filter(u => !u.emailVerified).length,
+      admins: users.filter((u) => u.role === 'admin').length,
+      team: users.filter((u) => u.role === 'team').length,
+      customers: users.filter((u) => u.role === 'customer').length,
+      verified: users.filter((u) => u.emailVerified).length,
+      unverified: users.filter((u) => !u.emailVerified).length,
     };
   },
-}
-  
+};

@@ -6,8 +6,8 @@ export async function middleware(request: NextRequest) {
 
   // Public routes
   const publicRoutes = ['/signin', '/signup', '/forgot-password', '/api/auth'];
-  
-  if (publicRoutes.some(route => pathname.startsWith(route)) || pathname === '/') {
+
+  if (publicRoutes.some((route) => pathname.startsWith(route)) || pathname === '/') {
     return NextResponse.next();
   }
 
@@ -24,7 +24,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
-  ],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'],
 };

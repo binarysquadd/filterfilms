@@ -81,7 +81,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signUpWithEmail = async (email: string, password: string, name?: string) => {
     const credential = await createUserWithEmailAndPassword(auth, email, password);
-    
+
     // Send name to backend during sync
     const token = await credential.user.getIdToken();
     const response = await fetch('/api/auth/sync', {
@@ -91,7 +91,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     if (!response.ok) throw new Error('Failed to create user');
-    
+
     const { user: dbUser } = await response.json();
     setUser(dbUser);
   };

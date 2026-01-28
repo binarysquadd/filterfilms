@@ -1,17 +1,23 @@
 'use client';
 
-import { useRouter } from "next/navigation";
-import { Button } from "@/app/src/components/ui/button";
-import { User } from "@/app/types/user";
-import { useEffect, useState } from "react";
-import { Loader2, Plus, X, Upload, Edit, Trash2 } from "lucide-react";
-import Image from "next/image";
-import toast from "react-hot-toast";
-import { Label } from "@/app/src/components/ui/label";
-import { Input } from "@/app/src/components/ui/input";
-import DeleteModal from "@/app/src/components/common/modal/delete-modal";
-import { Textarea } from "@/app/src/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/app/src/components/ui/select";
+import { useRouter } from 'next/navigation';
+import { Button } from '@/app/src/components/ui/button';
+import { User } from '@/app/types/user';
+import { useEffect, useState } from 'react';
+import { Loader2, Plus, X, Upload, Edit, Trash2 } from 'lucide-react';
+import Image from 'next/image';
+import toast from 'react-hot-toast';
+import { Label } from '@/app/src/components/ui/label';
+import { Input } from '@/app/src/components/ui/input';
+import DeleteModal from '@/app/src/components/common/modal/delete-modal';
+import { Textarea } from '@/app/src/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/app/src/components/ui/select';
 
 interface Props {
   initialTeam?: User[];
@@ -79,7 +85,7 @@ export default function TeamPage({ initialTeam }: Props) {
         const data = await res.json();
         setTeam(data.users);
       } catch (err) {
-        toast.error("Error fetching team members");
+        toast.error('Error fetching team members');
       } finally {
         setLoading(false);
       }
@@ -111,7 +117,7 @@ export default function TeamPage({ initialTeam }: Props) {
   const openDeleteModal = (id: string) => {
     setDeletingId(id);
     setDeleteOpen(true);
-  }
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -137,7 +143,7 @@ export default function TeamPage({ initialTeam }: Props) {
     });
 
     if (!response.ok) {
-      toast.error("Image upload failed");
+      toast.error('Image upload failed');
       throw new Error('Image upload failed');
     }
 
@@ -170,12 +176,10 @@ export default function TeamPage({ initialTeam }: Props) {
         const result = await response.json();
 
         if (response.ok) {
-          setTeam(prev =>
-            prev.map(m => m.id === editingId ? result.user : m)
-          );
-          toast.success("Team member updated successfully!");
+          setTeam((prev) => prev.map((m) => (m.id === editingId ? result.user : m)));
+          toast.success('Team member updated successfully!');
         } else {
-          toast.error(result.error || "Failed to update team member");
+          toast.error(result.error || 'Failed to update team member');
           return;
         }
       } else {
@@ -188,10 +192,10 @@ export default function TeamPage({ initialTeam }: Props) {
         const result = await response.json();
 
         if (response.ok) {
-          setTeam(prev => [...prev, result.user]);
-          toast.success("Team member added successfully!");
+          setTeam((prev) => [...prev, result.user]);
+          toast.success('Team member added successfully!');
         } else {
-          toast.error(result.error || "Failed to add team member");
+          toast.error(result.error || 'Failed to add team member');
           return;
         }
       }
@@ -200,7 +204,7 @@ export default function TeamPage({ initialTeam }: Props) {
       resetForm();
       router.refresh();
     } catch (error) {
-      toast.error("An error occurred while saving the team member");
+      toast.error('An error occurred while saving the team member');
     } finally {
       setLoading(false);
       setIsUploading(false);
@@ -217,15 +221,15 @@ export default function TeamPage({ initialTeam }: Props) {
       });
 
       if (response.ok) {
-        setTeam(prev => prev.filter(m => m.id !== deletingId));
-        toast.success("Team member removed successfully!");
+        setTeam((prev) => prev.filter((m) => m.id !== deletingId));
+        toast.success('Team member removed successfully!');
         router.refresh();
       } else {
-        toast.error("Error deleting team member");
+        toast.error('Error deleting team member');
       }
     } catch (error) {
       console.error('Delete error:', error);
-      toast.error("Error deleting team member");
+      toast.error('Error deleting team member');
     } finally {
       setIsDeleting(false);
       setDeleteOpen(false);
@@ -236,9 +240,7 @@ export default function TeamPage({ initialTeam }: Props) {
   if (accessDenied) {
     return (
       <div className="flex h-96 items-center justify-center">
-        <p className="text-muted-foreground">
-          You do not have permission to view this page.
-        </p>
+        <p className="text-muted-foreground">You do not have permission to view this page.</p>
       </div>
     );
   }
@@ -262,7 +264,9 @@ export default function TeamPage({ initialTeam }: Props) {
             <table className="w-full">
               <thead className="bg-muted/50">
                 <tr>
-                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">Member</th>
+                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">
+                    Member
+                  </th>
                   <th className="p-3 text-sm font-medium text-muted-foreground">Role</th>
                   <th className="p-3 text-sm font-medium text-muted-foreground">Actions</th>
                 </tr>
@@ -287,7 +291,10 @@ export default function TeamPage({ initialTeam }: Props) {
                   </tr>
                 ) : (
                   team.map((member) => (
-                    <tr key={member.id ?? member.email} className="hover:bg-muted/30 cursor-pointer">
+                    <tr
+                      key={member.id ?? member.email}
+                      className="hover:bg-muted/30 cursor-pointer"
+                    >
                       <td className="p-4">
                         <div className="flex items-center space-x-4">
                           <div className="w-10 h-10 relative rounded-full overflow-hidden bg-muted">
@@ -317,7 +324,11 @@ export default function TeamPage({ initialTeam }: Props) {
                         <Button variant="cancel" size="sm" onClick={() => openModal(member)}>
                           <Edit className="w-4 h-4" />
                         </Button>
-                        <Button variant="cancel" size="sm" onClick={() => openDeleteModal(member.id)}>
+                        <Button
+                          variant="cancel"
+                          size="sm"
+                          onClick={() => openDeleteModal(member.id)}
+                        >
                           <Trash2 className="w-4 h-4 text-red-500" />
                         </Button>
                       </td>
@@ -336,11 +347,19 @@ export default function TeamPage({ initialTeam }: Props) {
               <form onSubmit={handleSubmit} className="p-6 space-y-4">
                 {/* Photo Upload */}
                 <div>
-                  <Label className="block text-sm font-medium text-foreground mb-2">Profile Photo</Label>
+                  <Label className="block text-sm font-medium text-foreground mb-2">
+                    Profile Photo
+                  </Label>
                   <div className="flex items-center space-x-4">
                     <div className="w-20 h-20 rounded-full overflow-hidden bg-muted">
                       {localPreview ? (
-                        <Image src={localPreview} alt="Preview" className="object-cover w-full h-full" width={100} height={100} />
+                        <Image
+                          src={localPreview}
+                          alt="Preview"
+                          className="object-cover w-full h-full"
+                          width={100}
+                          height={100}
+                        />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-muted-foreground text-2xl">
                           {formData.name ? formData.name.charAt(0).toUpperCase() : 'U'}
@@ -352,7 +371,12 @@ export default function TeamPage({ initialTeam }: Props) {
                         <Upload className="w-4 h-4" />
                         <span className="text-sm">Upload Photo</span>
                       </div>
-                      <Input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        className="hidden"
+                      />
                     </Label>
                   </div>
                 </div>
@@ -391,8 +415,10 @@ export default function TeamPage({ initialTeam }: Props) {
                       <SelectValue placeholder="Select status" />
                     </SelectTrigger>
                     <SelectContent>
-                      {roles.map(role => (
-                        <SelectItem key={role.value} value={role.value}>{role.label}</SelectItem>
+                      {roles.map((role) => (
+                        <SelectItem key={role.value} value={role.value}>
+                          {role.label}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -400,7 +426,9 @@ export default function TeamPage({ initialTeam }: Props) {
 
                 {/* Specialization */}
                 <div>
-                  <Label className="block text-sm font-medium text-foreground mb-2">Specialization</Label>
+                  <Label className="block text-sm font-medium text-foreground mb-2">
+                    Specialization
+                  </Label>
                   <Input
                     type="text"
                     value={formData.specialization}
@@ -410,7 +438,9 @@ export default function TeamPage({ initialTeam }: Props) {
 
                 {/* Experience */}
                 <div>
-                  <Label className="block text-sm font-medium text-foreground mb-2">Experience</Label>
+                  <Label className="block text-sm font-medium text-foreground mb-2">
+                    Experience
+                  </Label>
                   <Input
                     type="text"
                     value={formData.experience}
@@ -431,7 +461,9 @@ export default function TeamPage({ initialTeam }: Props) {
 
                 {/* Instagram */}
                 <div>
-                  <Label className="block text-sm font-medium text-foreground mb-2">Instagram</Label>
+                  <Label className="block text-sm font-medium text-foreground mb-2">
+                    Instagram
+                  </Label>
                   <Input
                     type="text"
                     value={formData.instagram}
@@ -442,7 +474,15 @@ export default function TeamPage({ initialTeam }: Props) {
 
                 {/* Submit Buttons */}
                 <div className="flex justify-end space-x-3 pt-4">
-                  <Button type="button" variant="cancel" onClick={() => { setIsModalOpen(false); resetForm(); }} disabled={loading || isUploading}>
+                  <Button
+                    type="button"
+                    variant="cancel"
+                    onClick={() => {
+                      setIsModalOpen(false);
+                      resetForm();
+                    }}
+                    disabled={loading || isUploading}
+                  >
                     Cancel
                   </Button>
                   <Button type="submit" variant="royal" disabled={loading || isUploading}>
@@ -451,7 +491,11 @@ export default function TeamPage({ initialTeam }: Props) {
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                         {isUploading ? 'Uploading...' : 'Saving...'}
                       </>
-                    ) : editingId ? 'Update Member' : 'Add Member'}
+                    ) : editingId ? (
+                      'Update Member'
+                    ) : (
+                      'Add Member'
+                    )}
                   </Button>
                 </div>
               </form>

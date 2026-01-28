@@ -4,7 +4,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
 @layer base {
   :root {
     --background: 60 33% 96%;
@@ -49,7 +48,11 @@
     --cream: 60 25% 93%;
 
     /* Gradients */
-    --gradient-royal: linear-gradient(135deg, hsl(var(--emerald)) 0%, hsl(var(--emerald-dark)) 100%);
+    --gradient-royal: linear-gradient(
+      135deg,
+      hsl(var(--emerald)) 0%,
+      hsl(var(--emerald-dark)) 100%
+    );
     --gradient-gold: linear-gradient(135deg, hsl(var(--gold)) 0%, hsl(var(--gold-dark)) 100%);
     --gradient-elegant: linear-gradient(180deg, hsl(var(--ivory)) 0%, hsl(var(--cream)) 100%);
 
@@ -83,7 +86,12 @@
     @apply bg-background text-foreground font-body antialiased;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-heading;
   }
 }
@@ -124,7 +132,13 @@
 
   /* Floral border pattern */
   .floral-border {
-    border-image: linear-gradient(90deg, hsl(var(--gold)) 0%, hsl(var(--gold-light)) 50%, hsl(var(--gold)) 100%) 1;
+    border-image: linear-gradient(
+        90deg,
+        hsl(var(--gold)) 0%,
+        hsl(var(--gold-light)) 50%,
+        hsl(var(--gold)) 100%
+      )
+      1;
   }
 
   /* Elegant card hover */
@@ -145,8 +159,12 @@
   }
 
   @keyframes shimmer {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
   }
 
   /* Fade in animation */
@@ -203,7 +221,8 @@
   }
 
   @keyframes pulseGlow {
-    0%, 100% {
+    0%,
+    100% {
       box-shadow: 0 0 20px hsl(var(--gold) / 0.3);
     }
     50% {
@@ -243,13 +262,22 @@
     text-wrap: balance;
   }
 
-  .delay-100 { animation-delay: 100ms; }
-  .delay-200 { animation-delay: 200ms; }
-  .delay-300 { animation-delay: 300ms; }
-  .delay-400 { animation-delay: 400ms; }
-  .delay-500 { animation-delay: 500ms; }
+  .delay-100 {
+    animation-delay: 100ms;
+  }
+  .delay-200 {
+    animation-delay: 200ms;
+  }
+  .delay-300 {
+    animation-delay: 300ms;
+  }
+  .delay-400 {
+    animation-delay: 400ms;
+  }
+  .delay-500 {
+    animation-delay: 500ms;
+  }
 }
-
 
 @media print {
   body {

@@ -1,9 +1,5 @@
-import UnifiedDashboard from "../src/layout/dashboard-layout";
+import UnifiedDashboard from '../src/layout/dashboard-layout';
 
-export default function TeamDashboard({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function TeamDashboard({ children }: { children: React.ReactNode }) {
   return <UnifiedDashboard>{children}</UnifiedDashboard>;
 }

@@ -1,32 +1,32 @@
 // lib/services/contact-service.ts
-import { driveService } from "../google-drive.server";
-import { ContactMessage } from "@/app/types/contact-message";
-import { v4 as uuidv4 } from "uuid";
+import { driveService } from '../google-drive.server';
+import { ContactMessage } from '@/app/types/contact-message';
+import { v4 as uuidv4 } from 'uuid';
 
-const COLLECTION = "contact";
+const COLLECTION = 'contact';
 
 export const contactService = {
   async getAll(): Promise<ContactMessage[]> {
     const messages = await driveService.getCollection<ContactMessage>(COLLECTION);
-    return messages.map(m => ({
+    return messages.map((m) => ({
       ...m,
       id: String(m.id),
-      status: m.status ?? "pending",
+      status: m.status ?? 'pending',
     }));
   },
 
   async getById(id: string): Promise<ContactMessage | null> {
     const messages = await this.getAll();
-    return messages.find(m => m.id === id) ?? null;
+    return messages.find((m) => m.id === id) ?? null;
   },
 
-  async create(data: Omit<ContactMessage, "id" | "createdAt" | "status">) {
+  async create(data: Omit<ContactMessage, 'id' | 'createdAt' | 'status'>) {
     const messages = await this.getAll();
 
     const newMessage: ContactMessage = {
       id: uuidv4(),
       createdAt: new Date().toISOString(),
-      status: "pending",
+      status: 'pending',
       ...data,
     };
 
@@ -37,7 +37,7 @@ export const contactService = {
 
   async update(id: string, updates: Partial<ContactMessage>) {
     const messages = await this.getAll();
-    const index = messages.findIndex(m => m.id === id);
+    const index = messages.findIndex((m) => m.id === id);
 
     if (index === -1) return null;
 
@@ -53,7 +53,7 @@ export const contactService = {
 
   async delete(id: string) {
     const messages = await this.getAll();
-    const filtered = messages.filter(m => m.id !== id);
+    const filtered = messages.filter((m) => m.id !== id);
 
     if (filtered.length === messages.length) return false;
 

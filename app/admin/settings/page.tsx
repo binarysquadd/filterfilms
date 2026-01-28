@@ -7,7 +7,6 @@ import { Textarea } from '@/app/src/components/ui/textarea';
 import { Button } from '@/app/src/components/ui/button';
 import { useRouter } from 'next/navigation';
 
-
 const AdminSettings: React.FC = () => {
   const router = useRouter();
   const { toast } = useToast();
@@ -36,7 +35,7 @@ const AdminSettings: React.FC = () => {
     try {
       const response = await fetch('/api/admin/setting');
       const data = await response.json();
-      
+
       if (response.ok && data.settings) {
         // If settings exist, use the first one (assuming single settings record)
         if (Array.isArray(data.settings) && data.settings.length > 0) {
@@ -69,7 +68,10 @@ const AdminSettings: React.FC = () => {
             socialYoutube: setting.socialYoutube || '',
           });
         }
-      } else if (response.status === 404 || (Array.isArray(data.settings) && data.settings.length === 0)) {
+      } else if (
+        response.status === 404 ||
+        (Array.isArray(data.settings) && data.settings.length === 0)
+      ) {
         // No settings found - this is okay, we'll create them on first save
         console.log('No settings found, will create on first save');
       } else {
@@ -77,7 +79,7 @@ const AdminSettings: React.FC = () => {
         toast({
           title: 'Error',
           description: 'Failed to load settings',
-          variant: 'destructive'
+          variant: 'destructive',
         });
       }
     } catch (error) {
@@ -85,7 +87,7 @@ const AdminSettings: React.FC = () => {
       toast({
         title: 'Error',
         description: 'Failed to load settings',
-        variant: 'destructive'
+        variant: 'destructive',
       });
     } finally {
       setIsFetching(false);
@@ -110,7 +112,7 @@ const AdminSettings: React.FC = () => {
 
     try {
       let response;
-      
+
       if (settingId) {
         // Update existing settings
         response = await fetch('/api/admin/setting', {
@@ -134,7 +136,7 @@ const AdminSettings: React.FC = () => {
           // Store the new setting ID
           setSettingId(result.setting.id);
         }
-        
+
         toast({
           title: 'Settings Saved',
           description: 'Your changes have been saved successfully.',
@@ -144,7 +146,7 @@ const AdminSettings: React.FC = () => {
         toast({
           title: 'Error',
           description: result.error || 'Failed to save settings',
-          variant: 'destructive'
+          variant: 'destructive',
         });
       }
     } catch (error) {
@@ -152,7 +154,7 @@ const AdminSettings: React.FC = () => {
       toast({
         title: 'Error',
         description: 'An unexpected error occurred',
-        variant: 'destructive'
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -224,7 +226,9 @@ const AdminSettings: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-foreground mb-2">Business Address</label>
+            <label className="block text-sm font-medium text-foreground mb-2">
+              Business Address
+            </label>
             <Input
               value={settings.address}
               onChange={(e) => setSettings({ ...settings, address: e.target.value })}
@@ -245,7 +249,9 @@ const AdminSettings: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-foreground mb-2">Business Description</label>
+            <label className="block text-sm font-medium text-foreground mb-2">
+              Business Description
+            </label>
             <Textarea
               value={settings.description}
               onChange={(e) => setSettings({ ...settings, description: e.target.value })}
@@ -257,7 +263,9 @@ const AdminSettings: React.FC = () => {
       </div>
 
       <div className="bg-card rounded-xl shadow-card p-6">
-        <h2 className="font-heading text-xl font-semibold text-foreground mb-6">Social Media Links</h2>
+        <h2 className="font-heading text-xl font-semibold text-foreground mb-6">
+          Social Media Links
+        </h2>
 
         <div className="space-y-4">
           <div>

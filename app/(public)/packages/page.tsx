@@ -1,27 +1,27 @@
-'use client'
+'use client';
 
-import Image from "next/image";
-import Link from "next/link";
-import SectionHeader from "@/app/src/components/common/SectionHeader";
+import Image from 'next/image';
+import Link from 'next/link';
+import SectionHeader from '@/app/src/components/common/SectionHeader';
 
 const packages = [
   {
-    title: "Photography Packages",
-    subtitle: "PREMIUM COLLECTION",
-    desc: "Timeless wedding photography capturing emotions, traditions, and candid moments with artistic storytelling.",
-    img: "/package-image/photo.png",
+    title: 'Photography Packages',
+    subtitle: 'PREMIUM COLLECTION',
+    desc: 'Timeless wedding photography capturing emotions, traditions, and candid moments with artistic storytelling.',
+    img: '/package-image/photo.png',
   },
   {
-    title: "Cinematography Packages",
-    subtitle: "BESPOKE FILMS",
-    desc: "Cinematic wedding films crafted like a movie, preserving your most memorable moments.",
-    img: "/package-image/cinematography.png",
+    title: 'Cinematography Packages',
+    subtitle: 'BESPOKE FILMS',
+    desc: 'Cinematic wedding films crafted like a movie, preserving your most memorable moments.',
+    img: '/package-image/cinematography.png',
   },
   {
-    title: "Custom Packages",
-    subtitle: "TAILORED EXPERIENCE",
-    desc: "Create a package that perfectly fits your wedding vision and personal style.",
-    img: "/package-image/custom1.png",
+    title: 'Custom Packages',
+    subtitle: 'TAILORED EXPERIENCE',
+    desc: 'Create a package that perfectly fits your wedding vision and personal style.',
+    img: '/package-image/custom1.png',
   },
 ];
 
@@ -60,9 +60,7 @@ export default function PackagesSection() {
               <h3 className="text-4xl lg:text-5xl font-heading font-bold text-ivory mb-2">
                 {packages[0].title}
               </h3>
-              <p className="text-ivory/80 text-lg leading-relaxed max-w-xl">
-                {packages[0].desc}
-              </p>
+              <p className="text-ivory/80 text-lg leading-relaxed max-w-xl">{packages[0].desc}</p>
             </div>
           </div>
 

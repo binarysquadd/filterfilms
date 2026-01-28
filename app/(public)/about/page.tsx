@@ -1,15 +1,13 @@
-import SectionHeader from "@/app/src/components/common/SectionHeader";
-import { Button } from "@/app/src/components/ui/button";
-import { ArrowRight, PhoneCallIcon } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
+import SectionHeader from '@/app/src/components/common/SectionHeader';
+import { Button } from '@/app/src/components/ui/button';
+import { PhoneCallIcon } from 'lucide-react';
+// import { ArrowRight, PhoneCallIcon } from "lucide-react";
+import Image from 'next/image';
+import Link from 'next/link';
 
 export default function AboutSection() {
   return (
-    <section
-      id="about"
-      className="relative overflow-hidden py-24 lg:py-32"
-    >
+    <section id="about" className="relative overflow-hidden py-24 lg:py-32">
       {/* Background Accent */}
       {/* <div className="absolute inset-0 -z-10">
         <div className="absolute top-1/4 left-0 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
@@ -39,9 +37,7 @@ export default function AboutSection() {
 
             {/* Floating Badge */}
             <div className="absolute -bottom-6 -right-6 bg-background/90 backdrop-blur-xl border border-border rounded-sm px-6 py-4 shadow-xl">
-              <p className="text-sm uppercase tracking-widest text-muted-foreground">
-                Since
-              </p>
+              <p className="text-sm uppercase tracking-widest text-muted-foreground">Since</p>
               <p className="text-2xl font-bold text-primary">2018</p>
             </div>
           </div>
@@ -53,19 +49,14 @@ export default function AboutSection() {
             </h3>
 
             <p className="text-lg text-muted-foreground leading-relaxed">
-              At{" "}
-              <span className="font-semibold text-foreground">
-                Filter Film Studio
-              </span>
-              , we believe every Indian wedding is more than an event — it’s a
-              cinematic journey filled with traditions, emotions, and stories
-              waiting to be told.
+              At <span className="font-semibold text-foreground">Filter Film Studio</span>, we
+              believe every Indian wedding is more than an event — it’s a cinematic journey filled
+              with traditions, emotions, and stories waiting to be told.
             </p>
 
             <p className="text-lg text-muted-foreground leading-relaxed">
-              From intimate rituals to grand celebrations, our team blends
-              creativity with technical excellence to preserve your moments
-              exactly the way they felt.
+              From intimate rituals to grand celebrations, our team blends creativity with technical
+              excellence to preserve your moments exactly the way they felt.
             </p>
 
             <div className="pt-6">

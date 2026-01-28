@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 import {
@@ -18,19 +18,19 @@ interface DataContextType {
   addPackage: (pkg: Omit<Package, 'id'>) => void;
   updatePackage: (id: string, pkg: Partial<Package>) => void;
   deletePackage: (id: string) => void;
-  
+
   // Bookings
   bookings: Booking[];
   addBooking: (booking: Omit<Booking, 'id' | 'createdAt'>) => void;
   updateBooking: (id: string, booking: Partial<Booking>) => void;
   deleteBooking: (id: string) => void;
-  
+
   // Team
   team: TeamMember[];
   addTeamMember: (member: Omit<TeamMember, 'id'>) => void;
   updateTeamMember: (id: string, member: Partial<TeamMember>) => void;
   deleteTeamMember: (id: string) => void;
-  
+
   // Gallery
   gallery: GalleryItem[];
   addGalleryItem: (item: Omit<GalleryItem, 'id'>) => void;
@@ -51,17 +51,15 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       ...pkg,
       id: `pkg-${Date.now()}`,
     };
-    setPackages(prev => [...prev, newPackage]);
+    setPackages((prev) => [...prev, newPackage]);
   }, []);
 
   const updatePackage = useCallback((id: string, pkg: Partial<Package>) => {
-    setPackages(prev =>
-      prev.map(p => (p.id === id ? { ...p, ...pkg } : p))
-    );
+    setPackages((prev) => prev.map((p) => (p.id === id ? { ...p, ...pkg } : p)));
   }, []);
 
   const deletePackage = useCallback((id: string) => {
-    setPackages(prev => prev.filter(p => p.id !== id));
+    setPackages((prev) => prev.filter((p) => p.id !== id));
   }, []);
 
   // Booking operations
@@ -71,17 +69,15 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       id: `book-${Date.now()}`,
       createdAt: new Date().toISOString().split('T')[0],
     };
-    setBookings(prev => [...prev, newBooking]);
+    setBookings((prev) => [...prev, newBooking]);
   }, []);
 
   const updateBooking = useCallback((id: string, booking: Partial<Booking>) => {
-    setBookings(prev =>
-      prev.map(b => (b.id === id ? { ...b, ...booking } : b))
-    );
+    setBookings((prev) => prev.map((b) => (b.id === id ? { ...b, ...booking } : b)));
   }, []);
 
   const deleteBooking = useCallback((id: string) => {
-    setBookings(prev => prev.filter(b => b.id !== id));
+    setBookings((prev) => prev.filter((b) => b.id !== id));
   }, []);
 
   // Team operations
@@ -90,17 +86,15 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       ...member,
       id: `team-${Date.now()}`,
     };
-    setTeam(prev => [...prev, newMember]);
+    setTeam((prev) => [...prev, newMember]);
   }, []);
 
   const updateTeamMember = useCallback((id: string, member: Partial<TeamMember>) => {
-    setTeam(prev =>
-      prev.map(t => (t.id === id ? { ...t, ...member } : t))
-    );
+    setTeam((prev) => prev.map((t) => (t.id === id ? { ...t, ...member } : t)));
   }, []);
 
   const deleteTeamMember = useCallback((id: string) => {
-    setTeam(prev => prev.filter(t => t.id !== id));
+    setTeam((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
   // Gallery operations
@@ -109,11 +103,11 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       ...item,
       id: `gal-${Date.now()}`,
     };
-    setGallery(prev => [...prev, newItem]);
+    setGallery((prev) => [...prev, newItem]);
   }, []);
 
   const deleteGalleryItem = useCallback((id: string) => {
-    setGallery(prev => prev.filter(g => g.id !== id));
+    setGallery((prev) => prev.filter((g) => g.id !== id));
   }, []);
 
   const value: DataContextType = {

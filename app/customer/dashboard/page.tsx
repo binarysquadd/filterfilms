@@ -1,6 +1,17 @@
 'use client';
 import Link from 'next/link';
-import { Calendar, Package, Clock, CheckCircle, AlertCircle, DollarSign, TrendingUp, Loader2, ArrowRight, Star } from 'lucide-react';
+import {
+  Calendar,
+  Package,
+  Clock,
+  CheckCircle,
+  AlertCircle,
+  DollarSign,
+  TrendingUp,
+  Loader2,
+  ArrowRight,
+  Star,
+} from 'lucide-react';
 import { useAuth } from '@/app/lib/firebase/auth-context';
 import { useState, useEffect } from 'react';
 import { Booking } from '@/app/types/booking';
@@ -8,11 +19,31 @@ import { Package as PackageType } from '@/app/types/package';
 import toast from 'react-hot-toast';
 
 const statusConfig = {
-  pending: { label: 'Pending', color: 'bg-yellow-100 text-yellow-700 border-yellow-200', icon: Clock },
-  approved: { label: 'Approved', color: 'bg-green-100 text-green-700 border-green-200', icon: CheckCircle },
-  'in-progress': { label: 'In Progress', color: 'bg-blue-100 text-blue-700 border-blue-200', icon: Clock },
-  completed: { label: 'Completed', color: 'bg-purple-100 text-purple-700 border-purple-200', icon: CheckCircle },
-  rejected: { label: 'Rejected', color: 'bg-red-100 text-red-700 border-red-200', icon: AlertCircle },
+  pending: {
+    label: 'Pending',
+    color: 'bg-yellow-100 text-yellow-700 border-yellow-200',
+    icon: Clock,
+  },
+  approved: {
+    label: 'Approved',
+    color: 'bg-green-100 text-green-700 border-green-200',
+    icon: CheckCircle,
+  },
+  'in-progress': {
+    label: 'In Progress',
+    color: 'bg-blue-100 text-blue-700 border-blue-200',
+    icon: Clock,
+  },
+  completed: {
+    label: 'Completed',
+    color: 'bg-purple-100 text-purple-700 border-purple-200',
+    icon: CheckCircle,
+  },
+  rejected: {
+    label: 'Rejected',
+    color: 'bg-red-100 text-red-700 border-red-200',
+    icon: AlertCircle,
+  },
 };
 
 export default function CustomerDashboard() {
@@ -63,7 +94,7 @@ export default function CustomerDashboard() {
     return new Date(dateString).toLocaleDateString('en-IN', {
       day: 'numeric',
       month: 'short',
-      year: 'numeric'
+      year: 'numeric',
     });
   };
 
@@ -74,7 +105,7 @@ export default function CustomerDashboard() {
     date.setHours(0, 0, 0, 0);
     const diffTime = date.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
+
     if (diffDays === 0) return 'Today';
     if (diffDays === 1) return 'Tomorrow';
     if (diffDays < 0) return `${Math.abs(diffDays)} days ago`;
@@ -83,10 +114,10 @@ export default function CustomerDashboard() {
 
   // Calculate statistics
   const totalBookings = bookings.length;
-  const pendingBookings = bookings.filter(b => b.status === 'pending').length;
-  const approvedBookings = bookings.filter(b => b.status === 'approved').length;
-  const inProgressBookings = bookings.filter(b => b.status === 'in-progress').length;
-  const completedBookings = bookings.filter(b => b.status === 'completed').length;
+  const pendingBookings = bookings.filter((b) => b.status === 'pending').length;
+  const approvedBookings = bookings.filter((b) => b.status === 'approved').length;
+  const inProgressBookings = bookings.filter((b) => b.status === 'in-progress').length;
+  const completedBookings = bookings.filter((b) => b.status === 'completed').length;
   // const rejectedBookings = bookings.filter(b => b.status === 'rejected').length;
 
   // Financial statistics
@@ -97,14 +128,16 @@ export default function CustomerDashboard() {
   // Upcoming events (next 30 days)
   const today = new Date();
   const next30Days = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
-  const upcomingEvents = bookings.filter(b => {
+  const upcomingEvents = bookings.filter((b) => {
     const eventDate = new Date(b.startDate);
     return eventDate >= today && eventDate <= next30Days && b.status !== 'rejected';
   });
 
   // Next event
   const nextEvent = bookings
-    .filter(b => new Date(b.startDate) >= today && b.status !== 'rejected' && b.status !== 'completed')
+    .filter(
+      (b) => new Date(b.startDate) >= today && b.status !== 'rejected' && b.status !== 'completed'
+    )
     .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())[0];
 
   // Recent bookings (last 5)
@@ -212,7 +245,9 @@ export default function CustomerDashboard() {
             href={stat.link}
             className="bg-card rounded-xl p-6 shadow-sm hover:shadow-md transition-all border border-gray-200 group"
           >
-            <div className={`w-12 h-12 rounded-lg ${stat.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+            <div
+              className={`w-12 h-12 rounded-lg ${stat.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}
+            >
               <stat.icon className="w-6 h-6 text-white" />
             </div>
             <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
@@ -256,13 +291,12 @@ export default function CustomerDashboard() {
         </div>
       )}
 
-
       {/* Recent Bookings */}
       <div className="bg-card rounded-xl shadow-sm border border-border">
         <div className="p-6 border-b border-border flex items-center justify-between">
           <h2 className="text-xl font-semibold text-foreground">Recent Bookings</h2>
-          <Link 
-            href="/customer/bookings" 
+          <Link
+            href="/customer/bookings"
             className="text-sm text-muted-foreground hover:text-primary font-medium flex items-center gap-1"
           >
             View All
@@ -274,7 +308,9 @@ export default function CustomerDashboard() {
             <div className="p-12 text-center">
               <Calendar className="w-16 h-16 mx-auto text-gold mb-4" />
               <h3 className="text-lg font-semibold text-foreground mb-2">No bookings yet</h3>
-              <p className="text-muted-foreground mb-6">Start by browsing our packages and creating your first booking!</p>
+              <p className="text-muted-foreground mb-6">
+                Start by browsing our packages and creating your first booking!
+              </p>
               <Link
                 href="/customer/packages"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-popover rounded-lg font-semibold hover:bg-primary/90 transition-colors"
@@ -285,21 +321,23 @@ export default function CustomerDashboard() {
             </div>
           ) : (
             recentBookings.map((booking) => {
-              const pkg = packages.find(p => 
-                booking.packages.some(bp => bp.packageId.includes(p.id))
+              const pkg = packages.find((p) =>
+                booking.packages.some((bp) => bp.packageId.includes(p.id))
               );
               const StatusIcon = statusConfig[booking.status].icon;
 
               return (
-                <div 
-                  key={booking.id} 
+                <div
+                  key={booking.id}
                   className="p-6 hover:bg-popover cursor-pointer transition-colors"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
                         <h3 className="font-semibold text-foreground">{booking.eventName}</h3>
-                        <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border ${statusConfig[booking.status].color}`}>
+                        <span
+                          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border ${statusConfig[booking.status].color}`}
+                        >
                           <StatusIcon className="w-3 h-3" />
                           {statusConfig[booking.status].label}
                         </span>
@@ -315,7 +353,9 @@ export default function CustomerDashboard() {
                         </div>
                         <div className="flex items-center gap-2">
                           <DollarSign className="w-4 h-4" />
-                          <span className="font-semibold text-gray-900">{formatPrice(booking.totalAmount)}</span>
+                          <span className="font-semibold text-gray-900">
+                            {formatPrice(booking.totalAmount)}
+                          </span>
                         </div>
                       </div>
                     </div>

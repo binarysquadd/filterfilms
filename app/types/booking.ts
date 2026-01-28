@@ -1,11 +1,6 @@
 // Updated booking types with start and end dates
 
-export type BookingStatus =
-  | "pending"
-  | "approved"
-  | "in-progress"
-  | "completed"
-  | "rejected";
+export type BookingStatus = 'pending' | 'approved' | 'in-progress' | 'completed' | 'rejected';
 
 export interface SelectedBookingPackage {
   groupId: string;
@@ -14,7 +9,7 @@ export interface SelectedBookingPackage {
   category: string;
   price: number;
   startDate: string; // Start date for this package
-  endDate: string;   // End date for this package
+  endDate: string; // End date for this package
 }
 
 export interface Booking {
@@ -24,7 +19,7 @@ export interface Booking {
   eventType: string;
   eventName: string;
   startDate: string; // Overall event start date
-  endDate: string;   // Overall event end date
+  endDate: string; // Overall event end date
   venue: string;
   status: BookingStatus;
   totalAmount: number;

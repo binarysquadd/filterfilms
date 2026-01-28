@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { User, UserRole } from "@/app/types/user";
-import { useRouter } from "next/navigation";
+import { useState } from 'react';
+import { User, UserRole } from '@/app/types/user';
+import { useRouter } from 'next/navigation';
 
 interface UserRoleManagerProps {
   user: User; // user being edited
@@ -12,15 +12,12 @@ interface UserRoleManagerProps {
   };
 }
 
-export default function UserRoleManager({
-  user,
-  currentUser,
-}: UserRoleManagerProps) {
+export default function UserRoleManager({ user, currentUser }: UserRoleManagerProps) {
   const [isUpdating, setIsUpdating] = useState(false);
   const [selectedRole, setSelectedRole] = useState<UserRole>(user.role);
   const router = useRouter();
 
-  const isAdmin = currentUser.role === "admin";
+  const isAdmin = currentUser.role === 'admin';
   const isSelf = currentUser.id === user.id;
 
   // Admin cannot update self
@@ -33,20 +30,20 @@ export default function UserRoleManager({
     setIsUpdating(true);
     try {
       const response = await fetch(`/api/admin/users/${user.id}/role`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ role: selectedRole }),
       });
 
       if (response.ok) {
         router.refresh();
-        alert("Role updated successfully!");
+        alert('Role updated successfully!');
       } else {
         const error = await response.json();
         alert(`Error: ${error.error}`);
       }
     } catch {
-      alert("Failed to update role");
+      alert('Failed to update role');
     } finally {
       setIsUpdating(false);
     }
@@ -76,7 +73,7 @@ export default function UserRoleManager({
           disabled={isUpdating}
           className="px-3 py-1 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 disabled:opacity-50"
         >
-          {isUpdating ? "Updating..." : "Update"}
+          {isUpdating ? 'Updating...' : 'Update'}
         </button>
       )}
     </div>

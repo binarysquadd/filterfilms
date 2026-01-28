@@ -9,7 +9,7 @@ export const CATEGORY = [
   { label: 'Others', value: 'others' },
 ] as const;
 
-export type Category = typeof CATEGORY[number]['value'];
+export type Category = (typeof CATEGORY)[number]['value'];
 
 export interface Package {
   id: string;

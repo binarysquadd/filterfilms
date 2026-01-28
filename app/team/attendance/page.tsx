@@ -9,7 +9,6 @@ import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import { set } from 'react-hook-form';
 
-
 export default function TeamAttendancePage() {
   const { user } = useAuth();
   const router = useRouter();
@@ -75,7 +74,7 @@ export default function TeamAttendancePage() {
     } catch (error) {
       toast.error('Error marking attendance');
       console.error('Error marking attendance:', error);
-    }finally{
+    } finally {
       setLoading(false);
     }
   };
@@ -86,9 +85,9 @@ export default function TeamAttendancePage() {
       toast.error('Please mark attendance first');
       return;
     }
-    
+
     const time = new Date().toTimeString().slice(0, 5);
-    
+
     setLoading(true);
     try {
       const res = await fetch(`/api/admin/attendance/${todayRecord.id}`, {
@@ -144,8 +143,7 @@ export default function TeamAttendancePage() {
     } catch (error) {
       toast.error('Error punching out');
       console.error('Error punching out:', error);
-      
-    }finally{
+    } finally {
       setLoading(false);
     }
   };
@@ -161,12 +159,15 @@ export default function TeamAttendancePage() {
   });
 
   // Group by date
-  const groupedByDate = filteredAttendance.reduce((acc, record) => {
-    const date = record.date;
-    if (!acc[date]) acc[date] = [];
-    acc[date].push(record);
-    return acc;
-  }, {} as Record<string, Attendance[]>);
+  const groupedByDate = filteredAttendance.reduce(
+    (acc, record) => {
+      const date = record.date;
+      if (!acc[date]) acc[date] = [];
+      acc[date].push(record);
+      return acc;
+    },
+    {} as Record<string, Attendance[]>
+  );
 
   // Calculate working hours
   const calculateHours = (checkIn?: string, checkOut?: string) => {
@@ -175,7 +176,7 @@ export default function TeamAttendancePage() {
     const [inH, inM] = checkIn.split(':').map(Number);
     const [outH, outM] = checkOut.split(':').map(Number);
 
-    const totalMinutes = (outH * 60 + outM) - (inH * 60 + inM);
+    const totalMinutes = outH * 60 + outM - (inH * 60 + inM);
     const hours = Math.floor(totalMinutes / 60);
     const minutes = totalMinutes % 60;
 
@@ -184,12 +185,22 @@ export default function TeamAttendancePage() {
 
   // Stats
   const totalDays = filteredAttendance.length;
-  const presentDays = filteredAttendance.filter(a => a.status === 'present').length;
+  const presentDays = filteredAttendance.filter((a) => a.status === 'present').length;
   const attendanceRate = totalDays > 0 ? ((presentDays / totalDays) * 100).toFixed(1) : '0';
 
   const months = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
   ];
 
   const years = Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i);
@@ -197,7 +208,6 @@ export default function TeamAttendancePage() {
   return (
     <div className="min-h-screen  p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-foreground">Attendance Tracker</h1>
@@ -250,23 +260,17 @@ export default function TeamAttendancePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="bg-card backdrop-blur rounded-lg p-4 border border-border">
               <p className="text-muted-foreground text-sm mb-1">Status</p>
-              <p className="text-xl font-semibold">
-                {todayRecord?.status || 'Not Marked'}
-              </p>
+              <p className="text-xl font-semibold">{todayRecord?.status || 'Not Marked'}</p>
             </div>
 
             <div className="bg-card backdrop-blur rounded-lg p-4 border border-border">
               <p className="text-muted-foreground text-sm mb-1">Check In</p>
-              <p className="text-xl font-semibold">
-                {todayRecord?.checkIn || '—'}
-              </p>
+              <p className="text-xl font-semibold">{todayRecord?.checkIn || '—'}</p>
             </div>
 
             <div className="bg-card backdrop-blur rounded-lg p-4 border border-border">
               <p className="text-muted-foreground text-sm mb-1">Check Out</p>
-              <p className="text-xl font-semibold">
-                {todayRecord?.checkOut || '—'}
-              </p>
+              <p className="text-xl font-semibold">{todayRecord?.checkOut || '—'}</p>
             </div>
 
             <div className="bg-card backdrop-blur rounded-lg p-4 border border-border">
@@ -280,48 +284,44 @@ export default function TeamAttendancePage() {
           <div className="flex gap-4 mt-6">
             {!todayRecord ? (
               <Button
-                variant='royal'
-                size='lg'
+                variant="royal"
+                size="lg"
                 onClick={handleMarkAttendance}
                 className="w-1/4 bg-card text-muted-foreground px-6 py-3 border border-border rounded-lg font-semibold transition-all"
               >
-                {
-                  loading ? (
-                    <div className="flex items-center gap-2">
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Marking Attendance...</span>
-                    </div>
-                  ) : (
-                    <span>Mark Attendance for Today</span>
-                  )
-                }
+                {loading ? (
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Marking Attendance...</span>
+                  </div>
+                ) : (
+                  <span>Mark Attendance for Today</span>
+                )}
               </Button>
             ) : (
-              <div className='flex flex-row gap-2 justify-end'>
+              <div className="flex flex-row gap-2 justify-end">
                 <Button
-                  variant='outline'
-                  size='lg'
+                  variant="outline"
+                  size="lg"
                   onClick={handlePunchIn}
                   disabled={!!todayRecord?.checkIn}
                   className="cursor-pointer"
                 >
-                  {
-                  loading ? (
+                  {loading ? (
                     <div className="flex items-center gap-2">
                       <Loader2 className="w-4 h-4 animate-spin" />
                       <span>Punching...</span>
                     </div>
                   ) : (
                     <span>Punch In</span>
-                  )
-                }
+                  )}
                 </Button>
                 <Button
-                  variant='destructive'
-                  size='lg'
+                  variant="destructive"
+                  size="lg"
                   onClick={handlePunchOut}
                   disabled={!todayRecord?.checkIn || !!todayRecord?.checkOut}
-                  className='cursor-pointer'
+                  className="cursor-pointer"
                 >
                   {loading ? (
                     <div className="flex items-center gap-2">
@@ -348,7 +348,11 @@ export default function TeamAttendancePage() {
                 className="px-4 py-2 border border-border rounded-lg"
               >
                 {months.map((month, index) => (
-                  <option key={index} value={index} className='border border-border rounded-lg bg-muted text-muted-foreground'>
+                  <option
+                    key={index}
+                    value={index}
+                    className="border border-border rounded-lg bg-muted text-muted-foreground"
+                  >
                     {month}
                   </option>
                 ))}
@@ -360,7 +364,11 @@ export default function TeamAttendancePage() {
                 className="px-4 py-2 border border-border rounded-lg"
               >
                 {years.map((year) => (
-                  <option key={year} value={year} className='border border-border rounded-lg bg-muted text-muted-foreground'>
+                  <option
+                    key={year}
+                    value={year}
+                    className="border border-border rounded-lg bg-muted text-muted-foreground"
+                  >
                     {year}
                   </option>
                 ))}
@@ -397,16 +405,22 @@ export default function TeamAttendancePage() {
                       const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'short' });
 
                       return (
-                        <tr key={date} className="hover:bg-popover transition-colors cursor-pointer">
+                        <tr
+                          key={date}
+                          className="hover:bg-popover transition-colors cursor-pointer"
+                        >
                           <td className="p-4 font-medium text-foreground">{date}</td>
                           <td className="p-4 text-foreground">{dayName}</td>
                           <td className="p-4">
-                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${record.status === 'present'
-                              ? 'bg-green-100 text-green-700'
-                              : record.status === 'absent'
-                                ? 'bg-red-100 text-red-700'
-                                : 'bg-yellow-100 text-yellow-700'
-                              }`}>
+                            <span
+                              className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                                record.status === 'present'
+                                  ? 'bg-green-100 text-green-700'
+                                  : record.status === 'absent'
+                                    ? 'bg-red-100 text-red-700'
+                                    : 'bg-yellow-100 text-yellow-700'
+                              }`}
+                            >
                               {record.status}
                             </span>
                           </td>

@@ -3,7 +3,6 @@ import { cookies } from 'next/headers';
 import { adminAuth } from '@/app/lib/firebase/admin';
 import { userService } from '@/app/lib/services/user-service.server';
 
-
 export async function POST(req: NextRequest) {
   try {
     const { token, name } = await req.json();

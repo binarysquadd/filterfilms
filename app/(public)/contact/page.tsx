@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import React, { useState } from 'react';
 import { MapPin, Phone, Mail, Clock, Send } from 'lucide-react';
@@ -69,7 +69,6 @@ export default function ContactPage() {
       {/* Content */}
       <section className="pb-24">
         <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-16 items-start">
-
           {/* Contact Info */}
           <div className="space-y-10 text-muted-foreground">
             <InfoItem
@@ -87,13 +86,25 @@ export default function ContactPage() {
             <InfoItem
               icon={<Phone />}
               title="Phone"
-              content={<>+91 9XXXXXXXXX<br />(Call / WhatsApp)</>}
+              content={
+                <>
+                  +91 9XXXXXXXXX
+                  <br />
+                  (Call / WhatsApp)
+                </>
+              }
             />
 
             <InfoItem
               icon={<Mail />}
               title="Email"
-              content={<>info@filterfilm.in<br />bookings@filterfilm.in</>}
+              content={
+                <>
+                  info@filterfilm.in
+                  <br />
+                  bookings@filterfilm.in
+                </>
+              }
             />
 
             <InfoItem
@@ -109,10 +120,7 @@ export default function ContactPage() {
           </div>
 
           {/* Form */}
-          <form
-            onSubmit={handleSubmit}
-            className="space-y-10 bg-primary/5 p-10"
-          >
+          <form onSubmit={handleSubmit} className="space-y-10 bg-primary/5 p-10">
             <InputField
               label="Your Name"
               value={formData.name}
@@ -142,9 +150,7 @@ export default function ContactPage() {
             />
 
             <div>
-              <label className="block text-sm uppercase tracking-wider mb-2">
-                Your Message
-              </label>
+              <label className="block text-sm uppercase tracking-wider mb-2">Your Message</label>
               <textarea
                 required
                 rows={5}
@@ -197,9 +203,7 @@ function InfoItem({
     <div className="flex items-start gap-4">
       <div className="mt-1 text-gold">{icon}</div>
       <div>
-        <h4 className="text-sm uppercase tracking-wider text-foreground mb-1">
-          {title}
-        </h4>
+        <h4 className="text-sm uppercase tracking-wider text-foreground mb-1">{title}</h4>
         <p className="leading-relaxed">{content}</p>
       </div>
     </div>
@@ -215,9 +219,7 @@ function InputField({
 }) {
   return (
     <div>
-      <label className="block text-sm uppercase tracking-wider mb-2">
-        {label}
-      </label>
+      <label className="block text-sm uppercase tracking-wider mb-2">{label}</label>
       <input
         type={type}
         {...props}

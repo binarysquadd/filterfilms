@@ -1,12 +1,22 @@
-"use client";
+'use client';
 
 import React, { useState, useEffect } from 'react';
-import { 
-  Menu, X, Home, Package, Calendar, Users, LogOut, User, 
-  ChevronRight, Loader2, Globe, ClipboardCheck, 
+import {
+  Menu,
+  X,
+  Home,
+  Package,
+  Calendar,
+  Users,
+  LogOut,
+  User,
+  ChevronRight,
+  Loader2,
+  Globe,
+  ClipboardCheck,
   UserSearch,
   MailOpenIcon,
-  ImageIcon
+  ImageIcon,
 } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
@@ -37,7 +47,7 @@ const navigationConfig = {
     { href: '/team/assignments', label: 'My Assignments', icon: Calendar },
     { href: '/team/attendance', label: 'Attendance', icon: ClipboardCheck },
     { href: '/team/profile', label: 'Profile', icon: User },
-  ]
+  ],
 };
 
 const roleConfig = {
@@ -48,7 +58,7 @@ const roleConfig = {
     textClass: 'text-purple-800',
     primaryClass: 'bg-purple-500',
     hoverClass: 'hover:bg-purple-50',
-    activeBorder: 'border-purple-500'
+    activeBorder: 'border-purple-500',
   },
   customer: {
     title: 'Customer Portal',
@@ -57,7 +67,7 @@ const roleConfig = {
     textClass: 'text-green-800',
     primaryClass: 'bg-green-500',
     hoverClass: 'hover:bg-green-50',
-    activeBorder: 'border-green-500'
+    activeBorder: 'border-green-500',
   },
   team: {
     title: 'Team Portal',
@@ -66,8 +76,8 @@ const roleConfig = {
     textClass: 'text-blue-800',
     primaryClass: 'bg-blue-500',
     hoverClass: 'hover:bg-blue-50',
-    activeBorder: 'border-blue-500'
-  }
+    activeBorder: 'border-blue-500',
+  },
 };
 
 interface UnifiedDashboardProps {
@@ -117,7 +127,9 @@ const UnifiedDashboard: React.FC<UnifiedDashboardProps> = ({ children }) => {
   return (
     <div className="h-screen flex overflow-hidden bg-gradient-elegant">
       {/* Sidebar */}
-      <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border transform transition-transform duration-300 lg:translate-x-0 lg:static flex flex-col ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border transform transition-transform duration-300 lg:translate-x-0 lg:static flex flex-col ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
+      >
         {/* Logo Header */}
         <div className="h-16 flex items-center justify-between px-4 border-b border-border flex-shrink-0">
           <div className="flex items-center gap-3">
@@ -149,13 +161,16 @@ const UnifiedDashboard: React.FC<UnifiedDashboardProps> = ({ children }) => {
                   href={item.href}
                   key={item.label}
                   onClick={() => setSidebarOpen(false)}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${isActive
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                    isActive
                       ? `bg-primary text-primary-foreground`
                       : `text-muted-foreground hover:bg-muted hover:text-foreground`
-                    }`}
+                  }`}
                 >
                   <Icon className="w-5 h-5 flex-shrink-0" />
-                  <span className="flex-1 text-left truncate font-bold text-base">{item.label}</span>
+                  <span className="flex-1 text-left truncate font-bold text-base">
+                    {item.label}
+                  </span>
                   {isActive && <ChevronRight className="w-4 h-4 flex-shrink-0" />}
                 </Link>
               );
@@ -174,7 +189,7 @@ const UnifiedDashboard: React.FC<UnifiedDashboardProps> = ({ children }) => {
               <Globe className="w-5 h-5 flex-shrink-0" />
               <span className="text-xs font-medium">Website</span>
             </button>
-            
+
             <button
               onClick={handleLogout}
               className="flex-1 flex flex-col items-center gap-1 px-2 py-2 text-destructive hover:bg-red-50 rounded-lg transition-colors group"
@@ -207,7 +222,7 @@ const UnifiedDashboard: React.FC<UnifiedDashboardProps> = ({ children }) => {
           >
             <Menu className="w-6 h-6 text-gray-700" />
           </button>
-          
+
           {/* Page title (optional, can be customized per page) */}
           <div className="hidden lg:block">
             <h1 className="text-xl font-bold text-gray-900">{config.title}</h1>
@@ -226,11 +241,9 @@ const UnifiedDashboard: React.FC<UnifiedDashboardProps> = ({ children }) => {
                   <h1 className="text-2xl font-bold text-gray-900 mb-2">
                     Welcome Back, {user.name || user.email?.split('@')[0]}!
                   </h1>
-                  <p className="text-gray-600">
-                    Here's your dashboard overview.
-                  </p>
+                  <p className="text-gray-600">Here's your dashboard overview.</p>
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   <div className="bg-card rounded-lg shadow p-6 border border-border hover:shadow-md transition-shadow">
                     <div className="flex items-center justify-between mb-4">
@@ -239,15 +252,17 @@ const UnifiedDashboard: React.FC<UnifiedDashboardProps> = ({ children }) => {
                     </div>
                     <p className="text-popover-foreground text-sm">Your main dashboard content</p>
                   </div>
-                  
+
                   <div className="bg-card rounded-lg shadow p-6 border border-border hover:shadow-md transition-shadow">
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="font-semibold text-popover-foreground">Statistics</h3>
                       <Package className="w-5 h-5 text-popover-foreground" />
                     </div>
-                    <p className="text-popover-foreground text-sm">View your analytics and metrics</p>
+                    <p className="text-popover-foreground text-sm">
+                      View your analytics and metrics
+                    </p>
                   </div>
-                  
+
                   <div className="bg-card rounded-lg shadow p-6 border border-border hover:shadow-md transition-shadow">
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="font-semibold text-popover-foreground">Quick Actions</h3>

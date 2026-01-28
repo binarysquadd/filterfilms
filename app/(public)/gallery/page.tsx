@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import { useState, useEffect } from 'react';
 import { X, Play, Filter, Loader2 } from 'lucide-react';
@@ -41,7 +41,7 @@ export default function GalleryPage() {
   const filteredGallery =
     activeCategory === 'All'
       ? galleries
-      : galleries.filter(item => item.category === activeCategory);
+      : galleries.filter((item) => item.category === activeCategory);
 
   return (
     <>
@@ -60,7 +60,7 @@ export default function GalleryPage() {
       <section className="relative top-2 z-40 bg-background">
         <div className="container mx-auto px-4">
           <div className="flex justify-center gap-2 py-3 overflow-x-auto scrollbar-hide">
-            {categories.map(category => (
+            {categories.map((category) => (
               <Button
                 key={category}
                 variant={activeCategory === category ? 'default' : 'outline'}
@@ -110,16 +110,14 @@ export default function GalleryPage() {
                   <div
                     key={item.id}
                     className="relative group overflow-hidden cursor-pointer shadow-md hover:shadow-xl transition-all"
-                    onClick={() =>
-                      item.type === 'photo' && setSelectedImage(item.url)
-                    }
+                    onClick={() => item.type === 'photo' && setSelectedImage(item.url)}
                   >
                     <div className="relative aspect-[4/5]">
                       <Image
                         src={
                           item.type === 'video'
-                            ? item.thumbnail ?? '/images/video-placeholder.jpg'
-                            : item.url ?? '/images/image-placeholder.jpg'
+                            ? (item.thumbnail ?? '/images/video-placeholder.jpg')
+                            : (item.url ?? '/images/image-placeholder.jpg')
                         }
                         alt={item.title}
                         fill
@@ -138,9 +136,7 @@ export default function GalleryPage() {
                       {/* Overlay */}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
                         <div className="absolute bottom-0 p-4">
-                          <p className="text-white font-semibold text-sm">
-                            {item.title}
-                          </p>
+                          <p className="text-white font-semibold text-sm">{item.title}</p>
                           <p className="text-gold text-xs">
                             {item.category} • {item.eventType}
                           </p>
@@ -174,12 +170,7 @@ export default function GalleryPage() {
           </button>
 
           <div className="relative w-full max-w-6xl h-[90vh]">
-            <Image
-              src={selectedImage}
-              alt="Preview"
-              fill
-              className="object-contain"
-            />
+            <Image src={selectedImage} alt="Preview" fill className="object-contain" />
           </div>
         </div>
       )}
