@@ -1,6 +1,7 @@
 import { userService } from '@/app/lib/services/user-service.server';
 import { NextResponse } from 'next/server';
 import { getServerSession } from '@/app/lib/firebase/server-auth';
+import type { User } from '@/app/types/user';
 
 export async function GET(req: Request, context: { params: Promise<{ userId: string }> }) {
   // ✅ MUST await params in Next 15+
@@ -64,7 +65,7 @@ export async function PATCH(req: Request, context: { params: Promise<{ userId: s
       address,
     } = await req.json();
 
-    const updatedData: any = {
+    const updatedData: Partial<User> = {
       name,
       email,
       role,

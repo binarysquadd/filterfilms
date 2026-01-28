@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/app/src/components/ui/button';
 import { User } from '@/app/types/user';
 import { useEffect, useState } from 'react';
-import { Loader2, Plus, X, Upload, Edit, Trash2 } from 'lucide-react';
+import { Loader2, Plus, Upload, Edit, Trash2 } from 'lucide-react';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
 import { Label } from '@/app/src/components/ui/label';
@@ -19,17 +19,13 @@ import {
   SelectValue,
 } from '@/app/src/components/ui/select';
 
-interface Props {
-  initialTeam?: User[];
-}
-
 const roles = [
   { value: 'admin', label: 'Admin' },
   { value: 'team', label: 'Team' },
   { value: 'customer', label: 'Customer' },
 ];
 
-export default function TeamPage({ initialTeam }: Props) {
+export default function TeamPage() {
   const router = useRouter();
   const [team, setTeam] = useState<User[]>([]);
   const [accessDenied, setAccessDenied] = useState(false);
@@ -84,7 +80,7 @@ export default function TeamPage({ initialTeam }: Props) {
 
         const data = await res.json();
         setTeam(data.users);
-      } catch (err) {
+      } catch {
         toast.error('Error fetching team members');
       } finally {
         setLoading(false);

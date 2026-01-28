@@ -1,7 +1,7 @@
 import { getServerSession } from '@/app/lib/firebase/server-auth';
 import { userService } from '@/app/lib/services/user-service.server';
-import { get } from 'http';
 import { NextRequest, NextResponse } from 'next/server';
+import type { User } from '@/app/types/user';
 
 // GET single team member
 export async function GET(req: NextRequest, context: { params: Promise<{ memberId: string }> }) {
@@ -45,7 +45,7 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ membe
       return NextResponse.json({ error: 'Team member not found' }, { status: 404 });
     }
 
-    const userUpdates: any = {};
+    const userUpdates: Partial<User> = {};
 
     // Basic fields
     if (updates.name !== undefined) userUpdates.name = updates.name;

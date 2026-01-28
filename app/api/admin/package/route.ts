@@ -2,7 +2,7 @@ import { getServerSession } from '@/app/lib/firebase/server-auth';
 import { packageService } from '@/app/lib/services/package-service';
 import { NextResponse } from 'next/server';
 
-export async function GET(req: Request) {
+export async function GET(_req: Request) {
   const session = await getServerSession();
   const allowedRoles = ['admin', 'customer', 'team'];
   if (!session || !allowedRoles.includes(session.role)) {
