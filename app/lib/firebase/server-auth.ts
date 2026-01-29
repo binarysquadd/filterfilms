@@ -1,5 +1,4 @@
 import { cookies } from 'next/headers';
-import { adminAuth } from './admin';
 import { userService } from '@/app/lib/services/user-service.server';
 import { User, UserRole } from '@/app/types/user';
 import { redirect } from 'next/navigation';
@@ -9,11 +8,12 @@ export async function getServerSession(): Promise<User | null> {
     const cookieStore = await cookies();
     const sessionCookie = cookieStore.get('firebase-session')?.value;
 
-    if (!sessionCookie) {
-      return null;
-    }
+    if (!sessionCookie) return null;
 
-    const decodedToken = await adminAuth.verifySessionCookie(sessionCookie, true);
+    // ✅ Lazy import so ./admin isn't evaluated during build collection
+    const { getAdminAuthClient } = await import('./admin');
+
+    const decodedToken = await getAdminAuthClient().verifySessionCookie(sessionCookie, true);
     const user = await userService.getUserByEmail(decodedToken.email!);
 
     return user;

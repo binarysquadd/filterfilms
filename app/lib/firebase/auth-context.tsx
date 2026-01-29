@@ -1,8 +1,8 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import {
-  User as FirebaseUser,
+  type User as FirebaseUser,
   onAuthStateChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -10,9 +10,11 @@ import {
   GoogleAuthProvider,
   signOut as firebaseSignOut,
   sendPasswordResetEmail,
+  type Auth,
+  getAuth,
 } from 'firebase/auth';
-import { auth } from './config';
 import { User } from '@/app/types/user';
+import { getFirebaseApp } from './client'; // ✅ create this helper (below)
 
 interface AuthContextType {
   user: User | null;
@@ -33,28 +35,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const getAuthClient = (): Auth | null => {
+    const app = getFirebaseApp();
+    if (!app) return null;
+    return getAuth(app);
+  };
+
   const syncUserWithBackend = async (fbUser: FirebaseUser | null) => {
     if (!fbUser) {
       setUser(null);
-      // Clear server session
-      await fetch('/api/auth/logout', { method: 'POST' });
+
+      // ✅ Don't spam CI/build or unauthenticated environments
+      if (typeof window !== 'undefined') {
+        try {
+          await fetch('/api/auth/logout', { method: 'POST' });
+        } catch {
+          // ignore
+        }
+      }
+
       return;
     }
 
     try {
-      // Get fresh token
       const token = await fbUser.getIdToken(true);
 
-      // Sync with backend
       const response = await fetch('/api/auth/sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token }),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to sync user');
-      }
+      if (!response.ok) throw new Error('Failed to sync user');
 
       const { user: dbUser } = await response.json();
       setUser(dbUser);
@@ -65,6 +77,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
+    const auth = getAuthClient();
+
+    // ✅ If Firebase isn't configured (like CI build), don't crash.
+    if (!auth) {
+      setFirebaseUser(null);
+      setUser(null);
+      setLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
       setFirebaseUser(fbUser);
       await syncUserWithBackend(fbUser);
@@ -75,14 +97,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signInWithEmail = async (email: string, password: string) => {
+    const auth = getAuthClient();
+    if (!auth) throw new Error('Firebase is not configured');
+
     const credential = await signInWithEmailAndPassword(auth, email, password);
     await syncUserWithBackend(credential.user);
   };
 
   const signUpWithEmail = async (email: string, password: string, name?: string) => {
+    const auth = getAuthClient();
+    if (!auth) throw new Error('Firebase is not configured');
+
     const credential = await createUserWithEmailAndPassword(auth, email, password);
 
-    // Send name to backend during sync
     const token = await credential.user.getIdToken();
     const response = await fetch('/api/auth/sync', {
       method: 'POST',
@@ -93,22 +120,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!response.ok) throw new Error('Failed to create user');
 
     const { user: dbUser } = await response.json();
+    setFirebaseUser(credential.user);
     setUser(dbUser);
   };
 
   const signInWithGoogle = async () => {
+    const auth = getAuthClient();
+    if (!auth) throw new Error('Firebase is not configured');
+
     const provider = new GoogleAuthProvider();
     const credential = await signInWithPopup(auth, provider);
     await syncUserWithBackend(credential.user);
   };
 
   const signOut = async () => {
-    await firebaseSignOut(auth);
-    await fetch('/api/auth/logout', { method: 'POST' });
+    const auth = getAuthClient();
+
+    // If auth isn't configured, just clear local state
+    if (auth) {
+      await firebaseSignOut(auth);
+    }
+
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch {
+      // ignore
+    }
+
+    setFirebaseUser(null);
     setUser(null);
   };
 
   const resetPassword = async (email: string) => {
+    const auth = getAuthClient();
+    if (!auth) throw new Error('Firebase is not configured');
+
     await sendPasswordResetEmail(auth, email);
   };
 
@@ -118,23 +164,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  return (
-    <AuthContext.Provider
-      value={{
-        user,
-        firebaseUser,
-        loading,
-        signInWithEmail,
-        signUpWithEmail,
-        signInWithGoogle,
-        signOut,
-        resetPassword,
-        refreshUser,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
+  const value = useMemo(
+    () => ({
+      user,
+      firebaseUser,
+      loading,
+      signInWithEmail,
+      signUpWithEmail,
+      signInWithGoogle,
+      signOut,
+      resetPassword,
+      refreshUser,
+    }),
+    // functions are stable enough; if you want you can wrap them in useCallback later
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [user, firebaseUser, loading]
   );
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export const useAuth = () => {
