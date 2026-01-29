@@ -1,0 +1,19 @@
+{
+  "extends": ["config:base"],
+  "timezone": "Asia/Kolkata",
+  "schedule": ["before 10am on monday"],
+  "prConcurrentLimit": 5,
+  "labels": ["deps"],
+  "rangeStrategy": "bump",
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "all non-major dependencies"
+    },
+    {
+      "matchUpdateTypes": ["major"],
+      "groupName": "major dependencies (manual review)",
+      "labels": ["deps", "major"]
+    }
+  ]
+}
