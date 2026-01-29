@@ -1,19 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { adminAuth } from '@/app/lib/firebase/admin';
+import { getAdminAuthClient } from '@/app/lib/firebase/admin';
 import { userService } from '@/app/lib/services/user-service.server';
 
 export async function POST(req: NextRequest) {
   try {
-    const { token, name } = await req.json();
+    const { token, name } = (await req.json()) as { token?: string; name?: string };
 
     if (!token) {
       return NextResponse.json({ error: 'No token provided' }, { status: 400 });
     }
 
+    // ✅ get the admin auth client (lazy / safe)
+    const adminAuth = getAdminAuthClient();
+
     // Verify the Firebase ID token
     const decodedToken = await adminAuth.verifyIdToken(token);
-    const email = decodedToken.email!;
+
+    const email = decodedToken.email;
+    if (!email) {
+      return NextResponse.json({ error: 'Token does not contain an email' }, { status: 400 });
+    }
 
     // Get or create user in database
     let user = await userService.getUserByEmail(email);
@@ -21,7 +28,7 @@ export async function POST(req: NextRequest) {
     if (!user) {
       user = await userService.createUser({
         email,
-        name: name || decodedToken.name,
+        name: name || decodedToken.name || '',
         image: decodedToken.picture,
         role: 'customer', // Default role for NEW users only
       });
