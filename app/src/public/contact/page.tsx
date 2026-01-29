@@ -6,7 +6,7 @@ import { useToast } from '@/app/hooks/use-toast';
 import SectionHeader from '@/app/src/components/common/SectionHeader';
 import { Button } from '@/app/src/components/ui/button';
 
-export default function ContactPage() {
+export default function ContactSection() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({

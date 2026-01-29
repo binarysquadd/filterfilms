@@ -213,6 +213,13 @@ export default function ManageGallery({ initialGallery }: Props) {
         <div className="flex justify-center py-20">
           <Loader2 className="animate-spin" />
         </div>
+      ) : gallery.length === 0 ? (
+        <div className="text-center py-20">
+          <p className="text-muted-foreground">No gallery items found</p>
+          <Button variant="royal" onClick={() => setIsModalOpen(true)} className="mt-4">
+            <Plus className="w-4 h-4 mr-1" /> Add Your First Item
+          </Button>
+        </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {gallery.map((item) => (
@@ -492,7 +499,7 @@ export default function ManageGallery({ initialGallery }: Props) {
       <DeleteModal
         open={deleteOpen}
         title="Delete Item"
-        description="This action cannot be undone."
+        description="Are you sure you want to delete this gallery item? This action cannot be undone."
         onCancel={() => setDeleteOpen(false)}
         onConfirm={handleDelete}
         loading={deleting}

@@ -85,7 +85,6 @@ export default function CustomersPage() {
       const data = await res.json();
       setCustomers(data.customers || []);
       setFilteredCustomers(data.customers || []);
-      toast.error('Error fetching customers');
     } finally {
       setLoading(false);
     }
@@ -250,7 +249,7 @@ export default function CustomersPage() {
           />
         </div>
 
-        <div className="bg-card rounded-xl shadow-card overflow-hidden">
+        <div className="bg-card rounded-xl overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-muted/50">
