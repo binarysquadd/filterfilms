@@ -101,4 +101,11 @@ export const galleryService = {
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .slice(0, limit);
   },
+  async getDistinctEventTypes(): Promise<string[]> {
+    const galleries = await this.getAllGalleries();
+    const eventTypes = galleries
+      .map((g) => g.eventType)
+      .filter((type, index, self) => type && self.indexOf(type) === index) as string[];
+    return eventTypes;
+  },
 };

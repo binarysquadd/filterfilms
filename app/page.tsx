@@ -1,19 +1,21 @@
-import Home from './(public)/home/page';
-import AboutSection from './(public)/about/page';
-import PackagesSection from './(public)/packages/page';
-import OurTeam from './(public)/our-team/page';
-import GalleryPage from './(public)/gallery/page';
-import ContactPage from './(public)/contact/page';
+import AboutSection from './src/public/about/page';
+import GallerySection from './src/public/gallery/page';
+import Home from './src/public/home/page';
+import OurTeam from './src/public/our-team/page';
+import PackagesSection from './src/public/packages/page';
+import StatisticsSection from './src/public/stats/page';
+import ContactSection from './src/public/contact/page';
 
 export default function Page() {
   return (
     <>
       <Home />
-      <AboutSection />
+      <StatisticsSection />
+      <GallerySection />
       <OurTeam />
-      <GalleryPage />
       <PackagesSection />
-      <ContactPage />
+      <AboutSection />
+      <ContactSection />
     </>
   );
 }

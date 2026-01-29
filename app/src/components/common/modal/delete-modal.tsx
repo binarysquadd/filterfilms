@@ -24,7 +24,7 @@ export default function DeleteModal({
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
-      <div className="w-full max-w-md rounded-2xl bg-card shadow-2xl animate-scale-in">
+      <div className="w-full max-w-md bg-card rounded-sm shadow-2xl animate-scale-in">
         {/* Header */}
         <div className="flex items-center justify-between border-b px-6 py-4">
           <div className="flex items-center gap-2 text-destructive font-semibold">

@@ -7,13 +7,7 @@ import Link from 'next/link';
 
 export default function AboutSection() {
   return (
-    <section id="about" className="relative overflow-hidden py-24 lg:py-32">
-      {/* Background Accent */}
-      {/* <div className="absolute inset-0 -z-10">
-        <div className="absolute top-1/4 left-0 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
-        <div className="absolute bottom-1/4 right-0 h-72 w-72 rounded-full bg-gold/10 blur-3xl" />
-      </div> */}
-
+    <section id="about" className="relative overflow-hidden lg:py-15">
       <div className="container mx-auto px-6 lg:px-8">
         <SectionHeader
           title="ABOUT US"

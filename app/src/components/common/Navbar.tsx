@@ -176,11 +176,11 @@ export default function Navbar() {
         <div className="lg:hidden flex items-center justify-between h-20">
           <Link href="/">
             <Image
-              src="/logo/filter-film-logo.svg"
+              src="/logo/logo3.png"
               alt="Filter Film Studio Logo"
               width={140}
               height={40}
-              className="object-contain"
+              className="object-contain w-25 h-25"
             />
           </Link>
 
