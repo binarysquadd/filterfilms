@@ -93,7 +93,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false);
     });
 
-    return unsubscribe
+    return unsubscribe;
   }, []);
 
   const signInWithEmail = async (email: string, password: string) => {
