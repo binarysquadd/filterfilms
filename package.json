@@ -52,5 +52,8 @@
     "tailwindcss": "^3.4.19",
     "typescript": "^5",
     "web-features": "^3.14.0"
+  },
+  "overrides": {
+    "picomatch": "4.0.3"
   }
 }
