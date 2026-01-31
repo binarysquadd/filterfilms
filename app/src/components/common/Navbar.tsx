@@ -94,11 +94,11 @@ export default function Navbar() {
           {/* Center Logo */}
           <Link href="/" className="">
             <Image
-              src="/logo/logo3.png"
+              src="/logo/logo.png"
               alt="Filter Film Studio Logo"
               width={180}
               height={60}
-              className="object-contain hover:scale-105 transition-transform"
+              className="object-contain mt-8 w-full hover:scale-105 transition-transform"
             />
           </Link>
 
@@ -176,11 +176,11 @@ export default function Navbar() {
         <div className="lg:hidden flex items-center justify-between h-20">
           <Link href="/">
             <Image
-              src="/logo/logo3.png"
+              src="/logo/logo.png"
               alt="Filter Film Studio Logo"
               width={140}
               height={40}
-              className="object-contain w-25 h-25"
+              className="object-contain mt-8 w-40"
             />
           </Link>
 
