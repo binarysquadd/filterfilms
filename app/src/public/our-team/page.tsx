@@ -4,7 +4,6 @@ import SectionHeader from '@/app/src/components/common/SectionHeader';
 import { Quote } from 'lucide-react';
 import Image from 'next/image';
 
-
 export default function OurTeam() {
   const founder = {
     name: 'Subham Dalai',
