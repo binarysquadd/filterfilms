@@ -72,7 +72,7 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
       <nav className="container mx-auto px-6 py-1">
         {/* ================= Desktop ================= */}
-        <div className="hidden lg:flex items-center justify-evenly h-24 relative">
+        <div className="hidden lg:flex items-center justify-evenly h-20 relative">
           {/* Left Links */}
           <div className="flex items-center gap-6">
             {navLinksLeft.map((link) => (
@@ -98,7 +98,7 @@ export default function Navbar() {
               alt="Filter Film Studio Logo"
               width={180}
               height={60}
-              className="object-contain w-32 hover:scale-105 transition-transform"
+              className="object-contain w-28 hover:scale-105 transition-transform"
             />
           </Link>
 
