@@ -2,119 +2,166 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useEffect, useMemo, useState } from 'react';
+import { Packages, CATEGORY } from '@/app/types/package';
 import SectionHeader from '@/app/src/components/common/SectionHeader';
+import { Button } from '@/app/src/components/ui/button';
+import toast from 'react-hot-toast';
+import { Loader2 } from 'lucide-react';
 
-const packages = [
-  {
-    title: 'Photography Packages',
-    subtitle: 'PREMIUM COLLECTION',
-    desc: 'Timeless wedding photography capturing emotions, traditions, and candid moments with artistic storytelling.',
-    img: '/package-image/photo.png',
-  },
-  {
-    title: 'Cinematography Packages',
-    subtitle: 'BESPOKE FILMS',
-    desc: 'Cinematic wedding films crafted like a movie, preserving your most memorable moments.',
-    img: '/package-image/cinematography.png',
-  },
-  {
-    title: 'Custom Packages',
-    subtitle: 'TAILORED EXPERIENCE',
-    desc: 'Create a package that perfectly fits your wedding vision and personal style.',
-    img: '/package-image/custom1.png',
-  },
-];
+type DisplayPackage = {
+  id: string;
+  name: string;
+  description: string;
+  preview: string;
+  duration: string;
+  // deliverables: string[];
+  category: string;
+};
 
-export default function PackagesSection() {
+export default function FeaturedPackagesSection() {
+  const [packageGroups, setPackageGroups] = useState<Packages[]>([]);
+  const [activeCategory, setActiveCategory] = useState<'all' | string>('all');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPackages = async () => {
+      try {
+        const res = await fetch('/api/admin/package/public');
+        const data = await res.json();
+        setPackageGroups(data.packageGroups || []);
+      } catch {
+        toast.error('Failed to load packages');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPackages();
+  }, []);
+
+  const popularPackages: DisplayPackage[] = useMemo(() => {
+    const all = packageGroups.flatMap((group) =>
+      group.packages
+        .filter((p) => p.popular)
+        .map((p) => ({
+          id: p.id,
+          name: p.name,
+          description: p.description,
+          preview: p.preview,
+          duration: p.duration,
+          // deliverables: p.deliverables ?? [],
+          category: group.category,
+        }))
+    );
+
+    return activeCategory === 'all'
+      ? all.slice(0, 6)
+      : all.filter((p) => p.category === activeCategory).slice(0, 6);
+  }, [packageGroups, activeCategory]);
+
+  const availableCategories = useMemo(
+    () => packageGroups.filter((g) => g.packages.some((p) => p.popular)).map((g) => g.category),
+    [packageGroups]
+  );
+
   return (
-    <section className="relative bg-ivory-dark py-24 overflow-hidden" id="packages">
-      {/* Background Circles */}
-      <div className="absolute top-0 left-0 w-96 h-96 bg-emerald/5 blur-3xl -translate-x-1/3 -translate-y-1/3" />
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-emerald/5 blur-3xl translate-x-1/3 translate-y-1/3" />
+    <section className="py-24 bg-ivory-dark" id="packages">
+      <div className="container mx-auto px-4">
+        <SectionHeader
+          title="Packages"
+          subtitle="Clear, structured packages designed for real-world needs"
+          centered
+        />
 
-      <div className="container mx-auto px-4 relative z-10">
-        {/* Section Header */}
-        <div className="mb-16">
-          <SectionHeader
-            title="PACKAGES"
-            subtitle="Curated photography and cinematography experiences designed for your once-in-a-lifetime moments."
-            centered
-          />
-        </div>
-
-        {/* Packages Grid */}
-        <div className="grid lg:grid-cols-12 gap-4 items-stretch">
-          {/* Photography Feature */}
-          <div className="lg:col-span-7 relative group overflow-hidden h-[600px]">
-            <Image
-              src={packages[0].img}
-              alt={packages[0].title}
-              fill
-              className="object-cover transition-transform duration-700 group-hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
-            <div className="absolute bottom-0 left-0 p-8">
-              <span className="inline-block px-4 py-1.5 bg-emerald/10 text-emerald text-xs font-semibold mb-2">
-                {packages[0].subtitle}
-              </span>
-              <h3 className="text-4xl lg:text-5xl font-heading font-bold text-ivory mb-2">
-                {packages[0].title}
-              </h3>
-              <p className="text-ivory/80 text-lg leading-relaxed max-w-xl">{packages[0].desc}</p>
-            </div>
-          </div>
-
-          {/* Right Stack */}
-          <div className="lg:col-span-5 flex flex-col gap-4">
-            {/* Cinematography Card */}
-            <div className="relative group overflow-hidden h-[288px]">
-              <Image
-                src={packages[1].img}
-                alt={packages[1].title}
-                fill
-                className="object-cover transition-transform duration-700 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-              <div className="absolute bottom-0 left-0 p-6">
-                <span className="inline-block px-3 py-1 bg-emerald/10 text-emerald text-xs font-semibold mb-1">
-                  {packages[1].subtitle}
-                </span>
-                <h3 className="text-2xl font-heading font-bold text-ivory mb-1">
-                  {packages[1].title}
-                </h3>
-                <p className="text-ivory/80 text-sm leading-relaxed">{packages[1].desc}</p>
-              </div>
-            </div>
-
-            {/* Custom Package Card */}
-            <div className="relative group overflow-hidden h-[288px]">
-              <Image
-                src={packages[2].img}
-                alt={packages[2].title}
-                fill
-                className="object-cover transition-transform duration-700 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
-              <div className="absolute bottom-0 left-0 p-6">
-                <span className="inline-block px-3 py-1 bg-emerald/10 text-emerald text-xs font-semibold mb-1">
-                  {packages[2].subtitle}
-                </span>
-                <h3 className="text-2xl font-heading font-bold text-ivory mb-1">
-                  {packages[2].title}
-                </h3>
-                <p className="text-ivory/80 text-sm leading-relaxed">{packages[2].desc}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom CTA */}
-        <div className="mt-12 text-center">
-          <Link
-            href="/signin"
-            className="inline-block bg-primary text-ivory font-semibold rounded-full px-8 py-4 text-lg hover:bg-emerald-dark transition-colors shadow"
+        {/* FILTER */}
+        <div className="flex justify-center gap-2 mt-8 mb-14 overflow-x-auto scrollbar-hide">
+          <Button
+            size="sm"
+            variant={activeCategory === 'all' ? 'default' : 'outline'}
+            onClick={() => setActiveCategory('all')}
+            className="rounded-full whitespace-nowrap"
           >
-            Create Your Custom Package
+            All
+          </Button>
+          {availableCategories.map((cat) => (
+            <Button
+              key={cat}
+              size="sm"
+              variant={activeCategory === cat ? 'default' : 'outline'}
+              onClick={() => setActiveCategory(cat)}
+              className="rounded-full whitespace-nowrap"
+            >
+              {CATEGORY.find((c) => c.value === cat)?.label}
+            </Button>
+          ))}
+        </div>
+
+        {/* GRID */}
+        <div className="relative min-h-[360px]">
+          {loading ? (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Loader2 className="w-10 h-10 animate-spin text-muted-foreground" />
+            </div>
+          ) : popularPackages.length > 0 ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {popularPackages.slice(0, 6).map((pkg) => (
+                <div key={pkg.id} className="border border-border bg-white flex flex-col">
+                  {/* Image */}
+                  <div className="relative h-52">
+                    <Image src={pkg.preview} alt={pkg.name} fill className="object-cover" />
+                  </div>
+
+                  {/* Content */}
+                  <div className="p-6 flex flex-col flex-1">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-lg font-semibold">{pkg.name}</h3>
+                      <span className="text-xs uppercase tracking-wide text-muted-foreground">
+                        {CATEGORY.find((c) => c.value === pkg.category)?.label}
+                      </span>
+                    </div>
+
+                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                      {pkg.description}
+                    </p>
+
+                    {/* Deliverables */}
+                    {/* <ul className="space-y-2 text-sm mb-6">
+                      {pkg.deliverables.slice(0, 5).map((item, idx) => (
+                        <li key={idx} className="flex items-start gap-2">
+                          <Check className="w-4 h-4 mt-0.5 text-primary" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul> */}
+
+                    {/* Footer */}
+                    <div className="mt-auto flex items-center justify-between pt-4 border-t">
+                      <span className="text-sm text-muted-foreground">
+                        Duration: {pkg.duration} Days
+                      </span>
+
+                      <Link href="/packages" className="text-primary font-medium text-sm">
+                        View Details →
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="flex items-center justify-center text-muted-foreground py-20">
+              No featured packages available
+            </div>
+          )}
+        </div>
+
+        {/* CTA */}
+        <div className="text-center mt-16">
+          <Link
+            href="/packages"
+            className="inline-block bg-primary text-white px-10 py-4 font-semibold hover:bg-primary/90 transition rounded-full"
+          >
+            View All Packages
           </Link>
         </div>
       </div>
