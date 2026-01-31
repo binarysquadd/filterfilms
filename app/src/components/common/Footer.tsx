@@ -98,7 +98,16 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="mt-14 pt-6 border-t border-emerald-dark/10 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-emerald-dark/50">
-          <p>© {new Date().getFullYear()} Filter Film Studio. All rights reserved.</p>
+          <p>
+            © {new Date().getFullYear()}{' '}
+            <Link
+              href="https://binarysquad.pages.dev/"
+              className="text-primary font-semibold border-b-2 hover:text-primary hover:font-bold"
+            >
+              Binary Squad
+            </Link>
+            . Crafted with excellence.
+          </p>
           <div className="flex gap-6">
             <Link href="#" className="hover:text-gold transition-colors">
               Privacy Policy

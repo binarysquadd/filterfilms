@@ -7,7 +7,7 @@ import Link from 'next/link';
 
 export default function AboutSection() {
   return (
-    <section id="about" className="relative overflow-hidden lg:py-15">
+    <section id="about" className="relative overflow-hidden lg:py-20 py-12 bg-ivory">
       <div className="container mx-auto px-6 lg:px-8">
         <SectionHeader
           title="ABOUT US"
