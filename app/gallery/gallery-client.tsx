@@ -1,44 +1,55 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { Play, Loader2, Filter, Share2, Check } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Play, Loader2, Share2, Check, X, ChevronDown } from 'lucide-react';
 import Image from 'next/image';
-import { Gallery } from '@/app/types/gallery';
-import { Button } from '@/app/src/components/ui/button';
-import SectionHeader from '../src/components/common/SectionHeader';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-// Separate component that uses useSearchParams
+import { Gallery, eventTypes } from '@/app/types/gallery';
+import { Button } from '@/app/src/components/ui/button';
+import SectionHeader from '../src/components/common/SectionHeader';
+
+/* ---------------- HELPER ---------------- */
+const toEmbedUrl = (url: string) => {
+  if (url.includes('youtube.com') || url.includes('youtu.be')) {
+    const id = url.includes('youtu.be') ? url.split('/').pop() : new URL(url).searchParams.get('v');
+    return `https://www.youtube.com/embed/${id}?autoplay=1`;
+  }
+
+  if (url.includes('vimeo.com')) {
+    const id = url.split('/').pop();
+    return `https://player.vimeo.com/video/${id}?autoplay=1`;
+  }
+
+  return url;
+};
+
 export function GalleryContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const wheelLock = useRef(false);
 
-  /* ----------------------------------------
-       STATE
-    ----------------------------------------- */
+  /* ---------------- STATE ---------------- */
   const [galleries, setGalleries] = useState<Gallery[]>([]);
   const [events, setEvents] = useState<string[]>(['All']);
+
   const [activeEvent, setActiveEvent] = useState('All');
+  const [activeCategory, setActiveCategory] = useState('All');
+
+  const [activeItemId, setActiveItemId] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  /* ----------------------------------------
-       READ EVENT FROM URL (ON LOAD)
-    ----------------------------------------- */
+  /* ---------------- URL → STATE ---------------- */
   useEffect(() => {
-    const eventFromUrl = searchParams.get('event');
-    if (eventFromUrl) {
-      setActiveEvent(decodeURIComponent(eventFromUrl));
-    } else {
-      setActiveEvent('All');
-    }
+    setActiveEvent(searchParams.get('event') ?? 'All');
+    setActiveCategory(searchParams.get('category') ?? 'All');
+    setActiveItemId(searchParams.get('item'));
   }, [searchParams]);
 
-  /* ----------------------------------------
-       FETCH DATA
-    ----------------------------------------- */
+  /* ---------------- FETCH ---------------- */
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -56,159 +67,331 @@ export function GalleryContent() {
         setLoading(false);
       }
     };
-
     fetchData();
   }, []);
 
-  /* ----------------------------------------
-       FILTER
-    ----------------------------------------- */
-  const filteredGallery =
-    activeEvent === 'All' ? galleries : galleries.filter((g) => g.eventType === activeEvent);
+  /* ---------------- FILTERED LIST ---------------- */
+  const filteredGallery = useMemo(() => {
+    return galleries.filter((item) => {
+      const eventMatch = activeEvent === 'All' || item.eventType === activeEvent;
+      const categoryMatch = activeCategory === 'All' || item.category === activeCategory;
+      return eventMatch && categoryMatch;
+    });
+  }, [galleries, activeEvent, activeCategory]);
 
-  /* ----------------------------------------
-       UPDATE URL ON FILTER CHANGE
-    ----------------------------------------- */
-  const handleEventChange = (event: string) => {
-    setActiveEvent(event);
+  /* ---------------- ACTIVE INDEX ---------------- */
+  const activeIndex = useMemo(() => {
+    if (!activeItemId) return null;
+    const index = filteredGallery.findIndex((g) => g.id === activeItemId);
+    return index === -1 ? null : index;
+  }, [activeItemId, filteredGallery]);
 
-    if (event === 'All') {
-      router.push('/gallery', { scroll: false });
-    } else {
-      router.push(`/gallery?event=${encodeURIComponent(event)}`, {
-        scroll: false,
-      });
-    }
+  /* ---------------- URL HELPER ---------------- */
+  const updateURL = useCallback(
+    (paramsObj: Record<string, string | null>) => {
+      const params = new URLSearchParams(searchParams.toString());
+
+      Object.entries(paramsObj).forEach(([k, v]) => (v ? params.set(k, v) : params.delete(k)));
+
+      router.replace(`/gallery?${params.toString()}`, { scroll: false });
+    },
+    [router, searchParams]
+  );
+
+  /* ---------------- LIGHTBOX ---------------- */
+  const openLightbox = useCallback(
+    (id: string) => {
+      setActiveItemId(id);
+      updateURL({ item: id });
+    },
+    [updateURL]
+  );
+
+  const closeLightbox = useCallback(() => {
+    setActiveItemId(null);
+    updateURL({ item: null });
+  }, [updateURL]);
+
+  /* ---------------- SCROLL / KEY NAV ---------------- */
+  useEffect(() => {
+    if (activeIndex === null) return;
+
+    const next = () => {
+      if (activeIndex < filteredGallery.length - 1) {
+        const nextId = filteredGallery[activeIndex + 1].id;
+        setActiveItemId(nextId);
+        updateURL({ item: nextId });
+      }
+    };
+
+    const prev = () => {
+      if (activeIndex > 0) {
+        const prevId = filteredGallery[activeIndex - 1].id;
+        setActiveItemId(prevId);
+        updateURL({ item: prevId });
+      }
+    };
+
+    const onWheel = (e: WheelEvent) => {
+      if (wheelLock.current) return;
+      wheelLock.current = true;
+
+      if (e.deltaY > 0) {
+        next();
+      } else {
+        prev();
+      }
+
+      setTimeout(() => (wheelLock.current = false), 400);
+    };
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next();
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') prev();
+      if (e.key === 'Escape') closeLightbox();
+    };
+
+    window.addEventListener('wheel', onWheel, { passive: true });
+    window.addEventListener('keydown', onKey);
+    return () => {
+      window.removeEventListener('wheel', onWheel);
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [activeIndex, filteredGallery, closeLightbox, updateURL]);
+
+  /* ---------------- SHARE ---------------- */
+  const handleShare = async () => {
+    await navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
-  /* ----------------------------------------
-       SHARE LINK HANDLER
-    ----------------------------------------- */
-  const handleShareLink = async () => {
-    const url = window.location.href;
+  const handleItemShare = async (itemId: string) => {
+    const params = new URLSearchParams(window.location.search);
+    params.set('item', itemId);
+
+    const fullUrl = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
 
     try {
-      await navigator.clipboard.writeText(url);
+      await navigator.clipboard.writeText(fullUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error('Failed to copy:', err);
+      console.error('Failed to copy link', err);
     }
   };
 
-  /* ----------------------------------------
-       UI
-    ----------------------------------------- */
+  /* ---------------- UI ---------------- */
   return (
     <section className="py-16">
       <div className="container mx-auto px-4">
         <SectionHeader
           title="Gallery"
-          subtitle="Explore our curated collection of moments captured through our lens."
+          subtitle="Explore moments effortlessly and relive them with ease"
           centered
         />
 
-        {/* FILTER & SHARE */}
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-10">
-          {/* Filter Buttons */}
-          <div className="flex justify-center gap-2 overflow-x-auto scrollbar-hide">
-            {events.map((event) => (
-              <Button
-                key={event}
-                size="sm"
-                variant={activeEvent === event ? 'default' : 'outline'}
-                onClick={() => handleEventChange(event)}
-                className="rounded-full whitespace-nowrap"
-              >
-                {event}
-              </Button>
-            ))}
+        {/* FILTERS BAR */}
+        <div className="flex justify-center mt-6 items-center gap-3 mb-10 flex-wrap">
+          {/* Event Filter */}
+          <div className="relative">
+            <select
+              value={activeEvent}
+              onChange={(e) => {
+                setActiveEvent(e.target.value);
+                setActiveCategory('All');
+                updateURL({
+                  event: e.target.value === 'All' ? null : e.target.value,
+                  category: null,
+                });
+              }}
+              className="appearance-none rounded-full border px-4 py-2 pr-10 text-sm outline-none cursor-pointer"
+            >
+              {events.map((e) => (
+                <option key={e} value={e}>
+                  {e === 'All' ? 'All Events' : e}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none text-muted-foreground" />
           </div>
 
-          {/* Share Button */}
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={handleShareLink}
-            className="rounded-full whitespace-nowrap gap-2"
-          >
-            {copied ? (
-              <>
-                <Check className="w-4 h-4" />
-                Copied!
-              </>
-            ) : (
-              <>
-                <Share2 className="w-4 h-4" />
-                Share
-              </>
-            )}
-          </Button>
+          {/* Category Filter */}
+          {activeEvent !== 'All' && (
+            <div className="relative">
+              <select
+                value={activeCategory}
+                onChange={(e) => {
+                  setActiveCategory(e.target.value);
+                  updateURL({
+                    category: e.target.value === 'All' ? null : e.target.value,
+                  });
+                }}
+                className="appearance-none rounded-full border px-4 py-2 pr-10 text-sm outline-none cursor-pointer"
+              >
+                <option value="All">All Categories</option>
+                {eventTypes[activeEvent].categories.map((c) => (
+                  <option key={c.value} value={c.value}>
+                    {c.label}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none text-muted-foreground" />
+            </div>
+          )}
         </div>
 
-        {/* LOADING */}
-        {loading && (
-          <div className="py-24 flex flex-col items-center">
-            <Loader2 className="w-10 h-10 animate-spin text-primary mb-4" />
-            <p className="text-muted-foreground">Loading gallery…</p>
-          </div>
-        )}
-
-        {/* ERROR */}
-        {error && !loading && (
-          <div className="text-center py-24">
-            <Filter className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-            <p className="text-destructive">{error}</p>
-          </div>
-        )}
-
         {/* GRID */}
-        {!loading && !error && (
-          <>
-            {filteredGallery.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                {filteredGallery.map((item) => (
-                  <div
-                    key={item.id}
-                    className="group relative overflow-hidden hover:shadow-xl transition cursor-pointer"
-                  >
-                    <div className="relative aspect-[4/5]">
-                      <Image
-                        src={
-                          item.type === 'video'
-                            ? (item.thumbnail ?? '/images/video-placeholder.jpg')
-                            : item.url
-                        }
-                        alt={item.title}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
+        {loading && (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+          </div>
+        )}
 
-                      {item.type === 'video' && (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="w-14 h-14 rounded-full bg-gold/90 flex items-center justify-center">
-                            <Play className="w-6 h-6 text-maroon-dark ml-1" />
-                          </div>
-                        </div>
-                      )}
+        {error && <div className="text-center py-20 text-muted-foreground">{error}</div>}
 
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition">
-                        <div className="absolute bottom-0 p-4">
-                          <p className="text-white font-semibold text-sm">{item.title}</p>
-                          <p className="text-gold text-xs">{item.category}</p>
-                        </div>
-                      </div>
+        {!loading && !error && filteredGallery.length === 0 && (
+          <div className="text-center py-20 text-muted-foreground">No moments found</div>
+        )}
+
+        {!loading && !error && filteredGallery.length > 0 && (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-0.5">
+            {filteredGallery.map((item) => (
+              <div
+                key={item.id}
+                onClick={() => openLightbox(item.id)}
+                className="relative aspect-[4/5] cursor-pointer overflow-hidden group"
+              >
+                {/* Thumbnail */}
+                <Image
+                  src={item.type === 'video' ? (item.thumbnail ?? item.url) : item.url}
+                  alt={item.title}
+                  fill
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+
+                {/* Video Play Icon */}
+                {item.type === 'video' && (
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="w-12 h-12 rounded-full bg-gold flex items-center justify-center transition-transform group-hover:scale-110">
+                      <Play className="w-5 h-5 text-white ml-1" />
                     </div>
                   </div>
-                ))}
+                )}
+
+                {/* Hover Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                  {/* Bottom Bar */}
+                  <div className="absolute bottom-0 w-full flex items-center justify-between px-4 py-3">
+                    {/* Info */}
+                    <div className="pr-10">
+                      <p className="text-white font-semibold text-sm leading-tight">{item.title}</p>
+                      <p className="text-gold text-xs">
+                        {item.category} • {item.eventType}
+                      </p>
+                    </div>
+
+                    {/* Share Button */}
+                    <Button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleItemShare(item.id);
+                      }}
+                      variant="ghost"
+                      size="icon"
+                      className="text-white hover:text-gold hover:bg-white/10 transition"
+                      aria-label="Share image"
+                    >
+                      {copied ? <Check className="w-4 h-4" /> : <Share2 className="w-4 h-4" />}
+                    </Button>
+                  </div>
+                </div>
               </div>
-            ) : (
-              <div className="text-center py-24">
-                <Filter className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">No items found for {activeEvent}</p>
-              </div>
-            )}
-          </>
+            ))}
+          </div>
+        )}
+
+        {/* LIGHTBOX */}
+        {activeIndex !== null && (
+          <div
+            className="fixed inset-0 z-50 bg-black flex items-center justify-center"
+            onClick={closeLightbox}
+          >
+            {/* Close Button */}
+            <button
+              onClick={closeLightbox}
+              className="absolute top-6 right-6 text-white hover:text-white/70 transition z-10"
+              aria-label="Close"
+            >
+              <X className="w-6 h-6" />
+            </button>
+
+            {/* Share Button */}
+            <Button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleShare();
+              }}
+              variant="close"
+              size="icon"
+              className="absolute top-3 left-9 -translate-x-1/2 text-white border z-10 hover:border-gold hover:text-gold hover:bg-transparent transition"
+            >
+              {copied ? (
+                <>
+                  <Check className="w-4 h-4 mr-1" />
+                </>
+              ) : (
+                <>
+                  <Share2 className="w-4 h-4 mr-1" />
+                </>
+              )}
+            </Button>
+
+            {/* Progress Indicator */}
+            <div className="absolute top-14 left-6 text-white/60 text-sm z-10 pointer-events-none">
+              {activeIndex + 1} / {filteredGallery.length}
+            </div>
+
+            <div
+              className="relative w-screen h-screen flex items-center justify-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* PHOTO */}
+              {filteredGallery[activeIndex].type === 'photo' && (
+                <Image
+                  src={filteredGallery[activeIndex].url}
+                  alt={filteredGallery[activeIndex].title}
+                  fill
+                  priority
+                  sizes="100vw"
+                  className="object-contain"
+                />
+              )}
+
+              {/* UPLOADED VIDEO */}
+              {filteredGallery[activeIndex].type === 'video' &&
+                filteredGallery[activeIndex].videoSource === 'upload' && (
+                  <video
+                    src={filteredGallery[activeIndex].url}
+                    controls
+                    autoPlay
+                    className="max-h-screen max-w-screen"
+                  />
+                )}
+
+              {/* EXTERNAL VIDEO (YouTube/Vimeo) */}
+              {filteredGallery[activeIndex].type === 'video' &&
+                (filteredGallery[activeIndex].videoSource === 'external' ||
+                  !filteredGallery[activeIndex].videoSource) && (
+                  <iframe
+                    src={toEmbedUrl(filteredGallery[activeIndex].url)}
+                    className="w-full h-full max-h-screen max-w-screen"
+                    allow="autoplay; fullscreen"
+                    allowFullScreen
+                  />
+                )}
+            </div>
+          </div>
         )}
       </div>
     </section>
