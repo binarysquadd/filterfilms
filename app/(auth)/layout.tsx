@@ -1,13 +1,29 @@
+'use client';
+
 import { ArrowLeft } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useAuth } from '@/app/lib/firebase/auth-context';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && user) {
+      router.replace('/'); // or /customer/dashboard
+    }
+  }, [user, loading, router]);
+
+  // ⛔ Block rendering while deciding
+  if (loading || user) return null;
+
   return (
     <div className="h-screen flex bg-white overflow-hidden">
-      {/* Left Side - Branding */}
+      {/* Left Side */}
       <div className="hidden lg:flex lg:w-1/2 bg-emerald-800 px-12 py-8 flex-col justify-between relative overflow-hidden">
-        {/* Back Button */}
         <Link
           href="/"
           className="absolute top-6 left-6 z-20 inline-flex items-center gap-2 text-ivory/80 hover:text-ivory transition"
@@ -16,7 +32,6 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           <span className="text-sm">Back</span>
         </Link>
 
-        {/* Centered Logo Content */}
         <div className="relative z-10 flex flex-col items-center justify-center flex-1 text-center">
           <Image
             src="/logo/white-logo.png"
@@ -29,13 +44,10 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         </div>
       </div>
 
-      {/* Right Side - Auth Forms */}
+      {/* Right Side */}
       <div className="w-full lg:w-1/2 flex flex-col bg-ivory justify-center">
         <div className="flex-1 flex items-center justify-center px-6 py-8">
-          <div className="w-full max-w-md">
-            {/* Child Pages Render */}
-            {children}
-          </div>
+          <div className="w-full max-w-md">{children}</div>
         </div>
       </div>
     </div>
