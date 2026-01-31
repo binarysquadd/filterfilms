@@ -46,3 +46,5 @@ service-account.json
 note.txt
 
 drive-tokens.json
+
+package-lock.json
