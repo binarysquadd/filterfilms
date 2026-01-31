@@ -98,7 +98,7 @@ export default function Navbar() {
               alt="Filter Film Studio Logo"
               width={180}
               height={60}
-              className="object-contain mt-8 w-full hover:scale-105 transition-transform"
+              className="object-contain w-32 hover:scale-105 transition-transform"
             />
           </Link>
 
@@ -180,7 +180,7 @@ export default function Navbar() {
               alt="Filter Film Studio Logo"
               width={140}
               height={40}
-              className="object-contain mt-8 w-40"
+              className="object-contain w-32"
             />
           </Link>
 
