@@ -129,7 +129,7 @@ export default function GallerySection() {
           <div className="container mx-auto px-4">
             {previewGallery.length > 0 ? (
               <>
-                <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
+                <div className="grid gap-0.5 grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
                   {previewGallery.slice(0, 8).map((item) => (
                     <div
                       key={item.id}
