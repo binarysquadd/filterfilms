@@ -108,14 +108,14 @@ export default function Footer() {
             </Link>
             . Crafted with excellence.
           </p>
-          <div className="flex gap-6">
+          {/* <div className="flex gap-6">
             <Link href="#" className="hover:text-gold transition-colors">
               Privacy Policy
             </Link>
             <Link href="#" className="hover:text-gold transition-colors">
               Terms of Service
             </Link>
-          </div>
+          </div> */}
         </div>
       </div>
     </footer>

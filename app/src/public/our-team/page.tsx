@@ -1,7 +1,7 @@
 'use client';
 
 import SectionHeader from '@/app/src/components/common/SectionHeader';
-import { Quote } from 'lucide-react';
+import { Instagram, Quote } from 'lucide-react';
 import Image from 'next/image';
 
 export default function OurTeam() {
@@ -93,8 +93,9 @@ export default function OurTeam() {
                 href={`https://instagram.com/${founder.instagram.replace('@', '')}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm uppercase tracking-widest hover:text-gold transition-colors"
+                className="text-sm uppercase tracking-widest hover:text-gold transition-colors flex items-center justify-center"
               >
+                <Instagram className="inline-block mr-2 w-4 h-4" />
                 {founder.instagram}
               </a>
 
@@ -102,8 +103,9 @@ export default function OurTeam() {
                 href={`https://instagram.com/${founder.studioInstagram.replace('@', '')}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm uppercase tracking-widest hover:text-gold transition-colors"
+                className="text-sm uppercase tracking-widest hover:text-gold transition-colors flex items-center justify-center"
               >
+                <Instagram className="inline-block mr-2 w-4 h-4" />
                 {founder.studioInstagram}
               </a>
             </div>
