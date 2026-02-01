@@ -1,0 +1,19 @@
+name: Drive healthcheck
+
+on:
+  schedule:
+    - cron: '0 */6 * * *' # every 6 hours
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Drive healthcheck
+        id: ping
+        env:
+          HEALTHCHECK_URL: ${{ secrets.DRIVE_HEALTHCHECK_URL_PROD }}
+          HEALTHCHECK_SECRET: ${{ secrets.HEALTHCHECK_SECRET_PROD }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DRIVE_DISCORD_WEBHOOK_URL }}
+        run: ./.github/workflows/scripts/drive-healthcheck.sh

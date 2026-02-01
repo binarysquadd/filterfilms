@@ -8,8 +8,8 @@ const PORT = 4444;
 const REDIRECT_URI = `http://localhost:${PORT}/oauth2callback`;
 
 const oauth2Client = new google.auth.OAuth2(
-  process.env.AUTH_GOOGLE_ID,
-  process.env.AUTH_GOOGLE_SECRET,
+  process.env.GOOGLE_OAUTH_CLIENT_ID,
+  process.env.GOOGLE_OAUTH_CLIENT_SECRET,
   REDIRECT_URI
 );
 
@@ -33,6 +33,7 @@ const server = http.createServer(async (req, res) => {
 
   console.log('✅ Refresh token obtained');
   console.log(tokens);
+  console.log('Save the refresh token to GOOGLE_OAUTH_REFRESH_TOKEN');
 });
 
 server.listen(PORT, async () => {

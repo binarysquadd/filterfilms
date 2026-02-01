@@ -1,4 +1,5 @@
 import { google, type drive_v3 } from 'googleapis';
+import { logger } from './logger';
 
 type DriveCtx = {
   drive: drive_v3.Drive;
@@ -6,49 +7,95 @@ type DriveCtx = {
 };
 
 let cachedCtx: DriveCtx | null = null;
+let didWarnMissingConfig = false;
 
-function getDriveCtx(): DriveCtx {
+function getDriveConfigError(): string | null {
+  const missing: string[] = [];
+
+  if (!process.env.GOOGLE_OAUTH_CLIENT_ID) missing.push('GOOGLE_OAUTH_CLIENT_ID');
+  if (!process.env.GOOGLE_OAUTH_CLIENT_SECRET) missing.push('GOOGLE_OAUTH_CLIENT_SECRET');
+  if (!process.env.GOOGLE_OAUTH_REFRESH_TOKEN) missing.push('GOOGLE_OAUTH_REFRESH_TOKEN');
+  if (!process.env.GOOGLE_DRIVE_FOLDER_ID) missing.push('GOOGLE_DRIVE_FOLDER_ID');
+
+  if (missing.length === 0) return null;
+
+  return `Google Drive is not configured. Missing: ${missing.join(', ')}`;
+}
+
+function getDriveCtx(): DriveCtx | null {
   if (cachedCtx) return cachedCtx;
 
-  const clientId = process.env.GOOGLE_OAUTH_CLIENT_ID;
-  const clientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET;
-  const refreshToken = process.env.GOOGLE_OAUTH_REFRESH_TOKEN;
-  const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID;
-
-  if (!clientId || !clientSecret || !refreshToken || !folderId) {
-    throw new Error(
-      'Google Drive is not configured. Missing one of: ' +
-        'GOOGLE_OAUTH_CLIENT_ID, GOOGLE_OAUTH_CLIENT_SECRET, GOOGLE_OAUTH_REFRESH_TOKEN, GOOGLE_DRIVE_FOLDER_ID'
-    );
+  const configError = getDriveConfigError();
+  if (configError) {
+    if (!didWarnMissingConfig) {
+      logger.warn('drive.config.missing', { message: configError });
+      didWarnMissingConfig = true;
+    }
+    return null;
   }
 
-  const auth = new google.auth.OAuth2(clientId, clientSecret);
-  auth.setCredentials({ refresh_token: refreshToken });
+  const auth = new google.auth.OAuth2(
+    process.env.GOOGLE_OAUTH_CLIENT_ID,
+    process.env.GOOGLE_OAUTH_CLIENT_SECRET
+  );
+  auth.setCredentials({ refresh_token: process.env.GOOGLE_OAUTH_REFRESH_TOKEN });
 
   const drive = google.drive({ version: 'v3', auth });
 
-  cachedCtx = { drive, folderId };
+  cachedCtx = { drive, folderId: process.env.GOOGLE_DRIVE_FOLDER_ID as string };
   return cachedCtx;
 }
 
 async function getFileId(name: string): Promise<string | null> {
-  const { drive, folderId } = getDriveCtx();
+  const ctx = getDriveCtx();
+  if (!ctx) return null;
+
+  const { drive, folderId } = ctx;
 
   const res = await drive.files.list({
     q: `'${folderId}' in parents and name='${name}.json' and trashed=false`,
     fields: 'files(id, name)',
   });
 
-  if (!res.ok) {
-    console.log('Google Drive Refresh Token may have expired or is invalid.');
+  return res.data.files?.[0]?.id ?? null;
+}
+
+function normalizeGoogleError(error: unknown): {
+  message: string;
+  status?: number;
+  reason?: string;
+  invalidGrant?: boolean;
+} {
+  if (!error || typeof error !== 'object') {
+    return { message: 'Unknown Google API error' };
   }
 
-  return res.data.files?.[0]?.id ?? null;
+  const anyError = error as {
+    message?: string;
+    code?: number;
+    errors?: Array<{ reason?: string }>;
+    error?: string;
+    response?: { status?: number; data?: { error?: { errors?: Array<{ reason?: string }> } } };
+  };
+
+  const message = anyError.message ?? 'Unknown Google API error';
+  const status = anyError.code ?? anyError.response?.status;
+  const reason =
+    anyError.errors?.[0]?.reason ?? anyError.response?.data?.error?.errors?.[0]?.reason;
+  const invalidGrant =
+    anyError.error === 'invalid_grant' ||
+    reason === 'invalid_grant' ||
+    message.toLowerCase().includes('invalid_grant');
+
+  return { message, status, reason, invalidGrant };
 }
 
 export const driveService = {
   async getCollection<T>(name: string): Promise<T[]> {
-    const { drive } = getDriveCtx();
+    const ctx = getDriveCtx();
+    if (!ctx) return [];
+
+    const { drive } = ctx;
 
     const fileId = await getFileId(name);
     if (!fileId) return [];
@@ -68,7 +115,10 @@ export const driveService = {
   },
 
   async saveCollection<T>(name: string, data: T[]): Promise<void> {
-    const { drive, folderId } = getDriveCtx();
+    const ctx = getDriveCtx();
+    if (!ctx) return;
+
+    const { drive, folderId } = ctx;
 
     const fileId = await getFileId(name);
     const body = JSON.stringify(data, null, 2);
@@ -95,5 +145,60 @@ export const driveService = {
         body,
       },
     });
+  },
+
+  async healthCheck(): Promise<{
+    ok: boolean;
+    folder?: { id: string; name?: string; mimeType?: string; accessible: boolean };
+    folderError?: { message: string; status?: number; reason?: string };
+    error?: { message: string; status?: number; reason?: string; invalidGrant?: boolean };
+  }> {
+    const configError = getDriveConfigError();
+    if (configError) {
+      return { ok: false, error: { message: configError, reason: 'missing_env' } };
+    }
+
+    const ctx = getDriveCtx();
+    if (!ctx) {
+      return {
+        ok: false,
+        error: { message: 'Google Drive is not configured', reason: 'missing_env' },
+      };
+    }
+
+    try {
+      await ctx.drive.files.list({ pageSize: 1, fields: 'files(id)' });
+
+      try {
+        const folderRes = await ctx.drive.files.get({
+          fileId: ctx.folderId,
+          fields: 'id,name,mimeType',
+        });
+        return {
+          ok: true,
+          folder: {
+            id: folderRes.data.id as string,
+            name: folderRes.data.name ?? undefined,
+            mimeType: folderRes.data.mimeType ?? undefined,
+            accessible: true,
+          },
+        };
+      } catch (folderError) {
+        const normalizedFolderError = normalizeGoogleError(folderError);
+        return {
+          ok: true,
+          folder: { id: ctx.folderId, accessible: false },
+          folderError: {
+            message: normalizedFolderError.message,
+            status: normalizedFolderError.status,
+            reason: normalizedFolderError.reason,
+          },
+        };
+      }
+    } catch (error) {
+      const normalized = normalizeGoogleError(error);
+      logger.error('drive.health.failed', normalized);
+      return { ok: false, error: normalized };
+    }
   },
 };

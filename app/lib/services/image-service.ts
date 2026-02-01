@@ -1,5 +1,6 @@
 import { google, type drive_v3 } from 'googleapis';
 import { Readable } from 'stream';
+import { logger } from '../logger';
 
 type DriveCtx = {
   drive: drive_v3.Drive;
@@ -7,8 +8,9 @@ type DriveCtx = {
 };
 
 let cachedCtx: DriveCtx | null = null;
+let didWarnMissingConfig = false;
 
-function getDriveCtx(): DriveCtx {
+function getDriveCtx(): DriveCtx | null {
   if (cachedCtx) return cachedCtx;
 
   const clientId = process.env.GOOGLE_OAUTH_CLIENT_ID;
@@ -17,10 +19,15 @@ function getDriveCtx(): DriveCtx {
   const imagesFolderId = process.env.GOOGLE_DRIVE_IMAGES_FOLDER_ID;
 
   if (!clientId || !clientSecret || !refreshToken || !imagesFolderId) {
-    throw new Error(
-      'Google Drive image upload is not configured. Missing one of: ' +
-        'GOOGLE_OAUTH_CLIENT_ID, GOOGLE_OAUTH_CLIENT_SECRET, GOOGLE_OAUTH_REFRESH_TOKEN, GOOGLE_DRIVE_IMAGES_FOLDER_ID'
-    );
+    if (!didWarnMissingConfig) {
+      logger.warn('drive.images.config.missing', {
+        message:
+          'Google Drive image upload is not configured. Missing one of: ' +
+          'GOOGLE_OAUTH_CLIENT_ID, GOOGLE_OAUTH_CLIENT_SECRET, GOOGLE_OAUTH_REFRESH_TOKEN, GOOGLE_DRIVE_IMAGES_FOLDER_ID',
+      });
+      didWarnMissingConfig = true;
+    }
+    return null;
   }
 
   const auth = new google.auth.OAuth2(clientId, clientSecret);
@@ -34,7 +41,12 @@ function getDriveCtx(): DriveCtx {
 
 export const imageService = {
   async uploadImage(file: Buffer, filename: string, mimeType: string): Promise<string> {
-    const { drive, imagesFolderId } = getDriveCtx();
+    const ctx = getDriveCtx();
+    if (!ctx) {
+      throw new Error('Google Drive image upload is not configured');
+    }
+
+    const { drive, imagesFolderId } = ctx;
 
     try {
       const fileMetadata: drive_v3.Schema$File = {
@@ -68,19 +80,27 @@ export const imageService = {
       // Return a direct view link
       return `https://drive.google.com/uc?export=view&id=${fileId}`;
     } catch (error) {
-      console.error('Error uploading image:', error);
+      logger.error('drive.images.upload.failed', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+      });
       throw new Error('Failed to upload image');
     }
   },
 
   async deleteImage(fileId: string): Promise<boolean> {
-    const { drive } = getDriveCtx();
+    const ctx = getDriveCtx();
+    if (!ctx) return false;
+
+    const { drive } = ctx;
 
     try {
       await drive.files.delete({ fileId });
       return true;
     } catch (error) {
-      console.error('Error deleting image:', error);
+      logger.error('drive.images.delete.failed', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        fileId,
+      });
       return false;
     }
   },
