@@ -4,6 +4,34 @@
 npx tsx scripts/drive-auth-once.ts
 ```
 
+Drive env vars (runtime)
+• GOOGLE_OAUTH_CLIENT_ID
+• GOOGLE_OAUTH_CLIENT_SECRET
+• GOOGLE_OAUTH_REFRESH_TOKEN
+• GOOGLE_DRIVE_FOLDER_ID
+• GOOGLE_DRIVE_IMAGES_FOLDER_ID
+• HEALTHCHECK_SECRET (required for /api/health/drive)
+
+Drive healthcheck (GitHub Secrets)
+• DRIVE_HEALTHCHECK_URL_PROD (https://filterfilms.in/api/health/drive)
+• HEALTHCHECK_SECRET_PROD (must match runtime)
+• DRIVE_DISCORD_WEBHOOK_URL
+
+Local / Remote / Prod testing
+
+1. Set target in env
+   • DRIVE_HEALTHCHECK_TARGET="local" | "remote" | "prod"
+2. Set the corresponding URL
+   • DRIVE_HEALTHCHECK_URL_LOCAL="http://localhost:3002/api/health/drive"
+   • DRIVE_HEALTHCHECK_URL_REMOTE="http://100.64.11.64:8081/proxy/3002/"
+   • DRIVE_HEALTHCHECK_URL_PROD="https://filterfilms.in/api/health/drive"
+3. Set per-target secret if needed
+   • HEALTHCHECK_SECRET_LOCAL="..."
+   • HEALTHCHECK_SECRET_REMOTE="..."
+   • HEALTHCHECK_SECRET_PROD="..."
+4. Run
+   • ./scripts/run-drive-healthcheck.sh
+
 # CI / Build Stability Guidelines
 
 Environment Variables & Secrets
