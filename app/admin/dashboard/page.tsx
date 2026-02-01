@@ -150,25 +150,28 @@ export default function AdminDashboard() {
       </div>
 
       {/* Revenue Cards */}
-      <div className="grid md:grid-cols-2 gap-4">
-        <div className="bg-maroon rounded-xl p-6 text-white shadow-lg">
+      <div className="grid md:grid-cols-2 gap-6">
+        <div className="rounded-2xl p-6 bg-white/70 backdrop-blur border border-border shadow-sm hover:shadow-md transition">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-lg bg-white/20 flex items-center justify-center">
-              <IndianRupee className="w-6 h-6 text-white" />
+            <div className="w-12 h-12 rounded-lg bg-emerald-100 flex items-center justify-center">
+              <IndianRupee className="w-6 h-6 text-emerald-600" />
             </div>
+
             <div>
-              <p className="text-white/80 text-sm">Total Revenue</p>
-              <p className="text-2xl font-bold">{formatPrice(totalRevenue)}</p>
+              <p className="text-sm text-gray-500">Total Revenue</p>
+              <p className="text-2xl font-bold text-gray-900">{formatPrice(totalRevenue)}</p>
             </div>
           </div>
         </div>
-        <div className="bg-card rounded-xl p-6 shadow-sm border border-border border-l-4 border-l-yellow-500">
+
+        <div className="rounded-2xl p-6 bg-white/70 backdrop-blur border border-border shadow-sm hover:shadow-md transition">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-lg bg-yellow-50 border border-border flex items-center justify-center">
-              <TrendingUp className="w-6 h-6 text-yellow-600" />
+            <div className="w-12 h-12 rounded-lg bg-amber-100 flex items-center justify-center">
+              <TrendingUp className="w-6 h-6 text-amber-600" />
             </div>
+
             <div>
-              <p className="text-gray-600 text-sm">Pending Payments</p>
+              <p className="text-sm text-gray-500">Pending Payments</p>
               <p className="text-2xl font-bold text-gray-900">{formatPrice(pendingPayments)}</p>
             </div>
           </div>

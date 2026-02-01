@@ -16,6 +16,7 @@ export default function TeamAttendancePage() {
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [loading, setLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState<'mark' | 'punchIn' | 'punchOut' | null>(null);
 
   const today = new Date().toISOString().split('T')[0];
 
@@ -49,7 +50,7 @@ export default function TeamAttendancePage() {
 
   // Create today's attendance record
   const handleMarkAttendance = async () => {
-    setLoading(true);
+    setActionLoading('mark');
     try {
       const res = await fetch('/api/admin/attendance', {
         method: 'POST',
@@ -63,7 +64,7 @@ export default function TeamAttendancePage() {
       });
 
       if (!res.ok) {
-        alert('Failed to mark attendance');
+        toast.error('Failed to mark attendance');
         return;
       }
 
@@ -74,7 +75,7 @@ export default function TeamAttendancePage() {
       toast.error('Error marking attendance');
       console.error('Error marking attendance:', error);
     } finally {
-      setLoading(false);
+      setActionLoading(null);
     }
   };
 
@@ -87,7 +88,7 @@ export default function TeamAttendancePage() {
 
     const time = new Date().toTimeString().slice(0, 5);
 
-    setLoading(true);
+    setActionLoading('punchIn');
     try {
       const res = await fetch(`/api/admin/attendance/${todayRecord.id}`, {
         method: 'PATCH',
@@ -105,7 +106,9 @@ export default function TeamAttendancePage() {
       fetchAttendance();
     } catch (error) {
       console.error('Error punching in:', error);
-      alert('Error punching in');
+      toast.error('Error punching in');
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -123,7 +126,7 @@ export default function TeamAttendancePage() {
 
     const time = new Date().toTimeString().slice(0, 5);
 
-    setLoading(true);
+    setActionLoading('punchOut');
     try {
       const res = await fetch(`/api/admin/attendance/${todayRecord.id}`, {
         method: 'PATCH',
@@ -143,7 +146,7 @@ export default function TeamAttendancePage() {
       toast.error('Error punching out');
       console.error('Error punching out:', error);
     } finally {
-      setLoading(false);
+      setActionLoading(null);
     }
   };
 
@@ -280,58 +283,59 @@ export default function TeamAttendancePage() {
             </div>
           </div>
 
-          <div className="flex gap-4 mt-6">
+          {/* Action Buttons - Stack on mobile */}
+          <div className="flex flex-col sm:flex-row gap-3">
             {!todayRecord ? (
               <Button
-                variant="royal"
-                size="lg"
                 onClick={handleMarkAttendance}
-                className="w-1/4 bg-card text-muted-foreground px-6 py-3 border border-border rounded-lg font-semibold transition-all"
+                disabled={actionLoading === 'mark'}
+                className="w-full sm:w-auto px-6 py-2"
               >
-                {loading ? (
+                {actionLoading === 'mark' ? (
                   <div className="flex items-center gap-2">
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Marking Attendance...</span>
+                    <span>Marking...</span>
                   </div>
                 ) : (
-                  <span>Mark Attendance for Today</span>
+                  <span>Mark Attendance</span>
                 )}
               </Button>
             ) : (
-              <div className="flex flex-row gap-2 justify-end">
+              <>
                 <Button
                   variant="outline"
-                  size="lg"
                   onClick={handlePunchIn}
-                  disabled={!!todayRecord?.checkIn}
-                  className="cursor-pointer"
+                  disabled={!!todayRecord?.checkIn || actionLoading === 'punchIn'}
+                  className="flex-1"
                 >
-                  {loading ? (
+                  {actionLoading === 'punchIn' ? (
                     <div className="flex items-center gap-2">
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Punching...</span>
+                      <span>Punching In...</span>
                     </div>
                   ) : (
                     <span>Punch In</span>
                   )}
                 </Button>
+
                 <Button
                   variant="destructive"
-                  size="lg"
                   onClick={handlePunchOut}
-                  disabled={!todayRecord?.checkIn || !!todayRecord?.checkOut}
-                  className="cursor-pointer"
+                  disabled={
+                    !todayRecord?.checkIn || !!todayRecord?.checkOut || actionLoading === 'punchOut'
+                  }
+                  className="flex-1"
                 >
-                  {loading ? (
+                  {actionLoading === 'punchOut' ? (
                     <div className="flex items-center gap-2">
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Punching...</span>
+                      <span>Punching Out...</span>
                     </div>
                   ) : (
                     <span>Punch Out</span>
                   )}
                 </Button>
-              </div>
+              </>
             )}
           </div>
         </div>

@@ -13,7 +13,6 @@ import {
   Loader2,
   Download,
   Filter,
-  Loader,
 } from 'lucide-react';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
@@ -276,16 +275,16 @@ const AdminAttendancePage = () => {
     a.click();
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <Loader className="w-10 h-10 animate-spin text-muted-foreground mx-auto mb-4" />
-          <p className="text-muted-foreground font-medium">Loading attendance data...</p>
-        </div>
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center">
+  //       <div className="text-center">
+  //         <Loader className="w-10 h-10 animate-spin text-muted-foreground mx-auto mb-4" />
+  //         <p className="text-muted-foreground font-medium">Loading attendance data...</p>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <>
@@ -304,7 +303,7 @@ const AdminAttendancePage = () => {
               </div>
               <button
                 onClick={exportToCSV}
-                className="flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-lg hover:shadow-lg transition-all duration-200 font-medium"
+                className="flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-lg hover:shadow-md transition-all duration-200 font-medium"
               >
                 <Download className="w-4 h-4" />
                 Export CSV
@@ -325,7 +324,7 @@ const AdminAttendancePage = () => {
 
           {/* Stats Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-card text-muted-foreground rounded-2xl shadow-lg p-6 transform hover:scale-105 transition-transform duration-200">
+            <div className="bg-card text-muted-foreground rounded-2xl border p-6 transform hover:scale-105 transition-transform duration-200">
               <div className="flex items-center justify-between mb-3">
                 <div className="w-12 h-12 bg-muted rounded-xl flex items-center justify-center">
                   <UserCheck className="w-6 h-6" />
@@ -335,7 +334,7 @@ const AdminAttendancePage = () => {
               <p className="text-muted-foreground font-medium">Present Today</p>
             </div>
 
-            <div className="bg-card text-muted-foreground rounded-2xl shadow-lg p-6 transform hover:scale-105 transition-transform duration-200">
+            <div className="bg-card text-muted-foreground rounded-2xl border p-6 transform hover:scale-105 transition-transform duration-200">
               <div className="flex items-center justify-between mb-3">
                 <div className="w-12 h-12 bg-muted rounded-xl flex items-center justify-center">
                   <UserX className="w-6 h-6" />
@@ -345,7 +344,7 @@ const AdminAttendancePage = () => {
               <p className="text-muted-foreground font-medium">Absent Today</p>
             </div>
 
-            <div className="bg-card text-muted-foreground rounded-2xl shadow-lg p-6 transform hover:scale-105 transition-transform duration-200">
+            <div className="bg-card text-muted-foreground rounded-2xl border p-6 transform hover:scale-105 transition-transform duration-200">
               <div className="flex items-center justify-between mb-3">
                 <div className="w-12 h-12 bg-muted rounded-xl flex items-center justify-center">
                   <Clock className="w-6 h-6" />
@@ -355,7 +354,7 @@ const AdminAttendancePage = () => {
               <p className="text-muted-foreground font-medium">Half Day</p>
             </div>
 
-            <div className="bg-card text-muted-foreground rounded-2xl shadow-lg p-6 transform hover:scale-105 transition-transform duration-200">
+            <div className="bg-card text-muted-foreground rounded-2xl border p-6 transform hover:scale-105 transition-transform duration-200">
               <div className="flex items-center justify-between mb-3">
                 <div className="w-12 h-12 bg-muted rounded-xl flex items-center justify-center">
                   <Calendar className="w-6 h-6" />
@@ -367,7 +366,7 @@ const AdminAttendancePage = () => {
           </div>
 
           {/* Filters */}
-          <div className="bg-card text-muted-foreground rounded-2xl shadow-sm border border-border p-4">
+          <div className="bg-card text-muted-foreground rounded-2xl border border-border p-4">
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -402,7 +401,7 @@ const AdminAttendancePage = () => {
           </div>
 
           {/* Attendance Table */}
-          <div className="bg-card rounded-2xl shadow-sm border border-border overflow-hidden">
+          <div className="bg-card rounded-2xl  overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-muted/50">
@@ -418,7 +417,15 @@ const AdminAttendancePage = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
-                  {filteredMembers.length === 0 ? (
+                  {loading ? (
+                    <tr>
+                      <td colSpan={6} className="h-72">
+                        <div className="flex h-full items-center justify-center">
+                          <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+                        </div>
+                      </td>
+                    </tr>
+                  ) : filteredMembers.length === 0 ? (
                     <tr>
                       <td colSpan={6} className="p-8 text-center text-muted-foreground">
                         No team members found
@@ -432,7 +439,7 @@ const AdminAttendancePage = () => {
                       return (
                         <tr
                           key={member.id}
-                          className="hover:bg-popover transition-colors cursor-pointer"
+                          className="hover:bg-muted/30 transition-colors cursor-pointer"
                         >
                           <td className="p-4">
                             <div className="flex items-center gap-3">
