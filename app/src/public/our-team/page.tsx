@@ -11,7 +11,7 @@ export default function OurTeam() {
     specialization: 'Cinematic Wedding Filmmaker',
     experience: '7+ Years Experience',
     bio: `With over seven years of experience in the film industry, Subham Dalai founded Filter Film Studio with a vision to elevate wedding cinematography beyond documentation. His work blends deep-rooted Indian emotions with refined cinematic storytelling, crafting films that feel intimate, timeless, and visually powerful.`,
-    photo: '/team-image/founder1.png',
+    photo: '/founder/founder_filterfilm.webp',
     instagram: '@subhamdalai__',
     studioInstagram: '@filterfilm.studio',
 
@@ -24,7 +24,7 @@ export default function OurTeam() {
       {
         label: 'Teaching & Mentorship',
         value:
-          'Actively mentors aspiring filmmakers and wedding cinematographers through workshops, one-on-one sessions, and on-field training.',
+          'Actively mentors aspiring fashion designers and wedding cinematographers through workshops, one-on-one sessions, and on-field training.',
       },
       {
         label: 'Certifications',
@@ -45,20 +45,20 @@ export default function OurTeam() {
 
         <div className="mt-24 grid lg:grid-cols-12 gap-16 items-start">
           {/* Image */}
-          <div className="lg:col-span-5">
+          <div className="lg:col-span-4">
             <div className="relative h-[560px] overflow-hidden">
               <Image
                 src={founder.photo}
                 alt={founder.name}
                 fill
                 priority
-                className="object-cover"
+                className="object-cover w-full h-full"
               />
             </div>
           </div>
 
           {/* Content */}
-          <div className="lg:col-span-7">
+          <div className="lg:col-span-8">
             <span className="text-gold uppercase tracking-widest text-sm font-medium">
               {founder.experience}
             </span>
