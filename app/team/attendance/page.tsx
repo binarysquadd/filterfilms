@@ -284,12 +284,12 @@ export default function TeamAttendancePage() {
           </div>
 
           {/* Action Buttons - Stack on mobile */}
-          <div className="flex flex-col sm:flex-row gap-3">
+          <div className="flex flex-col sm:flex-row gap-3 mt-2">
             {!todayRecord ? (
               <Button
                 onClick={handleMarkAttendance}
                 disabled={actionLoading === 'mark'}
-                className="w-full sm:w-auto px-6 py-2"
+                size={'lg'}
               >
                 {actionLoading === 'mark' ? (
                   <div className="flex items-center gap-2">
@@ -306,7 +306,7 @@ export default function TeamAttendancePage() {
                   variant="outline"
                   onClick={handlePunchIn}
                   disabled={!!todayRecord?.checkIn || actionLoading === 'punchIn'}
-                  className="flex-1"
+                  size={'sm'}
                 >
                   {actionLoading === 'punchIn' ? (
                     <div className="flex items-center gap-2">
@@ -324,7 +324,7 @@ export default function TeamAttendancePage() {
                   disabled={
                     !todayRecord?.checkIn || !!todayRecord?.checkOut || actionLoading === 'punchOut'
                   }
-                  className="flex-1"
+                  size={'sm'}
                 >
                   {actionLoading === 'punchOut' ? (
                     <div className="flex items-center gap-2">
