@@ -17,6 +17,7 @@ import {
   UserSearch,
   MailOpenIcon,
   ImageIcon,
+  Clock,
 } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
@@ -33,6 +34,7 @@ const navigationConfig = {
     { href: '/admin/team', label: 'Manage Team', icon: Users },
     { href: '/admin/customers', label: 'Customers', icon: UserSearch },
     { href: '/admin/attendance', label: 'Attendance', icon: ClipboardCheck },
+    { href: '/admin/payments', label: 'Team Payments', icon: Clock },
     { href: '/admin/messages', label: 'Messages', icon: MailOpenIcon },
     { href: '/admin/profile', label: 'Profile', icon: User },
   ],
@@ -46,6 +48,7 @@ const navigationConfig = {
     { href: '/team/dashboard', label: 'Dashboard', icon: Home },
     { href: '/team/assignments', label: 'My Assignments', icon: Calendar },
     { href: '/team/attendance', label: 'Attendance', icon: ClipboardCheck },
+    { href: '/team/payments', label: 'Payments History', icon: Clock },
     { href: '/team/profile', label: 'Profile', icon: User },
   ],
 };

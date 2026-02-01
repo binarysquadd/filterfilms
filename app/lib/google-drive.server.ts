@@ -39,6 +39,10 @@ async function getFileId(name: string): Promise<string | null> {
     fields: 'files(id, name)',
   });
 
+  if (!res.ok) {
+    console.log('Google Drive Refresh Token may have expired or is invalid.');
+  }
+
   return res.data.files?.[0]?.id ?? null;
 }
 
