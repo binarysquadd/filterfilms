@@ -1,9 +1,11 @@
 // scripts/init-drive-db.ts
+// import 'dotenv/config';
+
 import { driveService } from '@/app/lib/google-drive.server';
 
 async function initDatabase() {
   const initialData = {
-    contact: [],
+    payments: [],
   };
 
   for (const [collection, data] of Object.entries(initialData)) {

@@ -132,13 +132,14 @@ const UnifiedDashboard: React.FC<UnifiedDashboardProps> = ({ children }) => {
       >
         {/* Logo Header */}
         <div className="h-16 flex items-center justify-between px-4 border-b border-border flex-shrink-0">
-          <div className="flex items-center gap-3">
+          <div className="h-10 w-auto flex items-center">
             <Image
-              src="/logo/logo_only.png"
+              src="/logo/logo-name.png"
               alt="Logo"
-              width={90}
-              height={32}
-              className=" w-full h-8"
+              width={160}
+              height={48}
+              className="object-contain w-56"
+              priority
             />
           </div>
           <button
