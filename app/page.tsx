@@ -5,6 +5,7 @@ import OurTeam from './src/public/our-team/page';
 import PackagesSection from './src/public/packages/page';
 import StatisticsSection from './src/public/stats/page';
 import ContactSection from './src/public/contact/page';
+import TestimonialsSection from './src/public/testimonials/page';
 
 export default function Page() {
   return (
@@ -15,6 +16,7 @@ export default function Page() {
       <OurTeam />
       <PackagesSection />
       <AboutSection />
+      <TestimonialsSection />
       <ContactSection />
     </>
   );
