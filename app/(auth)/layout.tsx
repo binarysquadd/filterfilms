@@ -34,13 +34,23 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
         <div className="relative z-10 flex flex-col items-center justify-center flex-1 text-center">
           <Image
-            src="/logo/white-logo.png"
+            src="/logo/white.png"
             alt="Filter Film Studio Logo"
             width={260}
             height={120}
             priority
-            className="object-contain w-full h-auto mb-8"
+            className="object-contain w-80 h-auto mb-8"
           />
+        </div>
+        <div className="relative z-10 text-center text-ivory text-xl pb-4">
+          &copy; {new Date().getFullYear()} Software Experience Crafted By{' '}
+          <Link
+            href="https://binarysquad.pages.dev/"
+            target="_blank"
+            className="underline text-muted"
+          >
+            Binary Squad
+          </Link>
         </div>
       </div>
 
