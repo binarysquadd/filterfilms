@@ -1,4 +1,3 @@
-// /api/admin/booking/route.ts
 import { getServerSession } from '@/app/lib/firebase/server-auth';
 import { bookingService } from '@/app/lib/services/booking-service';
 import { NextResponse } from 'next/server';
@@ -12,16 +11,11 @@ export async function GET() {
   try {
     let bookings;
 
-    // Admin can see all bookings
     if (session.role === 'admin') {
       bookings = await bookingService.getAllBookings();
-    }
-    // Customers can only see their own bookings
-    else if (session.role === 'customer') {
+    } else if (session.role === 'customer') {
       bookings = await bookingService.getBookingsByUserId(session.id);
-    }
-    // Team members can ONLY see bookings assigned to them
-    else if (session.role === 'team') {
+    } else if (session.role === 'team') {
       bookings = await bookingService.getBookingsByAssignedTeam(session.id);
     } else {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -34,7 +28,6 @@ export async function GET() {
   }
 }
 
-// /api/admin/booking/route.ts
 export async function POST(req: Request) {
   const session = await getServerSession();
   if (!session) {
@@ -48,7 +41,6 @@ export async function POST(req: Request) {
   try {
     const data = await req.json();
 
-    // ✅ Updated validation for new structure
     if (!data.packages || !Array.isArray(data.packages) || data.packages.length === 0) {
       return NextResponse.json({ error: 'At least one package is required' }, { status: 400 });
     }
@@ -57,20 +49,18 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // ✅ Create booking with packages array
     const newBooking = await bookingService.createBooking({
       userId: session.id,
-      packages: data.packages, // Array of packages with dates
+      packages: data.packages,
       eventType: data.eventType,
       eventName: data.eventName,
-      startDate: data.startDate, // Overall event dates
+      startDate: data.startDate,
       endDate: data.endDate,
       venue: data.venue,
       status: 'pending',
       totalAmount: data.totalAmount,
       paidAmount: data.paidAmount || 0,
       notes: data.notes || '',
-      assignedTeam: [],
     });
 
     return NextResponse.json({ booking: newBooking }, { status: 201 });

@@ -1,5 +1,5 @@
 import { driveService } from '../google-drive.server';
-import { Booking } from '@/app/types/booking';
+import { Booking, AssignmentTeamMember, BookingProgress } from '@/app/types/booking';
 import { v4 as uuidv4 } from 'uuid';
 
 export const bookingService = {
@@ -24,28 +24,52 @@ export const bookingService = {
     }
   },
 
-  async createBooking(bookingData: Omit<Booking, 'id' | 'createdAt'>): Promise<Booking> {
+  async createBooking(
+    bookingData: Omit<Booking, 'id' | 'createdAt' | 'updatedAt' | 'progress' | 'assignments'>
+  ): Promise<Booking> {
     const bookings = await this.getAllBookings();
+
+    const progress: BookingProgress = {
+      totalTasks: 0,
+      completedTasks: 0,
+      percentage: 0,
+    };
+
     const newBooking: Booking = {
       id: uuidv4(),
       ...bookingData,
+      assignments: [],
+      progress,
       createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
+
     bookings.push(newBooking);
     await driveService.saveCollection('bookings', bookings);
     return newBooking;
   },
+
   async updateBooking(id: string, updates: Partial<Booking>): Promise<Booking | null> {
     const bookings = await this.getAllBookings();
     const bookingIndex = bookings.findIndex((b) => b.id === id);
     if (bookingIndex === -1) return null;
-    bookings[bookingIndex] = {
+
+    const updatedBooking = {
       ...bookings[bookingIndex],
       ...updates,
+      updatedAt: new Date().toISOString(),
     };
+
+    // Recalculate progress if assignments were updated
+    if (updates.assignments) {
+      updatedBooking.progress = this.calculateProgress(updatedBooking.assignments);
+    }
+
+    bookings[bookingIndex] = updatedBooking;
     await driveService.saveCollection('bookings', bookings);
     return bookings[bookingIndex];
   },
+
   async deleteBooking(id: string): Promise<boolean> {
     const bookings = await this.getAllBookings();
     const bookingIndex = bookings.findIndex((b) => b.id === id);
@@ -54,14 +78,17 @@ export const bookingService = {
     await driveService.saveCollection('bookings', bookings);
     return true;
   },
+
   async getBookingsByUserId(userId: string): Promise<Booking[]> {
     const bookings = await this.getAllBookings();
     return bookings.filter((b) => b.userId === userId);
   },
+
   async getBookingsByStatus(status: Booking['status']): Promise<Booking[]> {
     const bookings = await this.getAllBookings();
     return bookings.filter((b) => b.status === status);
   },
+
   async searchBookings(query: string): Promise<Booking[]> {
     const bookings = await this.getAllBookings();
     return bookings.filter(
@@ -71,6 +98,7 @@ export const bookingService = {
         b.eventType.toLowerCase().includes(query.toLowerCase())
     );
   },
+
   async getBookingsInDateRange(startDate: string, endDate: string): Promise<Booking[]> {
     const bookings = await this.getAllBookings();
     const start = new Date(startDate);
@@ -81,36 +109,46 @@ export const bookingService = {
       return bookingStartDate <= end && bookingEndDate >= start;
     });
   },
+
   async getTotalRevenue(): Promise<number> {
     const bookings = await this.getAllBookings();
     return bookings.reduce((total, booking) => total + booking.paidAmount, 0);
   },
+
   async getBookingsByPackageId(packageId: string): Promise<Booking[]> {
     const bookings = await this.getAllBookings();
     return bookings.filter((b) => b.packages.some((pkg) => pkg.packageId.includes(packageId)));
   },
+
   async getUpcomingBookings(): Promise<Booking[]> {
     const bookings = await this.getAllBookings();
     const now = new Date();
     return bookings.filter((b) => new Date(b.startDate) > now);
   },
+
   async getPastBookings(): Promise<Booking[]> {
     const bookings = await this.getAllBookings();
     const now = new Date();
     return bookings.filter((b) => new Date(b.endDate) <= now);
   },
+
   async getBookingsByAssignedTeam(teamMemberId: string): Promise<Booking[]> {
     const bookings = await this.getAllBookings();
-    return bookings.filter((b) => b.assignedTeam?.includes(teamMemberId));
+    return bookings.filter((b) =>
+      b.assignments.some((assignment) => assignment.memberId === teamMemberId)
+    );
   },
+
   async getBookingsWithOutstandingPayments(): Promise<Booking[]> {
     const bookings = await this.getAllBookings();
     return bookings.filter((b) => b.totalAmount > b.paidAmount);
   },
+
   async getBookingsWithNotes(): Promise<Booking[]> {
     const bookings = await this.getAllBookings();
     return bookings.filter((b) => b.notes && b.notes.trim().length > 0);
   },
+
   async getBookingsCountByStatus(): Promise<Record<Booking['status'], number>> {
     const bookings = await this.getAllBookings();
     return bookings.reduce(
@@ -121,22 +159,26 @@ export const bookingService = {
       {} as Record<Booking['status'], number>
     );
   },
+
   async getAverageBookingAmount(): Promise<number> {
     const bookings = await this.getAllBookings();
     if (bookings.length === 0) return 0;
     const total = bookings.reduce((sum, b) => sum + b.totalAmount, 0);
     return total / bookings.length;
   },
+
   async getRecentBookings(days: number): Promise<Booking[]> {
     const bookings = await this.getAllBookings();
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - days);
     return bookings.filter((b) => new Date(b.createdAt) >= cutoffDate);
   },
+
   async getBookingCount(): Promise<number> {
     const bookings = await this.getAllBookings();
     return bookings.length;
   },
+
   async getTotalPendingAmount(): Promise<number> {
     const bookings = await this.getAllBookings();
     return bookings.reduce(
@@ -144,14 +186,17 @@ export const bookingService = {
       0
     );
   },
+
   async getBookingsByVenue(venue: string): Promise<Booking[]> {
     const bookings = await this.getAllBookings();
     return bookings.filter((b) => b.venue.toLowerCase() === venue.toLowerCase());
   },
+
   async getBookingsByEventType(eventType: string): Promise<Booking[]> {
     const bookings = await this.getAllBookings();
     return bookings.filter((b) => b.eventType.toLowerCase() === eventType.toLowerCase());
   },
+
   async getBookingsGroupedByUser(): Promise<Record<string, Booking[]>> {
     const bookings = await this.getAllBookings();
     return bookings.reduce(
@@ -165,6 +210,7 @@ export const bookingService = {
       {} as Record<string, Booking[]>
     );
   },
+
   async getBookingsGroupedByPackage(): Promise<Record<string, Booking[]>> {
     const bookings = await this.getAllBookings();
     return bookings.reduce(
@@ -182,10 +228,12 @@ export const bookingService = {
       {} as Record<string, Booking[]>
     );
   },
+
   async getTotalBookingsAmount(): Promise<number> {
     const bookings = await this.getAllBookings();
     return bookings.reduce((total, booking) => total + booking.totalAmount, 0);
   },
+
   async getBookingsByMonth(year: number, month: number): Promise<Booking[]> {
     const bookings = await this.getAllBookings();
     return bookings.filter((b) => {
@@ -193,6 +241,7 @@ export const bookingService = {
       return bookingStartDate.getFullYear() === year && bookingStartDate.getMonth() + 1 === month;
     });
   },
+
   async getBookingsByYear(year: number): Promise<Booking[]> {
     const bookings = await this.getAllBookings();
     return bookings.filter((b) => {
@@ -200,17 +249,90 @@ export const bookingService = {
       return bookingStartDate.getFullYear() === year;
     });
   },
+
   async getBookingsWithFullPayment(): Promise<Booking[]> {
     const bookings = await this.getAllBookings();
     return bookings.filter((b) => b.totalAmount === b.paidAmount);
   },
+
   async getBookingsWithPartialPayment(): Promise<Booking[]> {
     const bookings = await this.getAllBookings();
     return bookings.filter((b) => b.paidAmount > 0 && b.paidAmount < b.totalAmount);
   },
+
   async getBookingsCreatedAfter(date: string): Promise<Booking[]> {
     const bookings = await this.getAllBookings();
     const compareDate = new Date(date);
     return bookings.filter((b) => new Date(b.createdAt) > compareDate);
+  },
+
+  async addAssignment(
+    bookingId: string,
+    assignment: AssignmentTeamMember
+  ): Promise<Booking | null> {
+    const bookings = await this.getAllBookings();
+    const bookingIndex = bookings.findIndex((b) => b.id === bookingId);
+    if (bookingIndex === -1) return null;
+
+    const booking = bookings[bookingIndex];
+    booking.assignments.push(assignment);
+    booking.progress = this.calculateProgress(booking.assignments);
+    booking.updatedAt = new Date().toISOString();
+
+    bookings[bookingIndex] = booking;
+    await driveService.saveCollection('bookings', bookings);
+    return booking;
+  },
+
+  async updateAssignment(
+    bookingId: string,
+    memberId: string,
+    updates: Partial<AssignmentTeamMember>
+  ): Promise<Booking | null> {
+    const bookings = await this.getAllBookings();
+    const bookingIndex = bookings.findIndex((b) => b.id === bookingId);
+    if (bookingIndex === -1) return null;
+
+    const booking = bookings[bookingIndex];
+    const assignmentIndex = booking.assignments.findIndex((a) => a.memberId === memberId);
+    if (assignmentIndex === -1) return null;
+
+    booking.assignments[assignmentIndex] = {
+      ...booking.assignments[assignmentIndex],
+      ...updates,
+    };
+    booking.progress = this.calculateProgress(booking.assignments);
+    booking.updatedAt = new Date().toISOString();
+
+    bookings[bookingIndex] = booking;
+    await driveService.saveCollection('bookings', bookings);
+    return booking;
+  },
+
+  async removeAssignment(bookingId: string, memberId: string): Promise<Booking | null> {
+    const bookings = await this.getAllBookings();
+    const bookingIndex = bookings.findIndex((b) => b.id === bookingId);
+    if (bookingIndex === -1) return null;
+
+    const booking = bookings[bookingIndex];
+    booking.assignments = booking.assignments.filter((a) => a.memberId !== memberId);
+    booking.progress = this.calculateProgress(booking.assignments);
+    booking.updatedAt = new Date().toISOString();
+
+    bookings[bookingIndex] = booking;
+    await driveService.saveCollection('bookings', bookings);
+    return booking;
+  },
+
+  calculateProgress(assignments: AssignmentTeamMember[]): BookingProgress {
+    const totalTasks = assignments.length;
+    const completedTasks = assignments.filter((a) => a.isCompleted).length;
+    const percentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
+    return {
+      totalTasks,
+      completedTasks,
+      percentage,
+    };
   },
 };

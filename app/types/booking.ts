@@ -1,30 +1,89 @@
-// Updated booking types with start and end dates
+// -----------------------------
+// Booking & Assignment Types
+// -----------------------------
 
 export type BookingStatus = 'pending' | 'approved' | 'in-progress' | 'completed' | 'rejected';
+
+// Edit categories
+export type AssignmentCategory = 'photo_edit' | 'video_edit_traditional' | 'video_edit_cinematic';
+
+// -----------------------------
+// Selected Package
+// -----------------------------
 
 export interface SelectedBookingPackage {
   groupId: string;
   packageId: string[];
   name: string;
-  category: string;
+
+  // High-level category for UI grouping
+  category: 'photo_edit' | 'video_edit';
+
   price: number;
-  startDate: string; // Start date for this package
-  endDate: string; // End date for this package
+
+  startDate: string;
+  endDate: string;
 }
+
+// -----------------------------
+// Team Assignment
+// -----------------------------
+
+export interface AssignmentTeamMember {
+  memberId: string;
+  category: AssignmentCategory;
+
+  assignedDate: string;
+  completedDate?: string;
+
+  comments?: string;
+
+  // Team marks this
+  isCompleted: boolean;
+}
+
+// -----------------------------
+// Progress Summary (Customer View)
+// -----------------------------
+
+export interface BookingProgress {
+  totalTasks: number;
+  completedTasks: number;
+  percentage: number;
+}
+
+// -----------------------------
+// Booking (FINAL)
+// -----------------------------
 
 export interface Booking {
   id: string;
   userId: string;
-  packages: SelectedBookingPackage[];
+
   eventType: string;
   eventName: string;
-  startDate: string; // Overall event start date
-  endDate: string; // Overall event end date
+
+  startDate: string;
+  endDate: string;
+
   venue: string;
+
+  // Admin-controlled status
   status: BookingStatus;
+
   totalAmount: number;
   paidAmount: number;
+
+  packages: SelectedBookingPackage[];
+
+  // Team assignments
+  assignments: AssignmentTeamMember[];
+
+  // Computed / stored progress
+  progress: BookingProgress;
+
   notes?: string;
-  assignedTeam?: string[];
+
   createdAt: string;
+  updatedAt: string;
 }

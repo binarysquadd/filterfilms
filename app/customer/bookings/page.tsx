@@ -11,24 +11,18 @@ import {
   Trash2,
   ArrowRight,
   Plus,
+  Calendar as CalendarIcon,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useToast } from '@/app/hooks/use-toast';
 import { Button } from '@/app/src/components/ui/button';
 import { Input } from '@/app/src/components/ui/input';
 import { Textarea } from '@/app/src/components/ui/textarea';
-import { Booking, BookingStatus } from '@/app/types/booking';
+import { Booking, BookingStatus, SelectedBookingPackage } from '@/app/types/booking';
 import { Label } from '@/app/src/components/ui/label';
 import { useRouter } from 'next/navigation';
 
-interface CartItem {
-  groupId: string;
-  packageId: string[];
-  name: string;
-  category: string;
-  price: number;
-  startDate: string;
-  endDate: string;
+interface CartItem extends SelectedBookingPackage {
   description?: string;
   deliverables?: string[];
   duration?: string;
@@ -122,7 +116,6 @@ export default function CustomerBookingsPage() {
     loadCartFromStorage();
   }, [fetchBookings, loadCartFromStorage]);
 
-  // Save cart to localStorage
   const saveCartToStorage = (cartData: CartItem[]) => {
     try {
       localStorage.setItem('bookingCart', JSON.stringify(cartData));
@@ -145,8 +138,8 @@ export default function CustomerBookingsPage() {
     });
   };
 
-  const removeFromCart = (packageId: string) => {
-    const updatedCart = cart.filter((item) => !item.packageId.includes(packageId));
+  const removeFromCart = (groupId: string) => {
+    const updatedCart = cart.filter((item) => item.groupId !== groupId);
     setCart(updatedCart);
     saveCartToStorage(updatedCart);
     toast({
@@ -155,9 +148,9 @@ export default function CustomerBookingsPage() {
     });
   };
 
-  const updateCartItemDates = (packageId: string, startDate: string, endDate: string) => {
+  const updateCartItemDates = (groupId: string, startDate: string, endDate: string) => {
     const updatedCart = cart.map((item) =>
-      item.packageId.includes(packageId) ? { ...item, startDate, endDate } : item
+      item.groupId === groupId ? { ...item, startDate, endDate } : item
     );
     setCart(updatedCart);
     saveCartToStorage(updatedCart);
@@ -181,7 +174,6 @@ export default function CustomerBookingsPage() {
   };
 
   const handleSubmitBooking = async () => {
-    // Validate cart items
     if (cart.length === 0) {
       toast({
         title: 'Error',
@@ -191,7 +183,6 @@ export default function CustomerBookingsPage() {
       return;
     }
 
-    // Validate all packages have dates
     const missingDates = cart.filter((item) => !item.startDate || !item.endDate);
     if (missingDates.length > 0) {
       toast({
@@ -202,7 +193,6 @@ export default function CustomerBookingsPage() {
       return;
     }
 
-    // Validate form data
     if (!formData.eventType || !formData.eventName || !formData.venue) {
       toast({
         title: 'Error',
@@ -212,7 +202,6 @@ export default function CustomerBookingsPage() {
       return;
     }
 
-    // Validate dates
     for (const item of cart) {
       if (new Date(item.startDate) > new Date(item.endDate)) {
         toast({
@@ -226,7 +215,6 @@ export default function CustomerBookingsPage() {
 
     setSubmitting(true);
     try {
-      // Calculate overall event dates from packages
       const allStartDates = cart.map((item) => new Date(item.startDate));
       const allEndDates = cart.map((item) => new Date(item.endDate));
       const overallStartDate = new Date(Math.min(...allStartDates.map((d) => d.getTime())));
@@ -264,7 +252,6 @@ export default function CustomerBookingsPage() {
           title: 'Booking Created',
           description: 'Your booking request has been submitted successfully.',
         });
-        // Clear cart
         setCart([]);
         saveCartToStorage([]);
         setShowCheckout(false);
@@ -320,7 +307,6 @@ export default function CustomerBookingsPage() {
   return (
     <>
       <div className="space-y-6 animate-fade-in">
-        {/* Header with Cart Button */}
         <div className="flex items-center justify-between">
           <div>
             <h1 className="font-heading text-3xl font-bold text-foreground">My Bookings</h1>
@@ -343,7 +329,6 @@ export default function CustomerBookingsPage() {
           </div>
         </div>
 
-        {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="bg-card rounded-xl p-5 hover:shadow-card border border-border">
             <p className="text-sm text-muted-foreground mb-1">Total Bookings</p>
@@ -369,7 +354,6 @@ export default function CustomerBookingsPage() {
           </div>
         </div>
 
-        {/* My Bookings Section */}
         <div className="bg-card rounded-xl overflow-hidden">
           {loading ? (
             <div className="flex items-center justify-center min-h-[400px]">
@@ -406,6 +390,9 @@ export default function CustomerBookingsPage() {
                       Packages
                     </th>
                     <th className="text-left p-4 text-sm font-medium text-muted-foreground">
+                      Progress
+                    </th>
+                    <th className="text-left p-4 text-sm font-medium text-muted-foreground">
                       Amount
                     </th>
                     <th className="text-left p-4 text-sm font-medium text-muted-foreground">
@@ -435,6 +422,19 @@ export default function CustomerBookingsPage() {
                           {booking.packages.length !== 1 ? 's' : ''}
                         </td>
                         <td className="p-4">
+                          <div className="flex items-center gap-2">
+                            <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden min-w-[60px]">
+                              <div
+                                className="h-full bg-primary transition-all"
+                                style={{ width: `${booking.progress.percentage}%` }}
+                              />
+                            </div>
+                            <span className="text-xs font-medium text-muted-foreground">
+                              {booking.progress.percentage}%
+                            </span>
+                          </div>
+                        </td>
+                        <td className="p-4">
                           <p className="text-sm font-semibold text-foreground">
                             {formatPrice(booking.totalAmount)}
                           </p>
@@ -460,7 +460,6 @@ export default function CustomerBookingsPage() {
         </div>
       </div>
 
-      {/* Cart Sidebar */}
       {showCart && (
         <div className="fixed inset-0 z-[9999] flex justify-end">
           <div
@@ -468,7 +467,6 @@ export default function CustomerBookingsPage() {
             onClick={() => setShowCart(false)}
           />
           <div className="relative bg-card w-full max-w-md h-full overflow-hidden flex flex-col shadow-2xl">
-            {/* Cart Header */}
             <div className="flex justify-between items-center border-b px-6 py-4">
               <div className="flex items-center gap-3">
                 <ShoppingCart className="w-8 h-8 text-primary" />
@@ -484,7 +482,6 @@ export default function CustomerBookingsPage() {
               </Button>
             </div>
 
-            {/* Cart Items */}
             <div className="flex-1 overflow-y-auto p-6">
               {cart.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-center">
@@ -502,7 +499,7 @@ export default function CustomerBookingsPage() {
                 <div className="space-y-4">
                   {cart.map((item) => (
                     <div
-                      key={item.packageId[0]}
+                      key={item.groupId}
                       className="bg-muted/30 rounded-lg p-4 border border-border"
                     >
                       <div className="flex items-start justify-between mb-3">
@@ -519,41 +516,40 @@ export default function CustomerBookingsPage() {
                           type="button"
                           size="sm"
                           variant="ghost"
-                          onClick={() => removeFromCart(item.packageId[0])}
+                          onClick={() => removeFromCart(item.groupId)}
                           className="h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive"
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
 
-                      {/* Date Selection */}
                       <div className="space-y-3 pt-3 border-t border-border">
                         <div>
                           <label className="block text-xs font-medium mb-1 text-muted-foreground">
-                            Start Date & Time <span className="text-destructive">*</span>
+                            Start Date <span className="text-destructive">*</span>
                           </label>
                           <Input
-                            type="datetime-local"
+                            type="date"
                             value={item.startDate}
                             onChange={(e) =>
-                              updateCartItemDates(item.packageId[0], e.target.value, item.endDate)
+                              updateCartItemDates(item.groupId, e.target.value, item.endDate)
                             }
-                            min={new Date().toISOString().slice(0, 16)}
+                            min={new Date().toISOString().split('T')[0]}
                             className="text-sm"
                           />
                         </div>
 
                         <div>
                           <label className="block text-xs font-medium mb-1 text-muted-foreground">
-                            End Date & Time <span className="text-destructive">*</span>
+                            End Date <span className="text-destructive">*</span>
                           </label>
                           <Input
-                            type="datetime-local"
+                            type="date"
                             value={item.endDate}
                             onChange={(e) =>
-                              updateCartItemDates(item.packageId[0], item.startDate, e.target.value)
+                              updateCartItemDates(item.groupId, item.startDate, e.target.value)
                             }
-                            min={item.startDate || new Date().toISOString().slice(0, 16)}
+                            min={item.startDate || new Date().toISOString().split('T')[0]}
                             className="text-sm"
                           />
                         </div>
@@ -564,7 +560,6 @@ export default function CustomerBookingsPage() {
               )}
             </div>
 
-            {/* Cart Footer */}
             {cart.length > 0 && (
               <div className="border-t px-6 py-4 bg-muted/20 space-y-4">
                 <div className="flex justify-between items-center">
@@ -583,11 +578,9 @@ export default function CustomerBookingsPage() {
         </div>
       )}
 
-      {/* Checkout Modal */}
       {showCheckout && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-card w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-xl shadow-2xl flex flex-col">
-            {/* Header */}
             <div className="flex justify-between items-center border-b px-6 py-4">
               <div>
                 <h2 className="text-xl font-bold text-foreground">Complete Your Booking</h2>
@@ -598,9 +591,7 @@ export default function CustomerBookingsPage() {
               </Button>
             </div>
 
-            {/* Form Content */}
             <div className="flex-1 overflow-y-auto p-6 space-y-6">
-              {/* Event Details */}
               <div className="space-y-4">
                 <h3 className="font-semibold text-lg text-foreground">Event Details</h3>
 
@@ -649,25 +640,22 @@ export default function CustomerBookingsPage() {
                 </div>
               </div>
 
-              {/* Order Summary */}
               <div className="space-y-4">
                 <h3 className="font-semibold text-lg text-foreground">Order Summary</h3>
 
                 <div className="space-y-3">
                   {cart.map((item) => (
                     <div
-                      key={item.packageId[0]}
+                      key={item.groupId}
                       className="flex justify-between items-start p-3 bg-muted/30 rounded-lg"
                     >
                       <div className="flex-1">
                         <p className="font-medium text-foreground">{item.name}</p>
-                        <p className="text-xs text-muted-foreground">{item.category}</p>
+                        <p className="text-xs text-muted-foreground capitalize">{item.category}</p>
                         {item.startDate && item.endDate && (
-                          <p className="text-xs text-muted-foreground mt-1">
-                            {formatDateRange(
-                              item.startDate.split('T')[0],
-                              item.endDate.split('T')[0]
-                            )}
+                          <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                            <CalendarIcon className="w-3 h-3" />
+                            {formatDateRange(item.startDate, item.endDate)}
                           </p>
                         )}
                       </div>
@@ -687,7 +675,6 @@ export default function CustomerBookingsPage() {
               </div>
             </div>
 
-            {/* Footer Actions */}
             <div className="border-t px-6 py-4 bg-muted/20 flex gap-3">
               <Button
                 variant="outline"
@@ -706,24 +693,9 @@ export default function CustomerBookingsPage() {
         </div>
       )}
 
-      {/* Invoice Modal */}
       {bookingDetailsModal.open && bookingDetailsModal.booking && (
-        <div className="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 print:bg-white print:p-0">
-          <div
-            id="invoice"
-            className="
-        bg-white text-black
-        w-full max-w-4xl
-        max-h-[95vh]
-        overflow-y-auto
-        rounded-xl shadow-2xl
-        print:max-h-none
-        print:overflow-visible
-        print:shadow-none
-        print:rounded-none
-      "
-          >
-            {/* HEADER */}
+        <div className="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white text-black w-full max-w-4xl max-h-[95vh] overflow-y-auto rounded-xl shadow-2xl">
             <div className="px-6 md:px-8 py-6 border-b">
               <div className="flex flex-col md:flex-row md:justify-between gap-4">
                 <div>
@@ -736,46 +708,28 @@ export default function CustomerBookingsPage() {
                   </p>
                 </div>
 
-                <div className="md:text-right">
-                  <Button
-                    variant="close"
-                    size={'icon'}
-                    onClick={closeBookingDetails}
-                    className="print:hidden"
-                  >
-                    <X className="w-5 h-5" />
-                  </Button>
-                </div>
+                <Button variant="close" size="icon" onClick={closeBookingDetails}>
+                  <X className="w-5 h-5" />
+                </Button>
               </div>
             </div>
 
-            {/* BODY */}
             <div className="px-6 md:px-8 py-6 space-y-8">
-              {/* BILLING INFO */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="flex flex-col gap-3">
-                  {/* Name */}
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
-                    <span className="w-28 text-xs text-gray-500">Name</span>
-                    <span className="font-semibold text-sm">
-                      {bookingDetailsModal.booking.eventName}
-                    </span>
+                <div className="space-y-3">
+                  <div>
+                    <span className="text-xs text-gray-500">Event Name</span>
+                    <p className="font-semibold text-sm">{bookingDetailsModal.booking.eventName}</p>
                   </div>
 
-                  {/* Event Type */}
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
-                    <span className="w-28 text-xs text-gray-500">Event Type</span>
-                    <span className="text-sm text-gray-700">
-                      {bookingDetailsModal.booking.eventType}
-                    </span>
+                  <div>
+                    <span className="text-xs text-gray-500">Event Type</span>
+                    <p className="text-sm text-gray-700">{bookingDetailsModal.booking.eventType}</p>
                   </div>
 
-                  {/* Venue */}
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
-                    <span className="w-28 text-xs text-gray-500">Venue</span>
-                    <span className="text-sm text-gray-700">
-                      {bookingDetailsModal.booking.venue}
-                    </span>
+                  <div>
+                    <span className="text-xs text-gray-500">Venue</span>
+                    <p className="text-sm text-gray-700">{bookingDetailsModal.booking.venue}</p>
                   </div>
                 </div>
 
@@ -790,9 +744,24 @@ export default function CustomerBookingsPage() {
                 </div>
               </div>
 
-              {/* LINE ITEMS */}
-              {/* Desktop / Print Table */}
-              <div className="hidden md:block print:block">
+              <div>
+                <p className="text-xs text-gray-500 mb-2">Progress</p>
+                <div className="flex items-center gap-3">
+                  <div className="flex w-1/4 h-3 bg-gray-200 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-blue-600 transition-all"
+                      style={{ width: `${bookingDetailsModal.booking.progress.percentage}%` }}
+                    />
+                  </div>
+                  <span className="text-sm font-medium">
+                    {bookingDetailsModal.booking.progress.completedTasks}/
+                    {bookingDetailsModal.booking.progress.totalTasks} tasks (
+                    {bookingDetailsModal.booking.progress.percentage}%)
+                  </span>
+                </div>
+              </div>
+
+              <div className="hidden md:block">
                 <table className="w-full border-collapse">
                   <thead>
                     <tr className="border-b text-sm text-gray-500">
@@ -804,7 +773,7 @@ export default function CustomerBookingsPage() {
                   </thead>
                   <tbody>
                     {bookingDetailsModal.booking.packages.map((pkg) => (
-                      <tr key={pkg.packageId[0]} className="border-b text-sm">
+                      <tr key={pkg.groupId} className="border-b text-sm">
                         <td className="py-3 font-medium">{pkg.name}</td>
                         <td className="py-3 capitalize">{pkg.category || 'General'}</td>
                         <td className="py-3">{formatDateRange(pkg.startDate, pkg.endDate)}</td>
@@ -817,10 +786,9 @@ export default function CustomerBookingsPage() {
                 </table>
               </div>
 
-              {/* Mobile Line Items */}
-              <div className="space-y-4 md:hidden print:hidden">
+              <div className="space-y-4 md:hidden">
                 {bookingDetailsModal.booking.packages.map((pkg) => (
-                  <div key={pkg.packageId[0]} className="border rounded-lg p-4 space-y-1">
+                  <div key={pkg.groupId} className="border rounded-lg p-4 space-y-1">
                     <p className="font-medium">{pkg.name}</p>
                     <p className="text-xs text-gray-500 capitalize">{pkg.category || 'General'}</p>
                     <p className="text-xs text-gray-500">
@@ -831,7 +799,6 @@ export default function CustomerBookingsPage() {
                 ))}
               </div>
 
-              {/* PAYMENT SUMMARY */}
               <div className="flex justify-end">
                 <div className="w-full md:w-1/2 space-y-2 text-sm">
                   <div className="flex justify-between">
@@ -858,7 +825,6 @@ export default function CustomerBookingsPage() {
                 </div>
               </div>
 
-              {/* NOTES */}
               {bookingDetailsModal.booking.notes && (
                 <div>
                   <p className="text-xs text-gray-500 mb-1">Notes</p>
@@ -867,14 +833,13 @@ export default function CustomerBookingsPage() {
               )}
             </div>
 
-            {/* FOOTER */}
-            <div className="border-t px-6 md:px-8 py-4 flex justify-between items-center text-xs text-gray-500 print:hidden">
+            <div className="border-t px-6 md:px-8 py-4 flex justify-between items-center text-xs text-gray-500">
               <span>Status: {bookingDetailsModal.booking.status}</span>
               <div className="flex gap-2">
                 <Button variant="outline" onClick={() => window.print()}>
                   Print
                 </Button>
-                <Button variant="ghost" onClick={closeBookingDetails}>
+                <Button variant="cancel" onClick={closeBookingDetails}>
                   Close
                 </Button>
               </div>

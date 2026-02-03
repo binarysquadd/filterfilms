@@ -59,6 +59,7 @@ export default function PaymentsAdminPage({ initialPayment, inititalTeamMembers 
   const [statusFilter, setStatusFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
   const [isViewMode, setIsViewMode] = useState(false);
+  const [statusLoadingId, setStatusLoadingId] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     teamMemberId: '',
@@ -237,6 +238,7 @@ export default function PaymentsAdminPage({ initialPayment, inititalTeamMembers 
   };
 
   const handleStatusChange = async (id: string, status: BaseTeamPayment['status']) => {
+    setStatusLoadingId(id);
     try {
       const response = await fetch(`/api/admin/payment/${id}`, {
         method: 'PATCH',
@@ -254,6 +256,8 @@ export default function PaymentsAdminPage({ initialPayment, inititalTeamMembers 
       }
     } catch {
       toast.error('Failed to update status');
+    } finally {
+      setStatusLoadingId(null);
     }
   };
 
@@ -529,7 +533,7 @@ export default function PaymentsAdminPage({ initialPayment, inititalTeamMembers 
                                 : payment.status === 'failed'
                                   ? 'bg-red-100 text-red-700'
                                   : 'bg-purple-100 text-purple-700'
-                          }`}
+                          } ${statusLoadingId === payment.id ? 'opacity-50 pointer-events-none' : ''}`}
                         >
                           {PAYMENT_STATUS.map((s) => (
                             <option key={s.value} value={s.value}>
@@ -537,6 +541,9 @@ export default function PaymentsAdminPage({ initialPayment, inititalTeamMembers 
                             </option>
                           ))}
                         </select>
+                        {statusLoadingId === payment.id && (
+                          <Loader2 className="w-4 h-4 inline-block ml-2 animate-spin text-muted-foreground" />
+                        )}
                       </td>
                       <td className="p-4">
                         <div className="flex items-center gap-2">
