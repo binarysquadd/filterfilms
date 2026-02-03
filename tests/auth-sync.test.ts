@@ -4,8 +4,11 @@ vi.mock('next/headers', () => ({
   cookies: vi.fn(async () => ({ set: vi.fn() })),
 }));
 
-const verifyIdTokenMock = vi.fn(async () => ({ email: 'user@example.com', name: 'User' }));
-const createSessionCookieMock = vi.fn(async () => 'cookie');
+const verifyIdTokenMock = vi.fn(async () => ({
+  email: 'user@example.com',
+  name: 'User',
+})) as unknown as ReturnType<typeof vi.fn>;
+const createSessionCookieMock = vi.fn(async () => 'cookie') as unknown as ReturnType<typeof vi.fn>;
 
 vi.mock('@/app/lib/firebase/admin', () => ({
   getAdminAuthClient: vi.fn(() => ({
@@ -47,7 +50,7 @@ describe('/api/auth/sync', () => {
   });
 
   it('returns 400 when token has no email', async () => {
-    verifyIdTokenMock.mockResolvedValueOnce({ name: 'User' });
+    verifyIdTokenMock.mockResolvedValueOnce({ name: 'User' } as { name: string; email?: string });
 
     const req = new Request('https://example.com/api/auth/sync', {
       method: 'POST',

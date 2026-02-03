@@ -22,7 +22,7 @@ describe('/api/health/drive', () => {
 
   it('returns 401 when secret is set, token missing, and production', async () => {
     process.env.HEALTHCHECK_SECRET = 'secret';
-    process.env.NODE_ENV = 'production';
+    Object.defineProperty(process.env, 'NODE_ENV', { value: 'production', configurable: true });
 
     const res = await GET(new Request('https://example.com/api/health/drive'));
 
@@ -31,7 +31,7 @@ describe('/api/health/drive', () => {
 
   it('returns 200 when secret matches and drive is ok', async () => {
     process.env.HEALTHCHECK_SECRET = 'secret';
-    process.env.NODE_ENV = 'production';
+    Object.defineProperty(process.env, 'NODE_ENV', { value: 'production', configurable: true });
     vi.mocked(driveService.healthCheck).mockResolvedValue({ ok: true });
 
     const res = await GET(new Request('https://example.com/api/health/drive?token=secret'));
@@ -45,7 +45,7 @@ describe('/api/health/drive', () => {
 
   it('returns 503 when drive check fails even with valid token', async () => {
     process.env.HEALTHCHECK_SECRET = 'secret';
-    process.env.NODE_ENV = 'production';
+    Object.defineProperty(process.env, 'NODE_ENV', { value: 'production', configurable: true });
     vi.mocked(driveService.healthCheck).mockResolvedValue({ ok: false });
 
     const res = await GET(new Request('https://example.com/api/health/drive?token=secret'));
