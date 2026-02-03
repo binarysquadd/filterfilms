@@ -10,7 +10,7 @@ export default function OurTeam() {
     role: 'Founder & Cinematographer',
     specialization: 'Cinematic Wedding Filmmaker',
     experience: '7+ Years Experience',
-    bio: `With over seven years of experience in the film industry, Subham Dalai founded Filter Film Studio with a vision to elevate wedding cinematography beyond documentation. His work blends deep-rooted Indian emotions with refined cinematic storytelling, crafting films that feel intimate, timeless, and visually powerful.`,
+    bio: `With over seven years of experience in wedding photography and cinematography. With a Master’s degree in Journalism, he brings a strong narrative approach to visual storytelling, creating refined, emotionally driven images and films that go beyond documentation to preserve moments with depth and timeless elegance.`,
     photo: '/founder/founder_filterfilm.webp',
     instagram: '@subhamdalai__',
     studioInstagram: '@filterfilm.studio',
@@ -19,7 +19,7 @@ export default function OurTeam() {
       {
         label: 'Education',
         value:
-          'Bachelor’s Degree in Film & Media Production with advanced training in cinematic storytelling and visual composition.',
+          'Master’s Degree in Journalism & Mass Communication with advanced training in cinematic storytelling and visual composition.',
       },
       {
         label: 'Teaching & Mentorship',
@@ -29,7 +29,7 @@ export default function OurTeam() {
       {
         label: 'Certifications',
         value:
-          'Certified Professional Cinematographer with specialized certifications in wedding filmmaking, color grading, and film editing.',
+          'Certified Professional Cinematographer with specialized certifications in wedding filmmaking, color grading.',
       },
     ],
   };

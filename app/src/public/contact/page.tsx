@@ -88,7 +88,7 @@ export default function ContactSection() {
               title="Phone"
               content={
                 <>
-                  +91 9XXXXXXXXX
+                  +91 7008772762
                   <br />
                   (Call / WhatsApp)
                 </>
@@ -100,9 +100,9 @@ export default function ContactSection() {
               title="Email"
               content={
                 <>
-                  info@filterfilm.in
+                  filterfilmwork@gmail.com
                   <br />
-                  bookings@filterfilm.in
+                  subhamabo@gmail.com
                 </>
               }
             />

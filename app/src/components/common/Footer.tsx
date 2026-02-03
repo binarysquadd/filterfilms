@@ -28,10 +28,25 @@ export default function Footer() {
             </p>
 
             <div className="flex gap-4">
-              {[Instagram, Facebook, Youtube].map((Icon, i) => (
+              {[
+                {
+                  Icon: Instagram,
+                  href: 'https://www.instagram.com/filterfilm.studio/',
+                },
+                {
+                  Icon: Facebook,
+                  href: '#', // TODO: add Facebook link later
+                },
+                {
+                  Icon: Youtube,
+                  href: 'https://www.youtube.com/@filterfilm505',
+                },
+              ].map(({ Icon, href }, i) => (
                 <a
                   key={i}
-                  href="#"
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="w-10 h-10 flex items-center justify-center border border-emerald-dark/20 text-emerald-dark/70 hover:text-gold hover:border-gold transition-colors"
                 >
                   <Icon className="w-5 h-5" />
@@ -69,6 +84,8 @@ export default function Footer() {
               <li>Drone Coverage</li>
               <li>Albums & Prints</li>
               <li>Same Day Edits</li>
+              <li>New Born</li>
+              <li>Maternity Shoots</li>
             </ul>
           </div>
 
@@ -86,11 +103,13 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="w-5 h-5 text-gold" />
-                +91 9XXXXXXXXX
+                +91 7008772762
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-gold" />
-                info@filterfilm.in
+                filterfilmwork@gmail.com
+                <br />
+                subhamabo@gmail.com
               </li>
             </ul>
           </div>
