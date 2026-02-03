@@ -517,33 +517,37 @@ export default function PaymentsAdminPage({ initialPayment, inititalTeamMembers 
                         </div>
                       </td>
                       <td className="p-4">
-                        <select
-                          value={payment.status}
-                          onChange={(e) =>
-                            handleStatusChange(
-                              payment.id,
-                              e.target.value as BaseTeamPayment['status']
-                            )
-                          }
-                          className={`text-xs px-2 py-1 rounded-full border-0 ${
-                            payment.status === 'completed'
-                              ? 'bg-green-100 text-green-700'
-                              : payment.status === 'pending'
-                                ? 'bg-yellow-100 text-yellow-700'
-                                : payment.status === 'failed'
-                                  ? 'bg-red-100 text-red-700'
-                                  : 'bg-purple-100 text-purple-700'
-                          } ${statusLoadingId === payment.id ? 'opacity-50 pointer-events-none' : ''}`}
-                        >
-                          {PAYMENT_STATUS.map((s) => (
-                            <option key={s.value} value={s.value}>
-                              {s.label}
-                            </option>
-                          ))}
-                        </select>
-                        {statusLoadingId === payment.id && (
-                          <Loader2 className="w-4 h-4 inline-block ml-2 animate-spin text-muted-foreground" />
-                        )}
+                        <div className="flex items-center">
+                          <select
+                            value={payment.status}
+                            disabled={statusLoadingId === payment.id}
+                            onChange={(e) =>
+                              handleStatusChange(
+                                payment.id,
+                                e.target.value as BaseTeamPayment['status']
+                              )
+                            }
+                            className={`text-xs px-2 py-1 rounded-full border-0 ${
+                              payment.status === 'completed'
+                                ? 'bg-green-100 text-green-700'
+                                : payment.status === 'pending'
+                                  ? 'bg-yellow-100 text-yellow-700'
+                                  : payment.status === 'failed'
+                                    ? 'bg-red-100 text-red-700'
+                                    : 'bg-purple-100 text-purple-700'
+                            } ${statusLoadingId === payment.id ? 'opacity-60 cursor-not-allowed' : ''}`}
+                          >
+                            {PAYMENT_STATUS.map((s) => (
+                              <option key={s.value} value={s.value}>
+                                {s.label}
+                              </option>
+                            ))}
+                          </select>
+
+                          {statusLoadingId === payment.id && (
+                            <span className="ml-2 inline-block w-3 h-3 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                          )}
+                        </div>
                       </td>
                       <td className="p-4">
                         <div className="flex items-center gap-2">
