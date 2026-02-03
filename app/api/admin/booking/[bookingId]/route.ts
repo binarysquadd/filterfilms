@@ -1,7 +1,7 @@
-// /api/bookings/[bookingId]/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { bookingService } from '@/app/lib/services/booking-service';
 import { getServerSession } from '@/app/lib/firebase/server-auth';
+import { AssignmentTeamMember } from '@/app/types/booking';
 
 export async function GET(req: NextRequest, context: { params: Promise<{ bookingId: string }> }) {
   const session = await getServerSession();
@@ -20,6 +20,13 @@ export async function GET(req: NextRequest, context: { params: Promise<{ booking
 
     if (session.role === 'customer' && booking.userId !== session.id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    if (session.role === 'team') {
+      const isAssigned = booking.assignments.some((a) => a.memberId === session.id);
+      if (!isAssigned) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
     }
 
     return NextResponse.json({ booking });
@@ -44,13 +51,11 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ booki
       return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
     }
 
-    // Admin
     if (session.role === 'admin') {
       const updatedBooking = await bookingService.updateBooking(bookingId, updates);
       return NextResponse.json({ booking: updatedBooking });
     }
 
-    // Customer
     if (session.role === 'customer') {
       if (existingBooking.userId !== session.id) {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -66,24 +71,38 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ booki
       const allowedUpdates = {
         eventType: updates.eventType,
         eventName: updates.eventName,
-        date: updates.date,
+        startDate: updates.startDate,
+        endDate: updates.endDate,
         venue: updates.venue,
         notes: updates.notes,
+        packages: updates.packages,
       };
 
       const updatedBooking = await bookingService.updateBooking(bookingId, allowedUpdates);
       return NextResponse.json({ booking: updatedBooking });
     }
 
-    // Team
     if (session.role === 'team') {
-      const allowedUpdates = {
-        status: updates.status,
-        assignedTeam: updates.assignedTeam,
-      };
+      const isAssigned = existingBooking.assignments.some((a) => a.memberId === session.id);
+      if (!isAssigned) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
 
-      const updatedBooking = await bookingService.updateBooking(bookingId, allowedUpdates);
-      return NextResponse.json({ booking: updatedBooking });
+      if (updates.assignments) {
+        const assignment = updates.assignments.find(
+          (a: AssignmentTeamMember) => a.memberId === session.id
+        );
+        if (assignment) {
+          const updatedBooking = await bookingService.updateAssignment(
+            bookingId,
+            session.id,
+            assignment
+          );
+          return NextResponse.json({ booking: updatedBooking });
+        }
+      }
+
+      return NextResponse.json({ error: 'Invalid update' }, { status: 400 });
     }
 
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
