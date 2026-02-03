@@ -42,9 +42,10 @@ jobs:
         run: npm run lint
 
       - name: Install sops
-        uses: mozilla/sops-action@v2
-        with:
-          version: '3.8.1'
+        run: |
+          curl -LO https://github.com/getsops/sops/releases/download/v3.11.0/sops-v3.11.0.linux.amd64
+          sudo mv sops-v3.11.0.linux.amd64 /usr/local/bin/sops
+          sudo chmod +x /usr/local/bin/sops
 
       - name: Configure age key
         run: |
