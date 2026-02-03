@@ -504,8 +504,8 @@ export default function TeamPaymentsPage({ initialPayments }: Props) {
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
                 <p className="text-sm text-blue-800">
-                  <strong>Note:</strong> All payment requests will be created with &ldquo;Pending&rdquo; status
-                  and require admin approval.
+                  <strong>Note:</strong> All payment requests will be created with
+                  &ldquo;Pending&rdquo; status and require admin approval.
                 </p>
               </div>
 
