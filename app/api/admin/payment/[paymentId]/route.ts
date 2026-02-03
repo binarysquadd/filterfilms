@@ -38,7 +38,7 @@ export async function PATCH(
 ) {
   const session = await getServerSession();
 
-  if (!session || session.role !== 'admin') {
+  if (!session || (session.role !== 'admin' && session.role !== 'team')) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

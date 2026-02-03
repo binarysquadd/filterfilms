@@ -2,11 +2,31 @@
 import { BaseTeamPayment, PAYMENT_STATUS, PaymentType } from '@/app/types/payment';
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { Search, Loader2, X, Download, Calendar, DollarSign, FileText, Eye } from 'lucide-react';
+import {
+  Search,
+  Loader2,
+  X,
+  Download,
+  Calendar,
+  DollarSign,
+  FileText,
+  Eye,
+  Plus,
+  Edit2,
+} from 'lucide-react';
 import { Input } from '@/app/src/components/ui/input';
 import { Button } from '@/app/src/components/ui/button';
 import { Label } from '@/app/src/components/ui/label';
+import { Textarea } from '@/app/src/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/app/src/components/ui/select';
 import { useAuth } from '@/app/lib/firebase/auth-context';
+import { useRouter } from 'next/navigation';
 
 interface Props {
   initialPayments: BaseTeamPayment[];
@@ -21,6 +41,7 @@ const PAYMENT_TYPES: { label: string; value: PaymentType }[] = [
 
 export default function TeamPaymentsPage({ initialPayments }: Props) {
   const { user } = useAuth();
+  const router = useRouter();
   const [payments, setPayments] = useState<BaseTeamPayment[]>(initialPayments || []);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -28,6 +49,16 @@ export default function TeamPaymentsPage({ initialPayments }: Props) {
   const [typeFilter, setTypeFilter] = useState('all');
   const [selectedPayment, setSelectedPayment] = useState<BaseTeamPayment | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  const [formData, setFormData] = useState({
+    amount: '',
+    type: 'monthly' as PaymentType,
+    paymentDate: '',
+    notes: '',
+  });
 
   const fetchPayments = useCallback(async () => {
     setLoading(true);
@@ -77,6 +108,94 @@ export default function TeamPaymentsPage({ initialPayments }: Props) {
     const matchesType = typeFilter === 'all' || payment.type === typeFilter;
     return matchesSearch && matchesStatus && matchesType;
   });
+
+  const openCreateModal = () => {
+    setSelectedPayment(null);
+    setIsEditMode(false);
+    setFormData({
+      amount: '',
+      type: 'monthly',
+      paymentDate: new Date().toISOString().split('T')[0],
+      notes: '',
+    });
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (payment: BaseTeamPayment) => {
+    setSelectedPayment(payment);
+    setIsEditMode(true);
+    setFormData({
+      amount: payment.amount.toString(),
+      type: payment.type,
+      paymentDate: payment.paymentDate,
+      notes: payment.notes || '',
+    });
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedPayment(null);
+    setIsEditMode(false);
+    setFormData({
+      amount: '',
+      type: 'monthly',
+      paymentDate: '',
+      notes: '',
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!formData.amount || !formData.paymentDate) {
+      toast.error('Please fill all required fields');
+      return;
+    }
+
+    if (!user?.id) {
+      toast.error('User not authenticated');
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const url = isEditMode ? `/api/admin/payment/${selectedPayment?.id}` : '/api/admin/payment';
+      const method = isEditMode ? 'PATCH' : 'POST';
+
+      const payload = {
+        teamMemberId: user.id,
+        amount: parseFloat(formData.amount),
+        status: 'pending' as const, // Team members can only create pending payments
+        type: formData.type,
+        paymentDate: formData.paymentDate,
+        notes: formData.notes,
+      };
+
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        toast.error(error.error || 'Operation failed');
+        throw new Error('Operation failed');
+      }
+
+      toast.success(
+        isEditMode ? 'Payment updated successfully' : 'Payment request created successfully'
+      );
+      closeModal();
+      fetchPayments();
+      router.refresh();
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const openViewModal = (payment: BaseTeamPayment) => {
     setSelectedPayment(payment);
@@ -159,10 +278,20 @@ export default function TeamPaymentsPage({ initialPayments }: Props) {
             <h1 className="font-heading text-3xl font-bold text-foreground">My Payments</h1>
             <p className="text-muted-foreground">View and track your payment history.</p>
           </div>
-          <Button variant="outline" onClick={exportToCSV} disabled={filteredPayments.length === 0}>
-            <Download className="w-4 h-4 mr-2" />
-            Download CSV
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={exportToCSV}
+              disabled={filteredPayments.length === 0}
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Download CSV
+            </Button>
+            <Button onClick={openCreateModal}>
+              <Plus className="w-4 h-4 mr-2" />
+              Add Payment
+            </Button>
+          </div>
         </div>
 
         {/* Stats Cards */}
@@ -330,9 +459,25 @@ export default function TeamPaymentsPage({ initialPayments }: Props) {
                         </p>
                       </td>
                       <td className="p-4">
-                        <Button variant="close" size="icon" onClick={() => openViewModal(payment)}>
-                          <Eye className="w-4 h-4" />
-                        </Button>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="close"
+                            size="icon"
+                            onClick={() => openViewModal(payment)}
+                          >
+                            <Eye className="w-4 h-4" />
+                          </Button>
+                          {/* Only allow editing pending payments */}
+                          {payment.status === 'pending' && (
+                            <Button
+                              variant="close"
+                              size="icon"
+                              onClick={() => openEditModal(payment)}
+                            >
+                              <Edit2 className="w-4 h-4" />
+                            </Button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))
@@ -342,6 +487,118 @@ export default function TeamPaymentsPage({ initialPayments }: Props) {
           </div>
         </div>
       </div>
+
+      {/* Create/Edit Payment Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-foreground/50">
+          <div className="bg-card rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-elegant animate-scale-in">
+            <div className="p-5 border-b border-border flex items-center justify-between">
+              <h2 className="font-heading text-lg font-semibold">
+                {isEditMode ? 'Edit Payment Request' : 'Create Payment Request'}
+              </h2>
+              <Button variant="close" size="icon" onClick={closeModal}>
+                <X className="w-5 h-5" />
+              </Button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                <p className="text-sm text-blue-800">
+                  <strong>Note:</strong> All payment requests will be created with
+                  &ldquo;Pending&rdquo; status and require admin approval.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-sm">
+                    Payment Type <span className="text-red-500">*</span>
+                  </Label>
+                  <Select
+                    required
+                    value={formData.type}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, type: value as PaymentType })
+                    }
+                    disabled={submitting}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PAYMENT_TYPES.map((type) => (
+                        <SelectItem key={type.value} value={type.value}>
+                          {type.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label className="text-sm">
+                    Amount (₹) <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    type="number"
+                    required
+                    min="0"
+                    step="0.01"
+                    value={formData.amount}
+                    onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                    placeholder="Enter amount"
+                    disabled={submitting}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label className="text-sm">
+                  Payment Date <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  type="date"
+                  required
+                  value={formData.paymentDate}
+                  onChange={(e) => setFormData({ ...formData, paymentDate: e.target.value })}
+                  disabled={submitting}
+                />
+              </div>
+
+              <div>
+                <Label className="text-sm">Notes</Label>
+                <Textarea
+                  showWordCount
+                  wordLimit={200}
+                  value={formData.notes}
+                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                  placeholder="Add any notes about this payment..."
+                  className="w-full mt-1 min-h-[100px]"
+                  disabled={submitting}
+                />
+              </div>
+
+              <div className="flex gap-2 pt-4 justify-end">
+                <Button type="button" variant="cancel" onClick={closeModal} disabled={submitting}>
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={submitting} className="min-w-[140px]">
+                  {submitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      {isEditMode ? 'Updating...' : 'Creating...'}
+                    </>
+                  ) : isEditMode ? (
+                    'Update Request'
+                  ) : (
+                    'Create Request'
+                  )}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* View Payment Modal */}
       {isViewModalOpen && selectedPayment && (
@@ -454,6 +711,16 @@ export default function TeamPaymentsPage({ initialPayments }: Props) {
                   </div>
                 </div>
               </div>
+
+              {/* Action Buttons */}
+              {selectedPayment.status === 'pending' && (
+                <div className="flex justify-end gap-2 pt-4 border-t border-border">
+                  <Button variant="outline" onClick={() => openEditModal(selectedPayment)}>
+                    <Edit2 className="w-4 h-4 mr-2" />
+                    Edit Request
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         </div>
