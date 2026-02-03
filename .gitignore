@@ -47,3 +47,4 @@ service-account.json
 note.txt
 
 drive-tokens.json
+.env*.local
