@@ -41,5 +41,25 @@ jobs:
       - name: Lint check
         run: npm run lint
 
+      - name: Install sops
+        uses: mozilla/sops-action@v2
+        with:
+          version: '3.8.1'
+
+      - name: Configure age key
+        run: |
+          mkdir -p ~/.config/sops/age
+          echo "${AGE_KEY}" > ~/.config/sops/age/keys.txt
+        env:
+          AGE_KEY: ${{ secrets.AGE_KEY }}
+
+      - name: Decrypt test env
+        run: |
+          sops --config platform/vercel/.sops.yaml -d platform/vercel/envs/development.sops.env > .env.test
+          test -s .env.test
+
+      - name: Test
+        run: npm test
+
       - name: Build check
         run: npm run build

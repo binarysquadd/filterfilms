@@ -1,0 +1,38 @@
+name: drive-backup
+
+on:
+  workflow_dispatch:
+  # schedule:
+  #   - cron: '0 2 * * *' # daily 02:00 UTC
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Drive backup
+        run: npx tsx scripts/drive-backup.ts
+        env:
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+          GOOGLE_DRIVE_FOLDER_ID: ${{ secrets.GOOGLE_DRIVE_FOLDER_ID }}
+          GOOGLE_DRIVE_BACKUP_FOLDER_ID: ${{ secrets.GOOGLE_DRIVE_BACKUP_FOLDER_ID }}
+          DRIVE_BACKUP_PREFIX: ${{ secrets.DRIVE_BACKUP_PREFIX }}
+          DRIVE_BACKUP_RETENTION: ${{ secrets.DRIVE_BACKUP_RETENTION }}
+          GOOGLE_DRIVE_BACKUP_ROOT_NAME: ${{ secrets.GOOGLE_DRIVE_BACKUP_ROOT_NAME }}
+          DRIVE_DISCORD_WEBHOOK_URL: ${{ secrets.DRIVE_DISCORD_WEBHOOK_URL }}
