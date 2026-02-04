@@ -1,0 +1,6 @@
+# keep encrypted JSONs tracked
+*.json
+!*.sops.json
+
+# legacy files
+*.sops.env

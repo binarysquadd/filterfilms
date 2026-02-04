@@ -40,7 +40,7 @@ server.listen(PORT, async () => {
   const authUrl = oauth2Client.generateAuthUrl({
     access_type: 'offline',
     prompt: 'consent', // REQUIRED ONLY THIS ONCE
-    scope: ['https://www.googleapis.com/auth/drive.file'],
+    scope: ['https://www.googleapis.com/auth/drive'],
   });
 
   console.log('Opening browser once...');

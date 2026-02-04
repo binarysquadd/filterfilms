@@ -63,3 +63,7 @@ sops --config "${SOPS_CONFIG}" -d "${ENC_FILE}" | \
     fi
     printf "%s" "${value}" | vercel env add "${key}" "${ENVIRONMENT}" --force --yes ${SENSITIVE_FLAG} --cwd .
   done
+
+
+# Last Convo With Codex
+# codex resume 019c2334-2f7f-7582-b9fc-9aa9d3724d61

@@ -48,3 +48,7 @@ note.txt
 
 drive-tokens.json
 .env*.local
+
+filterfilms-42c3e-firebase-adminsdk-fbsvc-2bfe5981e5.json
+platform/vercel/envs/filterfilms-42c3e-firebase-adminsdk-fbsvc-2bfe5981e5.json.sops.env
+platform/vercel/envs/client_secret_396585585345-19v4uhlq01d0agtibbcv8kqjbkddpmt6.apps.googleusercontent.com.json

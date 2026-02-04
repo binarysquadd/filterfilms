@@ -1,7 +1,7 @@
 SOPS_CONFIG := platform/vercel/.sops.yaml
 SOPS_FILES := $(wildcard platform/vercel/envs/*.sops.env)
 
-.PHONY: sops-encrypt sops-decrypt vercel-sync vercel-sync-all vercel-deploy-preview vercel-deploy-prod dev drive-backup test
+.PHONY: sops-encrypt sops-decrypt vercel-sync vercel-sync-all vercel-deploy-preview vercel-deploy-prod dev drive-backup test creds-encrypt creds-decrypt
 
 sops-encrypt:
 	@for f in $(SOPS_FILES); do \
@@ -12,6 +12,14 @@ sops-decrypt:
 	@for f in $(SOPS_FILES); do \
 		sops --config $(SOPS_CONFIG) -d -i $$f; \
 	done
+
+creds-encrypt:
+	@sops --config $(SOPS_CONFIG) -e -i platform/creds/gcp-oauth-client.sops.json
+	@sops --config $(SOPS_CONFIG) -e -i platform/creds/firebase-admin.sops.json
+
+creds-decrypt:
+	@sops --config $(SOPS_CONFIG) -d -i platform/creds/gcp-oauth-client.sops.json
+	@sops --config $(SOPS_CONFIG) -d -i platform/creds/firebase-admin.sops.json
 
 vercel-sync:
 	@if [ -z "$(ENV)" ]; then \
