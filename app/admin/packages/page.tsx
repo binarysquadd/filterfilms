@@ -149,6 +149,7 @@ export default function PackageManagement({ initialPackages }: Props) {
     });
 
     if (!response.ok) {
+      toast.error('Image upload failed');
       throw new Error('Image upload failed');
     }
 
