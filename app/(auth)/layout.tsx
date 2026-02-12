@@ -23,7 +23,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
   return (
     <div className="h-screen flex bg-white overflow-hidden">
       {/* Left Side */}
-      <div className="hidden lg:flex lg:w-1/2 bg-emerald-800 px-12 py-8 flex-col justify-between relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 bg-primary px-12 py-8 flex-col justify-between relative overflow-hidden">
         <Link
           href="/"
           className="absolute top-6 left-6 z-20 inline-flex items-center gap-2 text-ivory/80 hover:text-ivory transition"
@@ -34,7 +34,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
         <div className="relative z-10 flex flex-col items-center justify-center flex-1 text-center">
           <Image
-            src="/logo/white.png"
+            src="/logo/new_logo_white.png"
             alt="Filter Film Studio Logo"
             width={260}
             height={120}

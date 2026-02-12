@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { Button } from '@/app/src/components/ui/button';
 import { useEffect, useState } from 'react';
-import { Loader2, Eye, Trash2, Mail, Phone } from 'lucide-react';
+import { Loader2, Eye, Trash2, Mail, Phone, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import DeleteModal from '@/app/src/components/common/modal/delete-modal';
 import { ContactMessage } from '@/app/types/contact-message';
@@ -137,18 +137,18 @@ export default function ContactMessagesPage() {
         />
 
         {/* Table */}
-        <div className="bg-card rounded-xl shadow-card overflow-auto">
+        <div className="bg-card rounded-xl overflow-x-auto">
           <table className="w-full">
-            <thead>
-              <tr>
+            <thead className="bg-muted/50">
+              <tr className="font-medium text-sm text-muted-foreground text-left">
                 <th className="p-3 text-left">Contact</th>
-                <th className="p-3">Message</th>
-                <th className="p-3">Event</th>
-                <th className="p-3">Received</th>
-                <th className="p-3">Actions</th>
+                <th className="p-3 text-left">Message</th>
+                <th className="p-3 text-left">Event</th>
+                <th className="p-3 text-left">Received</th>
+                <th className="p-3 text-left">Actions</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-border">
               {loading ? (
                 <tr>
                   <td colSpan={5} className="text-center p-4">
@@ -163,7 +163,7 @@ export default function ContactMessagesPage() {
                 </tr>
               ) : (
                 filteredMessages.map((msg) => (
-                  <tr key={msg.id}>
+                  <tr key={msg.id} className="hover:bg-muted/30 cursor-pointer">
                     <td className="p-3">
                       <div>{msg.name}</div>
                       <div className="text-sm text-muted-foreground flex gap-1 items-center">
@@ -176,15 +176,15 @@ export default function ContactMessagesPage() {
                       )}
                     </td>
                     <td className="p-3 truncate max-w-xs">{msg.message}</td>
-                    <td className="p-3 text-center">{msg.eventDate ?? 'N/A'}</td>
-                    <td className="p-3 text-center">
+                    <td className="p-3 text-left">{msg.eventDate ?? 'N/A'}</td>
+                    <td className="p-3 text-left">
                       {new Date(msg.createdAt).toLocaleDateString()}
                     </td>
-                    <td className="p-3 text-center space-x-2">
-                      <Button size="sm" variant="ghost" onClick={() => openViewModal(msg)}>
+                    <td className="p-3 text-left space-x-2">
+                      <Button size="sm" variant="cancel" onClick={() => openViewModal(msg)}>
                         <Eye className="w-4 h-4" />
                       </Button>
-                      <Button size="sm" variant="ghost" onClick={() => openDeleteModal(msg.id)}>
+                      <Button size="sm" variant="cancel" onClick={() => openDeleteModal(msg.id)}>
                         <Trash2 className="w-4 h-4 text-red-500" />
                       </Button>
                     </td>
@@ -202,8 +202,8 @@ export default function ContactMessagesPage() {
           <div className="bg-card rounded-xl max-w-2xl w-full p-6 space-y-4">
             <div className="flex justify-between">
               <h2 className="text-xl font-bold">Message Details</h2>
-              <Button size="sm" variant="ghost" onClick={() => setViewModalOpen(false)}>
-                ✕
+              <Button size="icon" variant="close" onClick={() => setViewModalOpen(false)}>
+                <X className="w-4 h-4" />
               </Button>
             </div>
 
@@ -225,11 +225,13 @@ export default function ContactMessagesPage() {
               <p>
                 <strong>Message:</strong>
               </p>
-              <p className="bg-muted p-3 rounded">{selectedMessage.message}</p>
+              <p className="p-3">{selectedMessage.message}</p>
             </div>
 
             <div className="flex justify-end">
-              <Button onClick={() => setViewModalOpen(false)}>Close</Button>
+              <Button size="sm" variant="default" onClick={() => setViewModalOpen(false)}>
+                Close
+              </Button>
             </div>
           </div>
         </div>

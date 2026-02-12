@@ -61,7 +61,8 @@ export default function AssignmentsPage() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [selectedAssignment, setSelectedAssignment] = useState<AssignmentTeamMember | null>(null);
-  const [updating, setUpdating] = useState(false);
+  const [updatingCommentLoading, setUpdatingCommentLoading] = useState(false);
+  const [updateCommentSuccess, setUpdateCommentSuccess] = useState(false);
   const [assignmentComments, setAssignmentComments] = useState('');
 
   useEffect(() => {
@@ -138,7 +139,7 @@ export default function AssignmentsPage() {
   const handleToggleComplete = async (assignment: AssignmentTeamMember) => {
     if (!selectedBooking) return;
 
-    setUpdating(true);
+    setUpdateCommentSuccess(true);
     try {
       const updatedAssignments = selectedBooking.assignments.map((a) =>
         a.memberId === assignment.memberId && a.category === assignment.category
@@ -176,14 +177,14 @@ export default function AssignmentsPage() {
     } catch {
       toast.error('Failed to update assignment');
     } finally {
-      setUpdating(false);
+      setUpdateCommentSuccess(false);
     }
   };
 
   const handleUpdateComments = async () => {
     if (!selectedBooking || !selectedAssignment) return;
 
-    setUpdating(true);
+    setUpdatingCommentLoading(true);
     try {
       const updatedAssignments = selectedBooking.assignments.map((a) =>
         a.memberId === selectedAssignment.memberId && a.category === selectedAssignment.category
@@ -213,7 +214,7 @@ export default function AssignmentsPage() {
     } catch {
       toast.error('Failed to update comments');
     } finally {
-      setUpdating(false);
+      setUpdatingCommentLoading(false);
     }
   };
 
@@ -233,7 +234,7 @@ export default function AssignmentsPage() {
     return (
       <div className="space-y-6 animate-fade-in">
         <Button
-          variant="ghost"
+          variant="cancel"
           size="sm"
           onClick={() => {
             setSelectedBooking(null);
@@ -246,14 +247,15 @@ export default function AssignmentsPage() {
           Back to Assignments
         </Button>
 
-        <div className="bg-card rounded-xl shadow-card overflow-hidden">
-          <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-6 border-b border-border">
+        {/* Event Header */}
+        <div className="bg-card rounded-xl border border-border overflow-hidden">
+          <div className="bg-primary/10 p-6 border-b border-border">
             <div className="flex items-start justify-between">
               <div>
-                <h2 className="font-heading text-2xl font-bold text-foreground">
+                <h2 className="font-heading text-2xl font-bold text-foreground mb-1">
                   {selectedBooking.eventName}
                 </h2>
-                <p className="text-muted-foreground mt-1">{selectedBooking.eventType}</p>
+                <p className="text-muted-foreground text-sm">{selectedBooking.eventType}</p>
               </div>
               <span
                 className={`px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 border ${statusConfig[selectedBooking.status].color}`}
@@ -264,60 +266,116 @@ export default function AssignmentsPage() {
             </div>
           </div>
 
-          <div className="p-6 space-y-6">
-            <div className="bg-gradient-to-br from-primary/5 to-primary/10 rounded-xl p-5 border border-primary/20">
-              <div className="flex items-start gap-4">
-                <div className="w-16 h-16 rounded-xl bg-primary/20 flex flex-col items-center justify-center border-2 border-primary/30">
-                  <span className="text-2xl font-bold text-primary">
+          {/* Key Information Grid */}
+          <div className="p-6 grid md:grid-cols-3 gap-4">
+            {/* Date */}
+            <div className="bg-muted/50 rounded-lg p-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-lg bg-primary/20 flex flex-col items-center justify-center">
+                  <span className="text-lg font-bold text-primary">
                     {new Date(selectedBooking.startDate).getDate()}
                   </span>
-                  <span className="text-xs uppercase text-primary font-medium">
+                  <span className="text-[9px] uppercase text-primary font-medium">
                     {new Date(selectedBooking.startDate).toLocaleDateString('en-US', {
                       month: 'short',
                     })}
                   </span>
                 </div>
-                <div className="flex-1">
-                  <p className="text-sm text-muted-foreground mb-1">Event Date</p>
-                  <p className="font-semibold text-lg text-foreground">
+                <div>
+                  <p className="text-xs text-muted-foreground mb-0.5">Event Date</p>
+                  <p className="font-semibold text-sm">
                     {formatDateRange(selectedBooking.startDate, selectedBooking.endDate)}
                   </p>
-                  <p className="text-sm text-primary font-medium mt-1">
+                  <p className="text-xs text-primary font-medium">
                     {getDaysUntil(selectedBooking.startDate)}
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-muted/30 rounded-xl p-5">
+            {/* Venue */}
+            <div className="bg-muted/50 rounded-lg p-4">
               <div className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 text-primary mt-0.5" />
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">Venue</p>
-                  <p className="font-semibold text-foreground">{selectedBooking.venue}</p>
+                  <p className="text-xs text-muted-foreground mb-0.5">Venue</p>
+                  <p className="font-semibold text-sm">{selectedBooking.venue}</p>
                 </div>
               </div>
             </div>
 
-            <div>
-              <Label className="text-sm text-muted-foreground mb-2 block">Packages</Label>
-              <div className="space-y-2">
+            {/* Progress */}
+            <div className="bg-muted/50 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <Check className="w-5 h-5 text-primary mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-xs text-muted-foreground mb-0.5">Tasks Progress</p>
+                  <p className="font-semibold text-sm mb-2">
+                    {myAssignments.filter((a) => a.isCompleted).length} / {myAssignments.length}{' '}
+                    Completed
+                  </p>
+                  <div className="w-full bg-muted rounded-full h-1.5">
+                    <div
+                      className="bg-primary h-1.5 rounded-full transition-all"
+                      style={{
+                        width: `${(myAssignments.filter((a) => a.isCompleted).length / myAssignments.length) * 100}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content - Two Columns */}
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* Left Column - Packages & Tasks */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Packages */}
+            <div className="bg-card rounded-xl border border-border">
+              <div className="px-6 py-4 border-b border-border">
+                <h3 className="font-semibold text-lg flex items-center gap-2">
+                  Assigned Packages
+                  <span className="text-xs text-muted-foreground font-normal">
+                    ({selectedBooking.packages.length})
+                  </span>
+                </h3>
+              </div>
+              <div className="p-6 space-y-3">
                 {selectedBooking.packages.map((pkg, index) => (
-                  <div key={index} className="bg-muted/30 rounded-lg p-3">
-                    <p className="font-medium">{pkg.name}</p>
-                    <p className="text-xs text-muted-foreground capitalize">{pkg.category}</p>
-                    <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
-                      <Calendar className="w-3 h-3" />
-                      {formatDateRange(pkg.startDate, pkg.endDate)}
-                    </p>
+                  <div
+                    key={index}
+                    className="bg-muted/30 rounded-lg p-4 border border-border hover:border-primary/50 transition-colors"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <p className="font-medium text-foreground mb-1">{pkg.name}</p>
+                        <p className="text-xs text-muted-foreground capitalize mb-2">
+                          {pkg.category}
+                        </p>
+                        <p className="text-xs text-muted-foreground flex items-center gap-1">
+                          <Calendar className="w-3 h-3" />
+                          {formatDateRange(pkg.startDate, pkg.endDate)}
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div>
-              <Label className="text-sm text-muted-foreground mb-3 block">My Tasks</Label>
-              <div className="space-y-3">
+            {/* Tasks */}
+            <div className="bg-card rounded-xl border border-border">
+              <div className="px-6 py-4 border-b border-border">
+                <h3 className="font-semibold text-lg flex items-center gap-2">
+                  My Tasks
+                  <span className="text-xs text-muted-foreground font-normal">
+                    ({myAssignments.length})
+                  </span>
+                </h3>
+              </div>
+              <div className="p-6 space-y-3">
                 {myAssignments.map((assignment, index) => (
                   <div
                     key={index}
@@ -344,8 +402,8 @@ export default function AssignmentsPage() {
                       <div
                         className={`px-3 py-1 rounded-full text-xs font-medium ${
                           assignment.isCompleted
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-yellow-100 text-yellow-700'
+                            ? 'bg-green-100 text-green-700 border border-green-200'
+                            : 'bg-yellow-100 text-yellow-700 border border-yellow-200'
                         }`}
                       >
                         {assignment.isCompleted ? 'Completed' : 'In Progress'}
@@ -368,71 +426,94 @@ export default function AssignmentsPage() {
                 ))}
               </div>
             </div>
+          </div>
 
+          {/* Right Column - Actions */}
+          <div className="space-y-6">
+            {/* Task Actions */}
             {selectedAssignment && (
-              <div className="bg-muted/30 rounded-xl p-5 space-y-4">
-                <h4 className="font-semibold text-foreground">Task Actions</h4>
-
-                <div>
-                  <Label className="text-sm">Add/Update Comments</Label>
-                  <Textarea
-                    value={assignmentComments}
-                    onChange={(e) => setAssignmentComments(e.target.value)}
-                    placeholder="Add comments about your progress..."
-                    className="mt-1"
-                    rows={3}
-                  />
+              <div className="bg-card rounded-xl border border-border sticky top-6">
+                <div className="px-6 py-4 border-b border-border flex items-center justify-between">
+                  <h4 className="font-semibold">Task Actions</h4>
                   <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={handleUpdateComments}
-                    disabled={updating}
+                    variant="close"
+                    size="icon"
                     className="mt-2"
+                    onClick={() => setSelectedAssignment(null)}
                   >
-                    {updating ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Updating...
-                      </>
-                    ) : (
-                      'Update Comments'
-                    )}
+                    <X className="w-4 h-4" />
                   </Button>
                 </div>
+                <div className="p-6 space-y-4">
+                  <div>
+                    <Label className="text-sm mb-2">Comments</Label>
+                    <Textarea
+                      value={assignmentComments}
+                      onChange={(e) => setAssignmentComments(e.target.value)}
+                      placeholder="Add comments about your progress..."
+                      className="mt-1"
+                      rows={4}
+                    />
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={handleUpdateComments}
+                      disabled={updatingCommentLoading || updateCommentSuccess}
+                      className="mt-2 w-full"
+                    >
+                      {updatingCommentLoading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Updating...
+                        </>
+                      ) : (
+                        'Update Comments'
+                      )}
+                    </Button>
+                  </div>
 
-                <Button
-                  onClick={() => handleToggleComplete(selectedAssignment)}
-                  disabled={updating}
-                  className="w-full"
-                >
-                  {updating ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Processing...
-                    </>
-                  ) : selectedAssignment.isCompleted ? (
-                    <>
-                      <X className="w-4 h-4 mr-2" />
-                      Mark as Incomplete
-                    </>
-                  ) : (
-                    <>
-                      <Check className="w-4 h-4 mr-2" />
-                      Mark as Complete
-                    </>
-                  )}
-                </Button>
+                  <div className="pt-4 border-t border-border">
+                    <Button
+                      onClick={() => handleToggleComplete(selectedAssignment)}
+                      disabled={updatingCommentLoading || updateCommentSuccess}
+                      className="w-full"
+                    >
+                      {updateCommentSuccess ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Processing...
+                        </>
+                      ) : selectedAssignment.isCompleted ? (
+                        <>
+                          <X className="w-4 h-4 mr-2" />
+                          Mark as Incomplete
+                        </>
+                      ) : (
+                        <>
+                          <Check className="w-4 h-4 mr-2" />
+                          Mark as Complete
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
               </div>
             )}
 
+            {/* Notes */}
             {selectedBooking.notes && (
-              <div className="bg-muted/30 rounded-xl p-5">
-                <p className="text-sm text-muted-foreground mb-2">Additional Notes</p>
-                <p className="text-sm text-foreground">{selectedBooking.notes}</p>
+              <div className="bg-card rounded-xl border border-border">
+                <div className="px-6 py-4 border-b border-border">
+                  <h4 className="font-semibold text-sm">Additional Notes</h4>
+                </div>
+                <div className="p-6">
+                  <p className="text-sm text-muted-foreground">{selectedBooking.notes}</p>
+                </div>
               </div>
             )}
 
-            <div className="pt-4 border-t border-border">
+            {/* Metadata */}
+            <div className="bg-muted/30 rounded-lg p-4 border border-border">
               <p className="text-xs text-muted-foreground">
                 <span className="font-mono">ID: {selectedBooking.id.slice(0, 8)}</span>
                 {' • '}
@@ -509,7 +590,7 @@ export default function AssignmentsPage() {
         </div>
       </div>
 
-      <div className="bg-card rounded-xl shadow-card overflow-hidden">
+      <div className="bg-card rounded-xl overflow-hidden">
         {filteredBookings.length === 0 ? (
           <div className="p-12 text-center">
             <Calendar className="w-20 h-20 mx-auto text-muted-foreground mb-4 opacity-30" />
@@ -552,7 +633,7 @@ export default function AssignmentsPage() {
                     <tr
                       key={booking.id}
                       onClick={() => setSelectedBooking(booking)}
-                      className="hover:bg-accent/50 cursor-pointer transition-colors"
+                      className="hover:bg-muted/50 cursor-pointer transition-colors"
                     >
                       <td className="p-4">
                         <p className="font-medium text-foreground">{booking.eventName}</p>

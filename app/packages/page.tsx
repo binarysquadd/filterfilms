@@ -4,10 +4,11 @@ import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Packages, Category, CATEGORY } from '@/app/types/package';
-import { useAuth } from '../lib/firebase/auth-context';
+
 import toast from 'react-hot-toast';
 import { Loader2, ChevronDown } from 'lucide-react';
 import SectionHeader from '@/app/src/components/common/SectionHeader';
+import { useAuth } from '../lib/firebase/auth-context';
 
 type PackageWithCategoryAndSub = {
   id: string;
@@ -57,6 +58,7 @@ export default function PackagesPage() {
   const [loading, setLoading] = useState(true);
 
   const isLoggedIn = !!user;
+  const role = user?.role || 'customer'; // default to 'customer' if role is missing
 
   /* --------------------------------
        FETCH
@@ -110,6 +112,30 @@ export default function PackagesPage() {
 
     return list;
   }, [packageGroups, activeCategory, activeWeddingSub]);
+
+  /* --------------------------------
+      ROLE-BASED NAVIGATION
+   --------------------------------- */
+  const handleBookNow = () => {
+    if (!role) {
+      toast.error('Unable to determine user role');
+      return;
+    }
+
+    const dashboardRoutes: Record<string, string> = {
+      admin: '/admin/dashboard',
+      customer: '/customer/dashboard',
+      team: '/team/dashboard',
+    };
+
+    const route = dashboardRoutes[role];
+
+    if (route) {
+      router.push(route);
+    } else {
+      toast.error('Invalid user role');
+    }
+  };
 
   return (
     <section className="py-20">
@@ -219,10 +245,10 @@ export default function PackagesPage() {
                         </div>
 
                         <button
-                          onClick={() => router.push(`/customer/inquiries/new?packageId=${pkg.id}`)}
+                          onClick={handleBookNow}
                           className="px-5 py-2 bg-primary text-white text-sm font-medium rounded-full hover:bg-primary/90 transition"
                         >
-                          Inquire
+                          Book Now
                         </button>
                       </div>
                     ) : (

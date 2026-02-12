@@ -229,9 +229,7 @@ export default function SignInForm({ callbackUrl }: { callbackUrl?: string }) {
                 fill="#EA4335"
               />
             </svg>
-            <span className="text-black hover:text-ivory-dark font-medium">
-              Continue with Google
-            </span>
+            <span className="text-black font-medium">Continue with Google</span>
           </>
         )}
       </Button>
