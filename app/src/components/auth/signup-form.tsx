@@ -277,7 +277,7 @@ export default function SignUpForm({ callbackUrl }: { callbackUrl?: string }) {
       <Button
         type="button"
         variant="elegant"
-        className="w-full py-2.5 flex items-center justify-center gap-3"
+        className="w-full py-2.5 border transition-colors flex items-center justify-center gap-3 text-ivory"
         onClick={handleGoogleSignUp}
         disabled={anyLoading}
       >
@@ -303,7 +303,7 @@ export default function SignUpForm({ callbackUrl }: { callbackUrl?: string }) {
                 fill="#EA4335"
               />
             </svg>
-            <span className="font-medium">Continue with Google</span>
+            <span className="font-medium text-black">Continue with Google</span>
           </>
         )}
       </Button>

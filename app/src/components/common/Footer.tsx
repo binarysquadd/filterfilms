@@ -15,7 +15,7 @@ export default function Footer() {
             {/* Logo Image */}
             <div className="mb-4">
               <Image
-                src="/logo/logo.png" // replace with your logo path
+                src="/logo/new_logo.png" // replace with your logo path
                 alt="Filter Film Studio"
                 width={160}
                 height={50}

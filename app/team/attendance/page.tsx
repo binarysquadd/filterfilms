@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { Calendar, Clock, Users, TrendingUp, Loader2 } from 'lucide-react';
+import { Calendar, Clock, Users, TrendingUp, Loader2, CheckCircle, XCircle } from 'lucide-react';
 import { Attendance } from '@/app/types/attendance';
 import { Button } from '@/app/src/components/ui/button';
 import { useAuth } from '@/app/lib/firebase/auth-context';
@@ -208,154 +208,190 @@ export default function TeamAttendancePage() {
   const years = Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i);
 
   return (
-    <div className="min-h-screen  p-6">
+    <div className="min-h-screen p-6">
       <div className="max-w-7xl mx-auto space-y-6">
+        {/* Header */}
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-foreground">Attendance Tracker</h1>
-            <p className="text-muted-foreground">Track your daily attendance and working hours</p>
+            <p className="text-muted-foreground mt-1">
+              Track your daily attendance and working hours
+            </p>
           </div>
-          <div className="flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-lg shadow">
-            <Calendar className="w-5 h-5 text-foreground" />
-            <span className="font-medium text-foreground">{today}</span>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-card rounded-xl shadow-lg p-6 border-t-4 border-border">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-muted-foreground text-sm">Total Days</p>
-                <p className="text-3xl font-bold text-foreground mt-1">{totalDays}</p>
-              </div>
-              <Calendar className="w-12 h-12 text-foreground opacity-20" />
-            </div>
-          </div>
-
-          <div className="bg-card rounded-xl shadow-lg p-6 border-t-4 border-border">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-muted-foreground text-sm">Present Days</p>
-                <p className="text-3xl font-bold text-foreground mt-1">{presentDays}</p>
-              </div>
-              <Users className="w-12 h-12 text-foreground opacity-20" />
-            </div>
-          </div>
-
-          <div className="bg-card rounded-xl shadow-lg p-6 border-t-4 border-border">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-muted-foreground text-sm">Attendance Rate</p>
-                <p className="text-3xl font-bold text-foreground mt-1">{attendanceRate}%</p>
-              </div>
-              <TrendingUp className="w-12 h-12 text-foreground opacity-20" />
-            </div>
+          <div className="flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-lg">
+            <Calendar className="w-5 h-5 text-primary" />
+            <span className="font-semibold text-foreground">
+              {new Date(today).toLocaleDateString('en-IN', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric',
+              })}
+            </span>
           </div>
         </div>
 
-        <div className="bg-popover rounded-xl shadow-xl p-8 text-foreground">
-          <div className="flex items-center gap-3 mb-6">
-            <Clock className="w-8 h-8" />
-            <h2 className="text-2xl font-bold">Today&apos;s Attendance</h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-card backdrop-blur rounded-lg p-4 border border-border">
-              <p className="text-muted-foreground text-sm mb-1">Status</p>
-              <p className="text-xl font-semibold">{todayRecord?.status || 'Not Marked'}</p>
-            </div>
-
-            <div className="bg-card backdrop-blur rounded-lg p-4 border border-border">
-              <p className="text-muted-foreground text-sm mb-1">Check In</p>
-              <p className="text-xl font-semibold">{todayRecord?.checkIn || '—'}</p>
-            </div>
-
-            <div className="bg-card backdrop-blur rounded-lg p-4 border border-border">
-              <p className="text-muted-foreground text-sm mb-1">Check Out</p>
-              <p className="text-xl font-semibold">{todayRecord?.checkOut || '—'}</p>
-            </div>
-
-            <div className="bg-card backdrop-blur rounded-lg p-4 border border-border">
-              <p className="text-muted-foreground text-sm mb-1">Working Hours</p>
-              <p className="text-xl font-semibold">
-                {calculateHours(todayRecord?.checkIn, todayRecord?.checkOut)}
-              </p>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-card rounded-xl border border-border p-6 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Total Days</p>
+                <p className="text-3xl font-bold text-foreground">{totalDays}</p>
+              </div>
+              <div className="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center">
+                <Calendar className="w-6 h-6 text-blue-600" />
+              </div>
             </div>
           </div>
 
-          {/* Action Buttons - Stack on mobile */}
-          <div className="flex flex-col sm:flex-row gap-3 mt-2">
-            {!todayRecord ? (
-              <Button
-                onClick={handleMarkAttendance}
-                disabled={actionLoading === 'mark'}
-                size={'lg'}
-              >
-                {actionLoading === 'mark' ? (
-                  <div className="flex items-center gap-2">
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Marking...</span>
-                  </div>
-                ) : (
-                  <span>Mark Attendance</span>
-                )}
-              </Button>
-            ) : (
-              <>
+          <div className="bg-card rounded-xl border border-border p-6 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Present Days</p>
+                <p className="text-3xl font-bold text-foreground">{presentDays}</p>
+              </div>
+              <div className="w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center">
+                <CheckCircle className="w-6 h-6 text-green-600" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-card rounded-xl border border-border p-6 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Attendance Rate</p>
+                <p className="text-3xl font-bold text-foreground">{attendanceRate}%</p>
+              </div>
+              <div className="w-12 h-12 rounded-lg bg-purple-100 flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 text-purple-600" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Today's Attendance Card */}
+        <div className="bg-card rounded-xl border border-border overflow-hidden">
+          <div className="bg-muted px-6 py-4 border-b border-border">
+            <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
+              <Clock className="w-6 h-6" />
+              Today&#39;s Attendance
+            </h2>
+          </div>
+
+          <div className="p-6">
+            {/* Info Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+              <div className="bg-muted/50 rounded-lg p-4">
+                <p className="text-xs text-muted-foreground mb-1">Status</p>
+                <p className="text-lg font-semibold text-foreground capitalize">
+                  {todayRecord?.status || 'Not Marked'}
+                </p>
+              </div>
+
+              <div className="bg-muted/50 rounded-lg p-4">
+                <p className="text-xs text-muted-foreground mb-1">Check In</p>
+                <p className="text-lg font-semibold text-foreground">
+                  {todayRecord?.checkIn || '—'}
+                </p>
+              </div>
+
+              <div className="bg-muted/50 rounded-lg p-4">
+                <p className="text-xs text-muted-foreground mb-1">Check Out</p>
+                <p className="text-lg font-semibold text-foreground">
+                  {todayRecord?.checkOut || '—'}
+                </p>
+              </div>
+
+              <div className="bg-muted/50 rounded-lg p-4">
+                <p className="text-xs text-muted-foreground mb-1">Working Hours</p>
+                <p className="text-lg font-semibold text-foreground">
+                  {calculateHours(todayRecord?.checkIn, todayRecord?.checkOut)}
+                </p>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex flex-wrap gap-3">
+              {!todayRecord ? (
                 <Button
-                  variant="outline"
-                  onClick={handlePunchIn}
-                  disabled={!!todayRecord?.checkIn || actionLoading === 'punchIn'}
-                  size={'sm'}
+                  onClick={handleMarkAttendance}
+                  disabled={actionLoading === 'mark'}
+                  size="sm"
                 >
-                  {actionLoading === 'punchIn' ? (
-                    <div className="flex items-center gap-2">
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Punching In...</span>
-                    </div>
+                  {actionLoading === 'mark' ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Marking...
+                    </>
                   ) : (
-                    <span>Punch In</span>
+                    <>
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      Mark Attendance
+                    </>
                   )}
                 </Button>
+              ) : (
+                <div className="flex gap-3 flex-wrap">
+                  <Button
+                    variant="outline"
+                    onClick={handlePunchIn}
+                    disabled={!!todayRecord?.checkIn || actionLoading === 'punchIn'}
+                    size={'sm'}
+                  >
+                    {actionLoading === 'punchIn' ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Punching In...
+                      </>
+                    ) : (
+                      <>
+                        <Clock className="w-4 h-4 mr-2" />
+                        Punch In
+                      </>
+                    )}
+                  </Button>
 
-                <Button
-                  variant="destructive"
-                  onClick={handlePunchOut}
-                  disabled={
-                    !todayRecord?.checkIn || !!todayRecord?.checkOut || actionLoading === 'punchOut'
-                  }
-                  size={'sm'}
-                >
-                  {actionLoading === 'punchOut' ? (
-                    <div className="flex items-center gap-2">
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Punching Out...</span>
-                    </div>
-                  ) : (
-                    <span>Punch Out</span>
-                  )}
-                </Button>
-              </>
-            )}
+                  <Button
+                    variant="destructive"
+                    onClick={handlePunchOut}
+                    disabled={
+                      !todayRecord?.checkIn ||
+                      !!todayRecord?.checkOut ||
+                      actionLoading === 'punchOut'
+                    }
+                    size={'sm'}
+                  >
+                    {actionLoading === 'punchOut' ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Punching Out...
+                      </>
+                    ) : (
+                      <>
+                        <XCircle className="w-4 h-4 mr-2" />
+                        Punch Out
+                      </>
+                    )}
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
-        <div className="bg-card rounded-xl shadow-lg p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">Attendance History</h2>
+        {/* Attendance History */}
+        <div className="bg-card rounded-xl border-border overflow-hidden">
+          <div className="px-6 py-4 border-b border-border flex items-center justify-between flex-wrap gap-4 bg-muted/50">
+            <h2 className="text-xl font-bold text-foreground">Attendance History</h2>
 
             <div className="flex gap-3">
               <select
                 value={selectedMonth}
                 onChange={(e) => setSelectedMonth(Number(e.target.value))}
-                className="px-4 py-2 border border-border rounded-lg"
+                className="px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 {months.map((month, index) => (
-                  <option
-                    key={index}
-                    value={index}
-                    className="border border-border rounded-lg bg-muted text-muted-foreground"
-                  >
+                  <option key={index} value={index}>
                     {month}
                   </option>
                 ))}
@@ -364,14 +400,10 @@ export default function TeamAttendancePage() {
               <select
                 value={selectedYear}
                 onChange={(e) => setSelectedYear(Number(e.target.value))}
-                className="px-4 py-2 border border-border rounded-lg"
+                className="px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 {years.map((year) => (
-                  <option
-                    key={year}
-                    value={year}
-                    className="border border-border rounded-lg bg-muted text-muted-foreground"
-                  >
+                  <option key={year} value={year}>
                     {year}
                   </option>
                 ))}
@@ -380,23 +412,32 @@ export default function TeamAttendancePage() {
           </div>
 
           {loading ? (
-            <div className="text-center py-12 text-foreground">Loading...</div>
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-8 h-8 animate-spin " />
+            </div>
           ) : filteredAttendance.length === 0 ? (
-            <div className="text-center py-12 text-foreground">
-              No attendance records for {months[selectedMonth]} {selectedYear}
+            <div className="text-center py-12">
+              <Users className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
+              <p className="text-muted-foreground">
+                No attendance records for {months[selectedMonth]} {selectedYear}
+              </p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="bg-card border-b-2 border-border">
-                    <th className="text-left p-4 font-semibold text-foreground">Date</th>
-                    <th className="text-left p-4 font-semibold text-foreground">Day</th>
-                    <th className="text-left p-4 font-semibold text-foreground">Status</th>
-                    <th className="text-left p-4 font-semibold text-foreground">Check In</th>
-                    <th className="text-left p-4 font-semibold text-foreground">Check Out</th>
-                    <th className="text-left p-4 font-semibold text-foreground">Hours</th>
-                    <th className="text-left p-4 font-semibold text-foreground">Notes</th>
+                  <tr className="bg-muted/50 border-b border-border">
+                    <th className="text-left p-4 font-semibold text-foreground text-sm">Date</th>
+                    <th className="text-left p-4 font-semibold text-foreground text-sm">Day</th>
+                    <th className="text-left p-4 font-semibold text-foreground text-sm">Status</th>
+                    <th className="text-left p-4 font-semibold text-foreground text-sm">
+                      Check In
+                    </th>
+                    <th className="text-left p-4 font-semibold text-foreground text-sm">
+                      Check Out
+                    </th>
+                    <th className="text-left p-4 font-semibold text-foreground text-sm">Hours</th>
+                    <th className="text-left p-4 font-semibold text-foreground text-sm">Notes</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -408,36 +449,38 @@ export default function TeamAttendancePage() {
                       const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'short' });
 
                       return (
-                        <tr
-                          key={date}
-                          className="hover:bg-popover transition-colors cursor-pointer"
-                        >
-                          <td className="p-4 font-medium text-foreground">{date}</td>
-                          <td className="p-4 text-foreground">{dayName}</td>
+                        <tr key={date} className="hover:bg-muted/30 transition-colors">
+                          <td className="p-4 font-medium text-foreground text-sm">
+                            {new Date(date).toLocaleDateString('en-IN', {
+                              day: 'numeric',
+                              month: 'short',
+                            })}
+                          </td>
+                          <td className="p-4 text-foreground text-sm">{dayName}</td>
                           <td className="p-4">
                             <span
                               className={`px-3 py-1 rounded-full text-xs font-semibold ${
                                 record.status === 'present'
-                                  ? 'bg-green-100 text-green-700'
+                                  ? 'bg-green-100 text-green-700 border border-green-200'
                                   : record.status === 'absent'
-                                    ? 'bg-red-100 text-red-700'
-                                    : 'bg-yellow-100 text-yellow-700'
+                                    ? 'bg-red-100 text-red-700 border border-red-200'
+                                    : 'bg-yellow-100 text-yellow-700 border border-yellow-200'
                               }`}
                             >
                               {record.status}
                             </span>
                           </td>
-                          <td className="p-4 text-foreground">
-                            {record.checkIn || <span className="text-foreground">—</span>}
+                          <td className="p-4 text-foreground text-sm font-medium">
+                            {record.checkIn || '—'}
                           </td>
-                          <td className="p-4 text-foreground">
-                            {record.checkOut || <span className="text-foreground">—</span>}
+                          <td className="p-4 text-foreground text-sm font-medium">
+                            {record.checkOut || '—'}
                           </td>
-                          <td className="p-4 text-foreground font-medium">
+                          <td className="p-4 text-foreground text-sm font-semibold">
                             {calculateHours(record.checkIn, record.checkOut)}
                           </td>
-                          <td className="p-4 text-foreground text-sm">
-                            {record.notes || <span className="text-foreground">—</span>}
+                          <td className="p-4 text-muted-foreground text-sm">
+                            {record.notes || '—'}
                           </td>
                         </tr>
                       );

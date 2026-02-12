@@ -374,14 +374,14 @@ export default function PackageManagement({ initialPackages }: Props) {
                             </div>
                             <div className="flex gap-2">
                               <Button
-                                variant="ghost"
+                                variant="cancel"
                                 size="icon"
                                 onClick={() => openModal(packageGroup, pkg.id)}
                               >
                                 <Edit className="w-4 h-4" />
                               </Button>
                               <Button
-                                variant="ghost"
+                                variant="cancel"
                                 size="icon"
                                 className="text-destructive"
                                 onClick={() => openDeleteModal(packageGroup.id, pkg.id)}

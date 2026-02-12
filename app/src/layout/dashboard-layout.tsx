@@ -22,7 +22,6 @@ import {
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/app/lib/firebase/auth-context';
-import Image from 'next/image';
 
 // Navigation items for different roles
 const navigationConfig = {
@@ -136,14 +135,10 @@ const UnifiedDashboard: React.FC<UnifiedDashboardProps> = ({ children }) => {
         {/* Logo Header */}
         <div className="h-16 flex items-center justify-between px-4 border-b border-border flex-shrink-0">
           <div className="h-10 w-auto flex items-center">
-            <Image
-              src="/logo/logo-name.png"
-              alt="Logo"
-              width={160}
-              height={48}
-              className="object-contain w-56"
-              priority
-            />
+            {/* Page title (optional, can be customized per page) */}
+            <div className="">
+              <h1 className="text-xl font-bold text-gray-900">{config.title}</h1>
+            </div>
           </div>
           <button
             onClick={() => setSidebarOpen(false)}
@@ -226,11 +221,6 @@ const UnifiedDashboard: React.FC<UnifiedDashboardProps> = ({ children }) => {
           >
             <Menu className="w-6 h-6 text-gray-700" />
           </button>
-
-          {/* Page title (optional, can be customized per page) */}
-          <div className="hidden lg:block">
-            <h1 className="text-xl font-bold text-gray-900">{config.title}</h1>
-          </div>
 
           {/* Mobile spacer */}
           <div className="lg:hidden w-10" />

@@ -15,7 +15,8 @@
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 6%;
 
-    --primary: 168 70% 18%;
+    /* UPDATED PRIMARY COLOR (#8C2F39) */
+    --primary: 353 50% 37%;
     --primary-foreground: 60 33% 96%;
 
     --secondary: 43 65% 52%;
@@ -32,17 +33,19 @@
 
     --border: 60 15% 85%;
     --input: 60 15% 85%;
-    --ring: 168 70% 18%;
+    --ring: 353 50% 37%;
 
     --radius: 0.5rem;
 
-    /* Custom wedding theme colors */
-    --emerald: 168 70% 18%;
-    --emerald-light: 168 55% 28%;
-    --emerald-dark: 168 75% 12%;
+    /* Custom wedding theme colors (UPDATED) */
+    --emerald: 353 50% 37%;
+    --emerald-light: 353 50% 47%;
+    --emerald-dark: 353 50% 27%;
+
     --gold: 43 65% 52%;
     --gold-light: 43 70% 65%;
     --gold-dark: 43 60% 42%;
+
     --ivory: 60 33% 96%;
     --ivory-dark: 60 20% 90%;
     --cream: 60 25% 93%;
@@ -53,7 +56,9 @@
       hsl(var(--emerald)) 0%,
       hsl(var(--emerald-dark)) 100%
     );
+
     --gradient-gold: linear-gradient(135deg, hsl(var(--gold)) 0%, hsl(var(--gold-dark)) 100%);
+
     --gradient-elegant: linear-gradient(180deg, hsl(var(--ivory)) 0%, hsl(var(--cream)) 100%);
 
     /* Shadows */
@@ -63,12 +68,12 @@
 
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 0 0% 6%;
-    --sidebar-primary: 168 70% 18%;
+    --sidebar-primary: 353 50% 37%;
     --sidebar-primary-foreground: 60 33% 96%;
     --sidebar-accent: 43 65% 52%;
     --sidebar-accent-foreground: 0 0% 6%;
     --sidebar-border: 60 15% 85%;
-    --sidebar-ring: 168 70% 18%;
+    --sidebar-ring: 353 50% 37%;
   }
 }
 
@@ -125,12 +130,10 @@
     box-shadow: var(--shadow-gold);
   }
 
-  /* Mandala pattern overlay */
   .mandala-pattern {
     background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23D4AF37' fill-opacity='0.08'%3E%3Cpath d='M30 30c0-11.046 8.954-20 20-20s20 8.954 20 20-8.954 20-20 20-20-8.954-20-20zM10 30c0 11.046-8.954 20-20 20S-30 41.046-30 30s8.954-20 20-20 20 8.954 20 20z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
   }
 
-  /* Floral border pattern */
   .floral-border {
     border-image: linear-gradient(
         90deg,
@@ -141,12 +144,10 @@
       1;
   }
 
-  /* Elegant card hover */
   .card-hover {
     @apply transition-all duration-500 hover:shadow-elegant hover:-translate-y-1;
   }
 
-  /* Gold shimmer animation */
   .shimmer {
     background: linear-gradient(
       90deg,
@@ -167,7 +168,6 @@
     }
   }
 
-  /* Fade in animation */
   .animate-fade-in {
     animation: fadeIn 0.6s ease-out forwards;
   }
@@ -183,7 +183,6 @@
     }
   }
 
-  /* Scale in animation */
   .animate-scale-in {
     animation: scaleIn 0.5s ease-out forwards;
   }
@@ -199,7 +198,6 @@
     }
   }
 
-  /* Slide up animation */
   .animate-slide-up {
     animation: slideUp 0.5s ease-out forwards;
   }
@@ -215,7 +213,6 @@
     }
   }
 
-  /* Pulse glow */
   .pulse-glow {
     animation: pulseGlow 2s ease-in-out infinite;
   }
@@ -230,7 +227,6 @@
     }
   }
 
-  /* Decorative corner ornament */
   .ornament-corner {
     position: relative;
   }
@@ -295,11 +291,8 @@
   }
 }
 
-/* ================================
-   GLOBAL THIN SCROLLBAR
-================================ */
+/* GLOBAL THIN SCROLLBAR */
 
-/* Chrome, Edge, Safari */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -318,7 +311,6 @@
   background-color: rgba(0, 0, 0, 0.5);
 }
 
-/* Firefox */
 * {
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 0, 0, 0.4) transparent;

@@ -94,11 +94,11 @@ export default function Navbar() {
           {/* Center Logo */}
           <Link href="/" className="">
             <Image
-              src="/logo/logo.png"
+              src="/logo/new_logo.png"
               alt="Filter Film Studio Logo"
               width={180}
               height={60}
-              className="object-contain w-28 hover:scale-105 transition-transform"
+              className="object-contain w-24 hover:scale-105 transition-transform"
             />
           </Link>
 
